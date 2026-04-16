@@ -8,6 +8,7 @@ app/build/
 local.properties
 
 # IDE - only ignore local/cache files
+/.idea/
 /.idea/caches
 /.idea/libraries
 /.idea/modules.xml
