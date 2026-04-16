@@ -1,0 +1,32 @@
+# Gradle
+*.iml
+.gradle
+/build
+app/build/
+
+# Local config (machine-specific, never commit)
+local.properties
+
+# IDE - only ignore local/cache files
+/.idea/caches
+/.idea/libraries
+/.idea/modules.xml
+/.idea/workspace.xml
+/.idea/navEditor.xml
+/.idea/assetWizardSettings.xml
+
+# OS
+.DS_Store
+
+# Native build
+.externalNativeBuild
+.cxx
+
+# Build outputs
+*.apk
+*.aab
+*.ap_
+
+# Signing keys (sensitive!)
+*.keystore
+*.jks
