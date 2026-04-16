@@ -4,8 +4,11 @@ import android.os.Bundle;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowCompat;
+import androidx.core.view.WindowInsetsControllerCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -30,6 +33,7 @@ public class Home extends AppCompatActivity {
         setContentView(R.layout.activity_home);
 
         initializeViews();
+        setupSystemBars();
         applyWindowInsets();
         setupBottomNavigation();
         setupProductSections();
@@ -39,6 +43,16 @@ public class Home extends AppCompatActivity {
         bestSellersRecyclerView = findViewById(R.id.bestSellersRecyclerView);
         recommendationsRecyclerView = findViewById(R.id.recommendationsRecyclerView);
         bottomNavigationView = findViewById(R.id.bottomNavigation);
+    }
+
+    private void setupSystemBars() {
+        getWindow().setStatusBarColor(ContextCompat.getColor(this, R.color.home_background));
+
+        WindowInsetsControllerCompat insetsController =
+                WindowCompat.getInsetsController(getWindow(), findViewById(R.id.main));
+        if (insetsController != null) {
+            insetsController.setAppearanceLightStatusBars(true);
+        }
     }
 
     private void applyWindowInsets() {
