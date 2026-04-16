@@ -2,4 +2,30 @@
 <resources>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+    <color name="home_background">#FFFFFFFF</color>
+    <color name="home_white">#FFFFFFFF</color>
+    <color name="home_text_primary">#111111</color>
+    <color name="home_text_secondary">#303030</color>
+    <color name="home_text_hint">#7C7A78</color>
+    <color name="home_section_link">#80796F</color>
+    <color name="home_surface_subtle">#F6F4F1</color>
+    <color name="home_chip_border">#E7DED3</color>
+    <color name="home_chip_text">#2A2A2A</color>
+    <color name="home_balance_background">#1E1E1F</color>
+    <color name="home_balance_label">#E5D7B6</color>
+    <color name="home_balance_gold">#9A6B13</color>
+    <color name="home_balance_gold_glow">#6EF0B44A</color>
+    <color name="home_balance_blue_glow">#8A2A77FF</color>
+    <color name="home_balance_blue_mid">#2A1C47A9</color>
+    <color name="home_top_up_background">#2B2B2D</color>
+    <color name="home_promo_background">#D8D8D8</color>
+    <color name="home_promo_caption">#FFFFFF</color>
+    <color name="home_promo_discount">#D77FF2</color>
+    <color name="home_banner_badge_background">#42FFFFFF</color>
+    <color name="home_banner_secondary_start">#C2B7AE</color>
+    <color name="home_banner_secondary_end">#8E8479</color>
+    <color name="home_placeholder">#D9D9D9</color>
+    <color name="home_rating_star">#FFC600</color>
+    <color name="home_nav_background">#181818</color>
+    <color name="home_nav_inactive">#8B8B92</color>
 </resources>
