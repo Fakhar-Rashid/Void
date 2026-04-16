@@ -21,19 +21,16 @@ public class Home extends AppCompatActivity {
 
     private RecyclerView bestSellersRecyclerView;
     private RecyclerView recommendationsRecyclerView;
+    private BottomNavigationView bottomNavigationView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_home);
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
-            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
-            return insets;
-        });
 
         initializeViews();
+        applyWindowInsets();
         setupBottomNavigation();
         setupProductSections();
     }
@@ -41,11 +38,25 @@ public class Home extends AppCompatActivity {
     private void initializeViews() {
         bestSellersRecyclerView = findViewById(R.id.bestSellersRecyclerView);
         recommendationsRecyclerView = findViewById(R.id.recommendationsRecyclerView);
+        bottomNavigationView = findViewById(R.id.bottomNavigation);
+    }
+
+    private void applyWindowInsets() {
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (view, insets) -> {
+            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
+            view.setPadding(
+                    systemBars.left,
+                    systemBars.top,
+                    systemBars.right,
+                    0
+            );
+            return insets;
+        });
     }
 
     private void setupBottomNavigation() {
-        BottomNavigationView bottomNavigationView = findViewById(R.id.bottomNavigation);
         bottomNavigationView.setSelectedItemId(R.id.navigation_home);
+        bottomNavigationView.setItemActiveIndicatorEnabled(false);
     }
 
     private void setupProductSections() {
