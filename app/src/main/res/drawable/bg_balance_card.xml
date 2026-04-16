@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item>
+        <shape>
+            <corners android:radius="14dp" />
+            <gradient
+                android:angle="0"
+                android:centerColor="@color/home_balance_background"
+                android:endColor="@color/home_balance_background"
+                android:startColor="@color/home_balance_gold" />
+        </shape>
+    </item>
+
+    <item
+        android:left="-20dp"
+        android:top="-24dp">
+        <shape android:shape="oval">
+            <size
+                android:width="170dp"
+                android:height="120dp" />
+            <gradient
+                android:endColor="@android:color/transparent"
+                android:gradientRadius="86dp"
+                android:startColor="@color/home_balance_gold_glow"
+                android:type="radial" />
+        </shape>
+    </item>
+
+    <item
+        android:left="48dp"
+        android:top="34dp">
+        <shape android:shape="oval">
+            <size
+                android:width="180dp"
+                android:height="120dp" />
+            <gradient
+                android:endColor="@android:color/transparent"
+                android:gradientRadius="92dp"
+                android:startColor="@color/home_balance_blue_glow"
+                android:type="radial" />
+        </shape>
+    </item>
+</layer-list>
