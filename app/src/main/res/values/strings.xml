@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">Void</string>
+    <string name="greeting">Welcome Back</string>
 </resources>
