@@ -1,8 +1,6 @@
 package com.example.avoid;
 
-import android.content.Intent;
 import android.os.Bundle;
-import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
@@ -18,7 +16,6 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.avoid.adapter.CartAdapter;
-import com.example.avoid.adapter.ProductAdapter;
 import com.example.avoid.model.CartProduct;
 import com.example.avoid.model.Product;
 
@@ -26,19 +23,17 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-public class CartActivity extends AppCompatActivity {
+public class CheckoutActivity extends AppCompatActivity {
 
     private RecyclerView cartItemsRecyclerView;
-    private RecyclerView lastSeenRecyclerView;
     private TextView cartTotalPrice;
     private List<CartProduct> cartItems;
-    private Button checkoutButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
-        setContentView(R.layout.activity_cart);
+        setContentView(R.layout.activity_checkout);
 
         initializeViews();
         setupSystemBars();
@@ -48,16 +43,12 @@ public class CartActivity extends AppCompatActivity {
         btnBack.setOnClickListener(v -> finish());
 
         setupCartItems();
-        setupLastSeen();
         updateTotal();
-        proceedToCheckout();
     }
 
     private void initializeViews() {
-        cartItemsRecyclerView = findViewById(R.id.cartItemsRecyclerView);
-        lastSeenRecyclerView = findViewById(R.id.lastSeenRecyclerView);
-        checkoutButton=findViewById(R.id.btnCheckout);
-        cartTotalPrice = findViewById(R.id.cartTotalPrice);
+        cartItemsRecyclerView = findViewById(R.id.checkoutItemsRecyclerView);
+        cartTotalPrice = findViewById(R.id.checkoutTotalPrice);
     }
 
     private void setupSystemBars() {
@@ -92,31 +83,11 @@ public class CartActivity extends AppCompatActivity {
         cartItemsRecyclerView.setNestedScrollingEnabled(false);
     }
 
-    private void setupLastSeen() {
-        List<Product> lastSeen = new ArrayList<>();
-        lastSeen.add(new Product("Redmi 9A", "$ 348", "South Jakarta", "4.8 | Sold 250+"));
-        lastSeen.add(new Product("Redmi 11T", "$ 508.42", "South Jakarta", "4.8 | Sold 250+"));
-        lastSeen.add(new Product("iPhone 13", "$ 999", "Central Jakarta", "4.9 | Sold 300+"));
-        lastSeen.add(new Product("Dell XPS 13", "$ 1325", "West Jakarta", "4.7 | Sold 190+"));
-
-        lastSeenRecyclerView.setLayoutManager(
-                new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
-        lastSeenRecyclerView.setAdapter(
-                new ProductAdapter(lastSeen, ProductAdapter.LayoutMode.LIST_HORIZONTAL));
-        lastSeenRecyclerView.setNestedScrollingEnabled(false);
-    }
-
     private void updateTotal() {
         double total = 0;
         for (CartProduct item : cartItems) {
             total += item.getPriceValue() * item.getQuantity();
         }
         cartTotalPrice.setText(String.format(Locale.US, "$ %,.2f", total));
-    }
-
-    private void proceedToCheckout(){
-        checkoutButton.setOnClickListener(v->{
-            startActivity(new Intent(this, CheckoutActivity.class));
-        });
     }
 }
