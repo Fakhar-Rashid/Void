@@ -30,4 +30,5 @@
     <color name="home_nav_background">#181818</color>
     <color name="home_nav_inactive">#8B8B92</color>
     <color name="cart_delete">#E85C28</color>
+    <color name="profile_logout">#D94F3A</color>
 </resources>
