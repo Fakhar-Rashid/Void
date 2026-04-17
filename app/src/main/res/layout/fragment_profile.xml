@@ -40,7 +40,7 @@
                         android:background="@drawable/bg_avatar"
                         android:gravity="center"
                         android:fontFamily="sans-serif-medium"
-                        android:text="JD"
+                        android:text="FR"
                         android:textColor="@color/home_white"
                         android:textSize="28sp" />
 
@@ -60,7 +60,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="14dp"
                     android:fontFamily="sans-serif-black"
-                    android:text="John Doe"
+                    android:text="Fakhar Rashid"
                     android:textColor="@color/home_text_primary"
                     android:textSize="20sp" />
 
@@ -68,7 +68,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="4dp"
-                    android:text="johndoe@email.com"
+                    android:text="rbashir6666@gmail.com"
                     android:textColor="@color/home_text_hint"
                     android:textSize="14sp" />
             </LinearLayout>
@@ -229,77 +229,6 @@
                         app:srcCompat="@drawable/ic_chevron_right" />
                 </LinearLayout>
 
-                <View
-                    android:layout_width="match_parent"
-                    android:layout_height="1dp"
-                    android:background="@color/home_chip_border" />
-
-                <!-- Payment Methods -->
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="52dp"
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal">
-
-                    <ImageView
-                        android:layout_width="20dp"
-                        android:layout_height="20dp"
-                        android:contentDescription="Payment"
-                        android:tint="@color/home_text_secondary"
-                        app:srcCompat="@drawable/ic_payment" />
-
-                    <TextView
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="14dp"
-                        android:layout_weight="1"
-                        android:text="Payment Methods"
-                        android:textColor="@color/home_text_primary"
-                        android:textSize="15sp" />
-
-                    <ImageView
-                        android:layout_width="18dp"
-                        android:layout_height="18dp"
-                        android:contentDescription="Go"
-                        android:tint="@color/home_text_hint"
-                        app:srcCompat="@drawable/ic_chevron_right" />
-                </LinearLayout>
-
-                <View
-                    android:layout_width="match_parent"
-                    android:layout_height="1dp"
-                    android:background="@color/home_chip_border" />
-
-                <!-- My Orders -->
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="52dp"
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal">
-
-                    <ImageView
-                        android:layout_width="20dp"
-                        android:layout_height="20dp"
-                        android:contentDescription="Orders"
-                        android:tint="@color/home_text_secondary"
-                        app:srcCompat="@drawable/ic_shopping_bag" />
-
-                    <TextView
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="14dp"
-                        android:layout_weight="1"
-                        android:text="My Orders"
-                        android:textColor="@color/home_text_primary"
-                        android:textSize="15sp" />
-
-                    <ImageView
-                        android:layout_width="18dp"
-                        android:layout_height="18dp"
-                        android:contentDescription="Go"
-                        android:tint="@color/home_text_hint"
-                        app:srcCompat="@drawable/ic_chevron_right" />
-                </LinearLayout>
             </LinearLayout>
 
             <!-- PREFERENCES Section -->
@@ -374,41 +303,6 @@
                 android:paddingStart="16dp"
                 android:paddingEnd="16dp">
 
-                <!-- Help & Support -->
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="52dp"
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal">
-
-                    <ImageView
-                        android:layout_width="20dp"
-                        android:layout_height="20dp"
-                        android:contentDescription="Help"
-                        android:tint="@color/home_text_secondary"
-                        app:srcCompat="@drawable/ic_help" />
-
-                    <TextView
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="14dp"
-                        android:layout_weight="1"
-                        android:text="Help &amp; Support"
-                        android:textColor="@color/home_text_primary"
-                        android:textSize="15sp" />
-
-                    <ImageView
-                        android:layout_width="18dp"
-                        android:layout_height="18dp"
-                        android:contentDescription="Go"
-                        android:tint="@color/home_text_hint"
-                        app:srcCompat="@drawable/ic_chevron_right" />
-                </LinearLayout>
-
-                <View
-                    android:layout_width="match_parent"
-                    android:layout_height="1dp"
-                    android:background="@color/home_chip_border" />
 
                 <!-- Privacy Policy -->
                 <LinearLayout

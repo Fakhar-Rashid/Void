@@ -31,4 +31,12 @@
     <color name="home_nav_inactive">#8B8B92</color>
     <color name="cart_delete">#E85C28</color>
     <color name="profile_logout">#D94F3A</color>
+    <color name="order_confirmed">#2563EB</color>
+    <color name="order_confirmed_bg">#1A2563EB</color>
+    <color name="order_packed">#D97706</color>
+    <color name="order_packed_bg">#1AD97706</color>
+    <color name="order_on_the_way">#7C3AED</color>
+    <color name="order_on_the_way_bg">#1A7C3AED</color>
+    <color name="order_delivered">#16A34A</color>
+    <color name="order_delivered_bg">#1A16A34A</color>
 </resources>
