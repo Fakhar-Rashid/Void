@@ -1,5 +1,6 @@
 package com.example.avoid;
 
+import android.graphics.Color;
 import android.os.Bundle;
 
 import androidx.activity.EdgeToEdge;
@@ -13,10 +14,13 @@ import androidx.core.view.WindowInsetsControllerCompat;
 import androidx.viewpager2.widget.ViewPager2;
 
 import com.example.avoid.adapter.ViewPagerAdapter;
+import com.google.android.material.badge.BadgeDrawable;
 import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.tabs.TabLayoutMediator;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements CartBadgeUpdater {
+
+    private static final int CART_TAB_INDEX = 2;
 
     private static final int[] TAB_ICONS = {
             R.drawable.ic_home,
@@ -24,6 +28,8 @@ public class MainActivity extends AppCompatActivity {
             R.drawable.ic_bag,
             R.drawable.ic_profile
     };
+
+    private TabLayout tabLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,7 +61,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void setupTabs() {
         ViewPager2 viewPager = findViewById(R.id.viewPager);
-        TabLayout tabLayout  = findViewById(R.id.tabLayout);
+        tabLayout = findViewById(R.id.tabLayout);
 
         viewPager.setAdapter(new ViewPagerAdapter(this));
         viewPager.setUserInputEnabled(false);
@@ -63,5 +69,22 @@ public class MainActivity extends AppCompatActivity {
         new TabLayoutMediator(tabLayout, viewPager, (tab, position) ->
                 tab.setIcon(TAB_ICONS[position])
         ).attach();
+    }
+
+    @Override
+    public void updateCartBadge(int count) {
+        TabLayout.Tab cartTab = tabLayout.getTabAt(CART_TAB_INDEX);
+        if (cartTab == null) return;
+
+        BadgeDrawable badge = cartTab.getOrCreateBadge();
+        badge.setBackgroundColor(ContextCompat.getColor(this, R.color.home_balance_background));
+        badge.setBadgeTextColor(Color.WHITE);
+
+        if (count > 0) {
+            badge.setNumber(count);
+            badge.setVisible(true);
+        } else {
+            badge.setVisible(false);
+        }
     }
 }

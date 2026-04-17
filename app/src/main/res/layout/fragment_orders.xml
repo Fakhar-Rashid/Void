@@ -1,20 +1,50 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/home_background"
     android:orientation="vertical">
 
-    <TextView
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginStart="24dp"
-        android:layout_marginTop="24dp"
-        android:layout_marginBottom="16dp"
-        android:fontFamily="sans-serif-black"
-        android:text="My Orders"
-        android:textColor="@color/home_text_primary"
-        android:textSize="20sp" />
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingStart="24dp"
+        android:paddingTop="24dp"
+        android:paddingEnd="24dp"
+        android:paddingBottom="16dp">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:fontFamily="sans-serif-black"
+            android:includeFontPadding="false"
+            android:text="My Orders"
+            android:textColor="@color/home_text_primary"
+            android:textSize="24sp" />
+
+        <ImageButton
+            android:layout_width="@dimen/home_header_icon_size"
+            android:layout_height="@dimen/home_header_icon_size"
+            android:background="@android:color/transparent"
+            android:contentDescription="@string/home_cd_messages"
+            android:padding="@dimen/home_header_icon_padding"
+            android:tint="@color/home_text_primary"
+            app:srcCompat="@drawable/ic_chat" />
+
+        <ImageButton
+            android:layout_width="@dimen/home_header_icon_size"
+            android:layout_height="@dimen/home_header_icon_size"
+            android:layout_marginStart="@dimen/home_header_icon_spacing"
+            android:background="@android:color/transparent"
+            android:contentDescription="@string/home_cd_notifications"
+            android:padding="@dimen/home_header_icon_padding"
+            android:tint="@color/home_text_primary"
+            app:srcCompat="@drawable/ic_bell" />
+    </LinearLayout>
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/ordersRecyclerView"

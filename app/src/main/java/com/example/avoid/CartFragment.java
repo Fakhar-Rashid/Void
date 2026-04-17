@@ -76,15 +76,21 @@ public class CartFragment extends Fragment {
         lastSeenRecyclerView.setLayoutManager(
                 new LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false));
         lastSeenRecyclerView.setAdapter(
-                new ProductAdapter(lastSeen, ProductAdapter.LayoutMode.LIST_HORIZONTAL));
+                new ProductAdapter(lastSeen, ProductAdapter.LayoutMode.CARD));
         lastSeenRecyclerView.setNestedScrollingEnabled(false);
     }
 
     private void updateTotal() {
         double total = 0;
+        int count = 0;
         for (CartProduct item : cartItems) {
             total += item.getPriceValue() * item.getQuantity();
+            count += item.getQuantity();
         }
         cartTotalPrice.setText(String.format(Locale.US, "$ %,.2f", total));
+
+        if (getActivity() instanceof CartBadgeUpdater) {
+            ((CartBadgeUpdater) getActivity()).updateCartBadge(count);
+        }
     }
 }
