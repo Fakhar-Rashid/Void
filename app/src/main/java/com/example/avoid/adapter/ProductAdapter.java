@@ -70,10 +70,10 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductV
 
         ProductViewHolder(@NonNull View itemView) {
             super(itemView);
-            productNameTextView = itemView.findViewById(R.id.productNameTextView);
-            productPriceTextView = itemView.findViewById(R.id.productPriceTextView);
+            productNameTextView     = itemView.findViewById(R.id.productNameTextView);
+            productPriceTextView    = itemView.findViewById(R.id.productPriceTextView);
             productLocationTextView = itemView.findViewById(R.id.productLocationTextView);
-            productRatingTextView = itemView.findViewById(R.id.productRatingTextView);
+            productRatingTextView   = itemView.findViewById(R.id.productRatingTextView);
         }
 
         void bind(Product product) {

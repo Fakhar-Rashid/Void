@@ -14,19 +14,8 @@ public class Product {
         this.ratingSummary = ratingSummary;
     }
 
-    public String getName() {
-        return name;
-    }
-
-    public String getPrice() {
-        return price;
-    }
-
-    public String getLocation() {
-        return location;
-    }
-
-    public String getRatingSummary() {
-        return ratingSummary;
-    }
+    public String getName() { return name; }
+    public String getPrice() { return price; }
+    public String getLocation() { return location; }
+    public String getRatingSummary() { return ratingSummary; }
 }

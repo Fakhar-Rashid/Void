@@ -2,11 +2,9 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/home_background"
-    tools:context=".Home">
+    android:background="@color/home_background">
 
     <androidx.core.widget.NestedScrollView
         android:id="@+id/homeScrollView"
@@ -15,7 +13,7 @@
         android:clipToPadding="false"
         android:fillViewport="true"
         android:overScrollMode="never"
-        app:layout_constraintBottom_toTopOf="@id/bottomNavigation"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
@@ -480,19 +478,4 @@
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
 
-    <com.google.android.material.bottomnavigation.BottomNavigationView
-        android:id="@+id/bottomNavigation"
-        android:layout_width="0dp"
-        android:layout_height="@dimen/home_bottom_nav_height"
-        android:background="@color/home_nav_background"
-        android:elevation="@dimen/home_nav_elevation"
-        app:itemIconSize="@dimen/home_nav_icon_size"
-        app:itemIconTint="@color/bottom_nav_item_colors"
-        app:itemRippleColor="@android:color/transparent"
-        app:itemTextColor="@color/bottom_nav_item_colors"
-        app:labelVisibilityMode="unlabeled"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:menu="@menu/menu_bottom_nav" />
 </androidx.constraintlayout.widget.ConstraintLayout>
