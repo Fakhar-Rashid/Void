@@ -58,6 +58,7 @@ public class MainActivity extends AppCompatActivity {
         TabLayout tabLayout  = findViewById(R.id.tabLayout);
 
         viewPager.setAdapter(new ViewPagerAdapter(this));
+        viewPager.setUserInputEnabled(false);
 
         new TabLayoutMediator(tabLayout, viewPager, (tab, position) ->
                 tab.setIcon(TAB_ICONS[position])
