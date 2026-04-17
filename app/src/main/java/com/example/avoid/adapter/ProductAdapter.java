@@ -17,7 +17,8 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductV
 
     public enum LayoutMode {
         CARD(R.layout.item_product_card),
-        LIST(R.layout.item_product_list);
+        LIST(R.layout.item_product_list),
+        LIST_HORIZONTAL(R.layout.item_product_list);
 
         private final int layoutResId;
 
@@ -43,6 +44,10 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductV
     public ProductViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
                 .inflate(layoutMode.getLayoutResId(), parent, false);
+        if (layoutMode == LayoutMode.LIST_HORIZONTAL) {
+            int widthPx = (int) (290 * parent.getContext().getResources().getDisplayMetrics().density);
+            view.setLayoutParams(new ViewGroup.LayoutParams(widthPx, ViewGroup.LayoutParams.WRAP_CONTENT));
+        }
         return new ProductViewHolder(view);
     }
 

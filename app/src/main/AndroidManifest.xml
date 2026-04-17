@@ -21,6 +21,9 @@
             </intent-filter>
         </activity>
         <activity
+            android:name=".CartActivity"
+            android:exported="false" />
+        <activity
             android:name=".MainActivity"
             android:exported="false" />
     </application>

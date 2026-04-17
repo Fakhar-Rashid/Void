@@ -1,5 +1,6 @@
 package com.example.avoid;
 
+import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.activity.EdgeToEdge;
@@ -71,6 +72,13 @@ public class Home extends AppCompatActivity {
     private void setupBottomNavigation() {
         bottomNavigationView.setSelectedItemId(R.id.navigation_home);
         bottomNavigationView.setItemActiveIndicatorEnabled(false);
+        bottomNavigationView.setOnItemSelectedListener(item -> {
+            if (item.getItemId() == R.id.navigation_cart) {
+                startActivity(new Intent(this, CartActivity.class));
+                return false;
+            }
+            return true;
+        });
     }
 
     private void setupProductSections() {

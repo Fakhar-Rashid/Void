@@ -29,4 +29,5 @@
     <color name="home_rating_star">#FFC600</color>
     <color name="home_nav_background">#181818</color>
     <color name="home_nav_inactive">#8B8B92</color>
+    <color name="cart_delete">#E85C28</color>
 </resources>
