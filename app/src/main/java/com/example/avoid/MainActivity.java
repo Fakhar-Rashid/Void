@@ -69,6 +69,21 @@ public class MainActivity extends AppCompatActivity implements CartBadgeUpdater 
         new TabLayoutMediator(tabLayout, viewPager, (tab, position) ->
                 tab.setIcon(TAB_ICONS[position])
         ).attach();
+
+        tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
+            @Override
+            public void onTabSelected(TabLayout.Tab tab) {
+                getSupportFragmentManager().popBackStack(null, androidx.fragment.app.FragmentManager.POP_BACK_STACK_INCLUSIVE);
+            }
+
+            @Override
+            public void onTabUnselected(TabLayout.Tab tab) {}
+
+            @Override
+            public void onTabReselected(TabLayout.Tab tab) {
+                getSupportFragmentManager().popBackStack(null, androidx.fragment.app.FragmentManager.POP_BACK_STACK_INCLUSIVE);
+            }
+        });
     }
 
     @Override

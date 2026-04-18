@@ -69,13 +69,7 @@ public class CheckoutActivity extends AppCompatActivity {
     }
 
     private void setupCartItems() {
-        cartItems = new ArrayList<>();
-        cartItems.add(new CartProduct(
-                new Product("Xiamo 11T", "$ 407.70", "North Jakarta", "4.8 | Sold 250+"), "White", 1));
-        cartItems.add(new CartProduct(
-                new Product("Redmi 9A", "$ 348", "South Jakarta", "4.8 | Sold 250+"), "Black", 1));
-        cartItems.add(new CartProduct(
-                new Product("Macbook Pro M1", "$ 1203", "South Jakarta", "4.8 | Sold 250+"), "Silver", 1));
+        cartItems = CartManager.getInstance().getCartItems();
 
         CartAdapter cartAdapter = new CartAdapter(cartItems, this::updateTotal);
         cartItemsRecyclerView.setLayoutManager(new LinearLayoutManager(this));

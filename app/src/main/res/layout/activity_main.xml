@@ -1,22 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/home_background"
-    android:orientation="vertical">
+    android:background="@color/home_background">
 
     <androidx.viewpager2.widget.ViewPager2
         android:id="@+id/viewPager"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1" />
+        android:layout_height="match_parent"
+        android:layout_above="@id/tabLayout" />
+
+    <FrameLayout
+        android:id="@+id/fragment_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@id/tabLayout" />
 
     <com.google.android.material.tabs.TabLayout
         android:id="@+id/tabLayout"
         android:layout_width="match_parent"
         android:layout_height="@dimen/home_bottom_nav_height"
+        android:layout_alignParentBottom="true"
         android:background="@color/home_nav_background"
         android:elevation="@dimen/home_nav_elevation"
         app:tabGravity="fill"
@@ -26,4 +32,4 @@
         app:tabRippleColor="@android:color/transparent"
         app:tabBackground="@android:color/transparent" />
 
-</LinearLayout>
+</RelativeLayout>

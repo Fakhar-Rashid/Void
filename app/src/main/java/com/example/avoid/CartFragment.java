@@ -51,14 +51,17 @@ public class CartFragment extends Fragment {
         updateTotal();
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (cartItemsRecyclerView != null) {
+            setupCartItems();
+            updateTotal();
+        }
+    }
+
     private void setupCartItems() {
-        cartItems = new ArrayList<>();
-        cartItems.add(new CartProduct(
-                new Product("Xiamo 11T",     "$ 407.70", "North Jakarta", "4.8 | Sold 250+"), "White",  1));
-        cartItems.add(new CartProduct(
-                new Product("Redmi 9A",       "$ 348",    "South Jakarta", "4.8 | Sold 250+"), "Black",  1));
-        cartItems.add(new CartProduct(
-                new Product("Macbook Pro M1", "$ 1203",   "South Jakarta", "4.8 | Sold 250+"), "Silver", 1));
+        cartItems = CartManager.getInstance().getCartItems();
 
         CartAdapter cartAdapter = new CartAdapter(cartItems, this::updateTotal);
         cartItemsRecyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
@@ -76,8 +79,15 @@ public class CartFragment extends Fragment {
         lastSeenRecyclerView.setLayoutManager(
                 new LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false));
         lastSeenRecyclerView.setAdapter(
-                new ProductAdapter(lastSeen, ProductAdapter.LayoutMode.CARD));
+                new ProductAdapter(lastSeen, ProductAdapter.LayoutMode.CARD, this::openProductDetails));
         lastSeenRecyclerView.setNestedScrollingEnabled(false);
+    }
+
+    private void openProductDetails(Product product) {
+        requireActivity().getSupportFragmentManager().beginTransaction()
+                .add(R.id.fragment_container, ProductDetailsFragment.newInstance(product))
+                .addToBackStack(null)
+                .commit();
     }
 
     private void updateTotal() {
