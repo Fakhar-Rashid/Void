@@ -15,6 +15,10 @@ import java.util.List;
 
 public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductViewHolder> {
 
+    public interface OnProductClickListener {
+        void onProductClick(Product product);
+    }
+
     public enum LayoutMode {
         CARD(R.layout.item_product_card),
         LIST(R.layout.item_product_list),
@@ -33,10 +37,12 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductV
 
     private final List<Product> products;
     private final LayoutMode layoutMode;
+    private final OnProductClickListener listener;
 
-    public ProductAdapter(List<Product> products, LayoutMode layoutMode) {
+    public ProductAdapter(List<Product> products, LayoutMode layoutMode, OnProductClickListener listener) {
         this.products = products;
         this.layoutMode = layoutMode;
+        this.listener = listener;
     }
 
     @NonNull
@@ -53,7 +59,13 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductV
 
     @Override
     public void onBindViewHolder(@NonNull ProductViewHolder holder, int position) {
-        holder.bind(products.get(position));
+        Product product = products.get(position);
+        holder.bind(product);
+        holder.itemView.setOnClickListener(v -> {
+            if (listener != null) {
+                listener.onProductClick(product);
+            }
+        });
     }
 
     @Override

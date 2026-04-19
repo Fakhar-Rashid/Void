@@ -1,0 +1,400 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/home_background"
+    android:clickable="true"
+    android:focusable="true">
+
+    <androidx.core.widget.NestedScrollView
+        android:id="@+id/productDetailsScrollView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:clipToPadding="false"
+        android:paddingBottom="76dp"
+        android:overScrollMode="never">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingBottom="24dp">
+
+            <!-- Back button overlay (or we can put it in FrameLayout) -->
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="320dp">
+
+                <androidx.viewpager2.widget.ViewPager2
+                    android:id="@+id/productImagesViewPager"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent" />
+
+                <!-- Dot indicators container -->
+                <LinearLayout
+                    android:id="@+id/dotIndicatorsLayout"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="bottom|center_horizontal"
+                    android:layout_marginBottom="16dp"
+                    android:orientation="horizontal" />
+
+                <ImageButton
+                    android:id="@+id/backButton"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:layout_marginTop="32dp"
+                    android:layout_marginStart="16dp"
+                    android:background="@drawable/bg_avatar_circle"
+                    android:src="@drawable/ic_arrow_back"
+                    android:tint="@color/home_text_primary"
+                    android:padding="8dp"
+                    android:elevation="4dp" />
+            </FrameLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="20dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical">
+                    
+                    <TextView
+                        android:id="@+id/detailProductName"
+                        android:layout_width="0dp"
+                        android:layout_weight="1"
+                        android:layout_height="wrap_content"
+                        android:textSize="20sp"
+                        android:textColor="@color/home_text_primary"
+                        android:fontFamily="sans-serif-bold"
+                        android:textStyle="bold"
+                        tools:text="Xiaomi 11T" />
+
+                    <TextView
+                        android:id="@+id/detailProductPrice"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="16dp"
+                        android:textSize="22sp"
+                        android:textColor="@color/home_text_primary"
+                        android:fontFamily="sans-serif-black"
+                        tools:text="$ 407.70" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginTop="12dp"
+                    android:gravity="center_vertical">
+
+                    <ImageView
+                        android:layout_width="16dp"
+                        android:layout_height="16dp"
+                        android:src="@drawable/ic_star"
+                        android:tint="@color/home_rating_star" />
+
+                    <TextView
+                        android:id="@+id/detailProductRating"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="6dp"
+                        android:textSize="14sp"
+                        android:textColor="@color/home_text_primary"
+                        android:fontFamily="sans-serif-medium"
+                        tools:text="4.8" />
+
+                    <TextView
+                        android:id="@+id/detailProductSoldCount"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="6dp"
+                        android:textSize="14sp"
+                        android:textColor="@color/home_text_hint"
+                        tools:text="| Sold 250+" />
+                </LinearLayout>
+
+                <!-- Removed top divider -->
+
+                <!-- Detail Product Specs -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="32dp"
+                    android:textSize="16sp"
+                    android:textColor="@color/home_text_primary"
+                    android:fontFamily="sans-serif-bold"
+                    android:textStyle="bold"
+                    android:text="Detail Product" />
+
+                <TableLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:stretchColumns="1">
+                    <TableRow android:paddingBottom="8dp">
+                        <TextView android:text="Condition" android:textColor="@color/home_text_hint" android:textSize="14sp" />
+                        <TextView android:text="New" android:textColor="@color/home_text_primary" android:textSize="14sp" android:layout_marginStart="24dp" />
+                    </TableRow>
+                    <TableRow android:paddingBottom="8dp">
+                        <TextView android:text="Weight" android:textColor="@color/home_text_hint" android:textSize="14sp" />
+                        <TextView android:text="250 g" android:textColor="@color/home_text_primary" android:textSize="14sp" android:layout_marginStart="24dp" />
+                    </TableRow>
+                    <TableRow android:paddingBottom="8dp">
+                        <TextView android:text="Category" android:textColor="@color/home_text_hint" android:textSize="14sp" />
+                        <TextView android:text="Smartphone" android:textColor="@color/home_section_link" android:textSize="14sp" android:layout_marginStart="24dp" />
+                    </TableRow>
+                    <TableRow>
+                        <TextView android:text="Storefront" android:textColor="@color/home_text_hint" android:textSize="14sp" />
+                        <TextView android:id="@+id/detailProductStorefront" android:text="Unknown" android:textColor="@color/home_section_link" android:textSize="14sp" android:layout_marginStart="24dp" />
+                    </TableRow>
+                </TableLayout>
+
+                <TextView
+                    android:id="@+id/detailProductDescription"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:text="This is a detailed description of the product. It has many features and comes in various configurations. The screen is vibrant and the battery life is amazing."
+                    android:textColor="@color/home_text_secondary"
+                    android:textSize="14sp"
+                    android:lineSpacingExtra="4dp"
+                    android:maxLines="3"
+                    android:ellipsize="end" />
+
+                <TextView
+                    android:id="@+id/toggleDescriptionButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="More info"
+                    android:textColor="@color/home_section_link"
+                    android:textSize="14sp"
+                    android:fontFamily="sans-serif-medium" />
+
+                <!-- Removed divider -->
+
+                <!-- Choose Color -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="32dp"
+                    android:textSize="16sp"
+                    android:textColor="@color/home_text_primary"
+                    android:fontFamily="sans-serif-bold"
+                    android:textStyle="bold"
+                    android:text="Choose Color" />
+
+                <LinearLayout
+                    android:id="@+id/colorSwatchesLayout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:orientation="horizontal" />
+
+                <!-- Removed divider -->
+
+                <!-- Reviews -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginTop="32dp"
+                    android:gravity="center_vertical">
+                    
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:textSize="16sp"
+                        android:textColor="@color/home_text_primary"
+                        android:fontFamily="sans-serif-bold"
+                        android:textStyle="bold"
+                        android:text="Reviews" />
+                        
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="See all"
+                        android:textColor="@color/home_section_link"
+                        android:textSize="14sp" />
+                </LinearLayout>
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/reviewsRecyclerView"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:nestedScrollingEnabled="false"
+                    android:overScrollMode="never" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="32dp"
+                    android:layout_marginBottom="8dp"
+                    android:textSize="16sp"
+                    android:textColor="@color/home_text_primary"
+                    android:fontFamily="sans-serif-bold"
+                    android:textStyle="bold"
+                    android:text="Store Information" />
+
+                <!-- Store Information -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="12dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical">
+
+                        <!-- Avatar -->
+                        <ImageView
+                            android:layout_width="48dp"
+                            android:layout_height="48dp"
+                            android:src="@drawable/ic_profile"
+                            android:background="@drawable/bg_avatar_circle"
+                            android:scaleType="centerCrop" />
+
+                        <!-- Store Info -->
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:layout_marginStart="12dp"
+                            android:orientation="vertical">
+
+                            <!-- Store Name -->
+                            <TextView
+                                android:id="@+id/storeNameText"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="AlfinasStore"
+                                android:textColor="@color/home_text_primary"
+                                android:textSize="15sp" />
+
+                            <!-- Status + Location -->
+                            <LinearLayout
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:orientation="horizontal"
+                                android:layout_marginTop="2dp">
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="Online"
+                                    android:textStyle="bold"
+                                    android:textColor="@color/home_text_primary"
+                                    android:textSize="12sp" />
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text=" . North Jakarta"
+                                    android:textColor="@color/home_text_hint"
+                                    android:textSize="12sp" />
+                            </LinearLayout>
+
+                        </LinearLayout>
+
+                        <!-- Follow Button -->
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/followStoreButton"
+                            android:layout_width="wrap_content"
+                            android:layout_height="36dp"
+                            android:text="Follow"
+                            android:textStyle="bold"
+                            android:textAllCaps="false"
+                            android:textSize="13sp"
+                            android:textColor="@color/home_text_primary"
+                            app:backgroundTint="@android:color/transparent"
+                            app:strokeColor="@color/home_chip_border"
+                            app:strokeWidth="1dp"
+                            app:cornerRadius="8dp"
+                            android:insetTop="0dp"
+                            android:insetBottom="0dp"
+                            style="@style/Widget.Material3.Button.OutlinedButton" />
+
+                    </LinearLayout>
+
+                    <!-- Rating Row -->
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:layout_marginTop="8dp"
+                        android:layout_marginStart="2dp">
+
+                        <ImageView
+                            android:layout_width="14dp"
+                            android:layout_height="14dp"
+                            android:src="@drawable/ic_star"
+                            android:tint="@color/home_text_hint" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="4.8 Rating Store"
+                            android:textColor="@color/home_text_hint"
+                            android:textSize="12sp"
+                            android:layout_marginStart="4dp" />
+                    </LinearLayout>
+
+                </LinearLayout>
+
+
+
+            </LinearLayout>
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+
+    <!-- Bottom Footer Layout -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="76dp"
+        android:layout_gravity="bottom"
+        android:background="@color/home_background"
+        android:elevation="8dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp">
+
+        <ImageButton
+            android:id="@+id/footerChatButton"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:background="@drawable/bg_category_chip"
+            android:src="@drawable/ic_chat"
+            android:tint="@color/home_text_primary"
+            android:padding="12dp" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/footerAddToCartButton"
+            android:layout_width="0dp"
+            android:layout_height="52dp"
+            android:layout_weight="1"
+            android:layout_marginStart="16dp"
+            android:text="Add to Cart"
+            android:textAllCaps="false"
+            android:textSize="16sp"
+            android:fontFamily="sans-serif-medium"
+            app:cornerRadius="8dp"
+            app:backgroundTint="@color/black"
+            android:textColor="@color/home_white" />
+    </LinearLayout>
+
+</FrameLayout>

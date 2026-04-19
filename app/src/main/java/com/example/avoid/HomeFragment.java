@@ -41,11 +41,18 @@ public class HomeFragment extends Fragment {
         bestSellersRecyclerView.setLayoutManager(
                 new LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false));
         bestSellersRecyclerView.setAdapter(
-                new ProductAdapter(createBestSellerProducts(), ProductAdapter.LayoutMode.CARD));
+                new ProductAdapter(createBestSellerProducts(), ProductAdapter.LayoutMode.CARD, this::openProductDetails));
 
         recommendationsRecyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
         recommendationsRecyclerView.setAdapter(
-                new ProductAdapter(createRecommendationProducts(), ProductAdapter.LayoutMode.LIST));
+                new ProductAdapter(createRecommendationProducts(), ProductAdapter.LayoutMode.LIST, this::openProductDetails));
+    }
+
+    private void openProductDetails(Product product) {
+        requireActivity().getSupportFragmentManager().beginTransaction()
+                .add(R.id.fragment_container, ProductDetailsFragment.newInstance(product))
+                .addToBackStack(null)
+                .commit();
     }
 
     private List<Product> createBestSellerProducts() {
