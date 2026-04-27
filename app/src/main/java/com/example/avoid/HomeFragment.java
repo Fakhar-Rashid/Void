@@ -46,8 +46,39 @@ public class HomeFragment extends Fragment {
                 new LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false));
         recommendationsRecyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
 
+        view.findViewById(R.id.searchBar).setOnClickListener(v -> openExplore(null));
+        wireCategoryChips(view);
+
         loadProducts(Product.CATEGORY_BEST_SELLER, ProductAdapter.LayoutMode.CARD, bestSellersRecyclerView);
         loadProducts(Product.CATEGORY_RECOMMENDATION, ProductAdapter.LayoutMode.LIST, recommendationsRecyclerView);
+    }
+
+    private void wireCategoryChips(View root) {
+        int[] chipIds = {
+                R.id.categoryChipLaptop,
+                R.id.categoryChipSmartphone,
+                R.id.categoryChipMonitor,
+                R.id.categoryChipAccessories
+        };
+        String[] labels = {
+                getString(R.string.home_category_laptop),
+                getString(R.string.home_category_smartphone),
+                getString(R.string.home_category_monitor),
+                getString(R.string.home_category_accessories)
+        };
+        for (int i = 0; i < chipIds.length; i++) {
+            View chip = root.findViewById(chipIds[i]);
+            if (chip == null) continue;
+            final String label = labels[i];
+            chip.setOnClickListener(v -> openExplore(label));
+        }
+    }
+
+    private void openExplore(@Nullable String initialQuery) {
+        requireActivity().getSupportFragmentManager().beginTransaction()
+                .add(R.id.fragment_container, ExploreProductsFragment.newInstance(initialQuery))
+                .addToBackStack(null)
+                .commit();
     }
 
     private void loadProducts(String category, ProductAdapter.LayoutMode mode, RecyclerView target) {

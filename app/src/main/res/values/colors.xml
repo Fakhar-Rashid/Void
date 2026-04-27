@@ -12,6 +12,8 @@
     <color name="home_surface_subtle">#F6F4F1</color>
     <color name="home_chip_border">#E7DED3</color>
     <color name="home_chip_text">#2A2A2A</color>
+    <color name="explore_trending_chip_bg">#EAF1FB</color>
+    <color name="explore_trending_chip_text">#5C6470</color>
     <color name="home_balance_background">#1E1E1F</color>
     <color name="home_balance_label">#E5D7B6</color>
     <color name="home_balance_gold">#9A6B13</color>

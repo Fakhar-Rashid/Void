@@ -37,4 +37,13 @@
     <string name="home_nav_title_orders">Orders</string>
     <string name="home_nav_title_cart">Cart</string>
     <string name="home_nav_title_profile">Profile</string>
+
+    <string name="explore_title">Explore Products</string>
+    <string name="explore_search_hint">Find Product, Store</string>
+    <string name="explore_search_by_category">Search by Category</string>
+    <string name="explore_trending_search">Trending Search</string>
+    <string name="explore_trending_products">Trending Products</string>
+    <string name="explore_search_results">Search Results</string>
+    <string name="explore_no_results">No products match your search.</string>
+    <string name="explore_cd_back">Back</string>
 </resources>

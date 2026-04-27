@@ -163,123 +163,12 @@
                 </androidx.constraintlayout.widget.ConstraintLayout>
             </FrameLayout>
 
-            <HorizontalScrollView
+            <include
+                android:id="@+id/categoryChips"
+                layout="@layout/view_category_chips"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/home_section_spacing_medium"
-                android:clipToPadding="false"
-                android:overScrollMode="never"
-                android:scrollbars="none">
-
-                <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal">
-
-                    <LinearLayout
-                        android:layout_width="wrap_content"
-                        android:layout_height="@dimen/home_chip_height"
-                        android:background="@drawable/bg_category_chip"
-                        android:gravity="center_vertical"
-                        android:orientation="horizontal"
-                        android:paddingStart="@dimen/home_chip_horizontal_padding"
-                        android:paddingEnd="@dimen/home_chip_horizontal_padding">
-
-                        <ImageView
-                            android:layout_width="@dimen/home_chip_icon_size"
-                            android:layout_height="@dimen/home_chip_icon_size"
-                            android:contentDescription="@string/home_cd_laptop"
-                            android:tint="@color/home_chip_text"
-                            app:srcCompat="@drawable/ic_laptop" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginStart="@dimen/home_chip_text_spacing"
-                            android:text="@string/home_category_laptop"
-                            android:textColor="@color/home_chip_text"
-                            android:textSize="@dimen/home_chip_text_size" />
-                    </LinearLayout>
-
-                    <LinearLayout
-                        android:layout_width="wrap_content"
-                        android:layout_height="@dimen/home_chip_height"
-                        android:layout_marginStart="@dimen/home_chip_spacing"
-                        android:background="@drawable/bg_category_chip"
-                        android:gravity="center_vertical"
-                        android:orientation="horizontal"
-                        android:paddingStart="@dimen/home_chip_horizontal_padding"
-                        android:paddingEnd="@dimen/home_chip_horizontal_padding">
-
-                        <ImageView
-                            android:layout_width="@dimen/home_chip_icon_size"
-                            android:layout_height="@dimen/home_chip_icon_size"
-                            android:contentDescription="@string/home_cd_smartphone"
-                            android:tint="@color/home_chip_text"
-                            app:srcCompat="@drawable/ic_smartphone" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginStart="@dimen/home_chip_text_spacing"
-                            android:text="@string/home_category_smartphone"
-                            android:textColor="@color/home_chip_text"
-                            android:textSize="@dimen/home_chip_text_size" />
-                    </LinearLayout>
-
-                    <LinearLayout
-                        android:layout_width="wrap_content"
-                        android:layout_height="@dimen/home_chip_height"
-                        android:layout_marginStart="@dimen/home_chip_spacing"
-                        android:background="@drawable/bg_category_chip"
-                        android:gravity="center_vertical"
-                        android:orientation="horizontal"
-                        android:paddingStart="@dimen/home_chip_horizontal_padding"
-                        android:paddingEnd="@dimen/home_chip_horizontal_padding">
-
-                        <ImageView
-                            android:layout_width="@dimen/home_chip_icon_size"
-                            android:layout_height="@dimen/home_chip_icon_size"
-                            android:contentDescription="@string/home_cd_monitor"
-                            android:tint="@color/home_chip_text"
-                            app:srcCompat="@drawable/ic_monitor" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginStart="@dimen/home_chip_text_spacing"
-                            android:text="@string/home_category_monitor"
-                            android:textColor="@color/home_chip_text"
-                            android:textSize="@dimen/home_chip_text_size" />
-                    </LinearLayout>
-
-                    <LinearLayout
-                        android:layout_width="wrap_content"
-                        android:layout_height="@dimen/home_chip_height"
-                        android:layout_marginStart="@dimen/home_chip_spacing"
-                        android:background="@drawable/bg_category_chip"
-                        android:gravity="center_vertical"
-                        android:orientation="horizontal"
-                        android:paddingStart="@dimen/home_chip_horizontal_padding"
-                        android:paddingEnd="@dimen/home_chip_horizontal_padding">
-
-                        <ImageView
-                            android:layout_width="@dimen/home_chip_icon_size"
-                            android:layout_height="@dimen/home_chip_icon_size"
-                            android:contentDescription="@string/home_cd_laptop"
-                            android:tint="@color/home_chip_text"
-                            app:srcCompat="@drawable/ic_laptop" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginStart="@dimen/home_chip_text_spacing"
-                            android:text="@string/home_category_accessories"
-                            android:textColor="@color/home_chip_text"
-                            android:textSize="@dimen/home_chip_text_size" />
-                    </LinearLayout>
-                </LinearLayout>
-            </HorizontalScrollView>
+                android:layout_marginTop="@dimen/home_section_spacing_medium" />
 
             <HorizontalScrollView
                 android:layout_width="match_parent"
