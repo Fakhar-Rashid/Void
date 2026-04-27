@@ -238,11 +238,12 @@ public class ProductDetailsFragment extends Fragment {
         addToCartButton.setOnClickListener(v -> {
             if (product != null) {
                 String selectedColor = getSelectedColorString();
-                CartManager.getInstance().addProduct(product, selectedColor, 1);
+                com.example.avoid.model.Cart cart = UserSession.getInstance().getCurrentUser().getCart();
+                cart.addItem(product, selectedColor, 1);
                 android.widget.Toast.makeText(requireContext(), "Added to cart", android.widget.Toast.LENGTH_SHORT).show();
-                
+
                 if (getActivity() instanceof CartBadgeUpdater) {
-                    ((CartBadgeUpdater) getActivity()).updateCartBadge(CartManager.getInstance().getTotalItemCount());
+                    ((CartBadgeUpdater) getActivity()).updateCartBadge(cart.getTotalItemCount());
                 }
             }
         });

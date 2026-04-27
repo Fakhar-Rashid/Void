@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="@dimen/home_balance_card_height"
+    android:background="@drawable/bg_balance_card"
+    android:elevation="@dimen/home_card_elevation"
+    android:padding="@dimen/home_balance_card_padding">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <TextView
+            android:id="@+id/balanceLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/home_balance_label"
+            android:textColor="@color/home_balance_label"
+            android:textSize="@dimen/home_balance_label_size"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/balanceAmount"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/home_balance_amount_top_margin"
+            android:fontFamily="sans-serif-medium"
+            android:textColor="@color/home_white"
+            android:textSize="@dimen/home_balance_amount_size"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/balanceLabel"
+            tools:text="$58.309" />
+
+        <LinearLayout
+            android:id="@+id/topUpButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/bg_top_up_button"
+            android:gravity="center"
+            android:minHeight="@dimen/home_top_up_height"
+            android:orientation="horizontal"
+            android:paddingStart="@dimen/home_top_up_horizontal_padding"
+            android:paddingTop="@dimen/home_top_up_vertical_padding"
+            android:paddingEnd="@dimen/home_top_up_horizontal_padding"
+            android:paddingBottom="@dimen/home_top_up_vertical_padding"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="@dimen/home_top_up_plus_spacing"
+                android:fontFamily="sans-serif-medium"
+                android:text="@string/home_plus_symbol"
+                android:textColor="@color/home_white"
+                android:textSize="@dimen/home_top_up_plus_size" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/home_top_up"
+                android:textColor="@color/home_white"
+                android:textSize="@dimen/home_top_up_text_size" />
+        </LinearLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</FrameLayout>

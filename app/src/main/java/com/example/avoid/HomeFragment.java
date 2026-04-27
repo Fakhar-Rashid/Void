@@ -5,6 +5,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -14,11 +15,13 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.avoid.adapter.ProductAdapter;
 import com.example.avoid.model.Product;
+import com.example.avoid.model.User;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 public class HomeFragment extends Fragment {
 
@@ -48,6 +51,7 @@ public class HomeFragment extends Fragment {
 
         view.findViewById(R.id.searchBar).setOnClickListener(v -> openExplore(null));
         wireCategoryChips(view);
+        bindBalance(view);
 
         loadProducts(Product.CATEGORY_BEST_SELLER, ProductAdapter.LayoutMode.CARD, bestSellersRecyclerView);
         loadProducts(Product.CATEGORY_RECOMMENDATION, ProductAdapter.LayoutMode.LIST, recommendationsRecyclerView);
@@ -72,6 +76,13 @@ public class HomeFragment extends Fragment {
             final String label = labels[i];
             chip.setOnClickListener(v -> openExplore(label));
         }
+    }
+
+    private void bindBalance(View root) {
+        User user = UserSession.getInstance().getCurrentUser();
+        if (user == null) return;
+        ((TextView) root.findViewById(R.id.balanceAmount))
+                .setText(String.format(Locale.US, "$%.3f", user.getBalance()));
     }
 
     private void openExplore(@Nullable String initialQuery) {

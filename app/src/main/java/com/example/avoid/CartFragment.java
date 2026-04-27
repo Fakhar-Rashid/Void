@@ -61,7 +61,7 @@ public class CartFragment extends Fragment {
     }
 
     private void setupCartItems() {
-        cartItems = CartManager.getInstance().getCartItems();
+        cartItems = UserSession.getInstance().getCurrentUser().getCart().getItems();
 
         CartAdapter cartAdapter = new CartAdapter(cartItems, this::updateTotal);
         cartItemsRecyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));

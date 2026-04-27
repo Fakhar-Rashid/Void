@@ -73,10 +73,13 @@ public class OrderAdapter extends RecyclerView.Adapter<OrderAdapter.OrderViewHol
         void bind(Order order) {
             Context ctx = itemView.getContext();
 
-            productName.setText(order.getItem().getProduct().getName());
+            com.example.avoid.model.CartProduct first = order.getFirstItem();
+            if (first != null) {
+                productName.setText(first.getProduct().getName());
+                colorQty.setText(first.getColor() + "  ·  Qty: " + first.getQuantity());
+                price.setText(first.getProduct().getPrice());
+            }
             orderDate.setText(order.getOrderDate());
-            colorQty.setText(order.getItem().getColor() + "  ·  Qty: " + order.getItem().getQuantity());
-            price.setText(order.getItem().getProduct().getPrice());
 
             boolean delivered = order.getStatus() == Order.Status.DELIVERED;
             progressContainer.setVisibility(delivered ? View.GONE : View.VISIBLE);

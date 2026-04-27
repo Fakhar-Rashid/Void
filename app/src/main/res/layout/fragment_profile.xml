@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/home_background"
@@ -35,14 +36,15 @@
                     android:layout_height="84dp">
 
                     <TextView
+                        android:id="@+id/profileAvatarInitials"
                         android:layout_width="84dp"
                         android:layout_height="84dp"
                         android:background="@drawable/bg_avatar"
                         android:gravity="center"
                         android:fontFamily="sans-serif-medium"
-                        android:text="FR"
                         android:textColor="@color/home_white"
-                        android:textSize="28sp" />
+                        android:textSize="28sp"
+                        tools:text="FR" />
 
                     <ImageView
                         android:layout_width="26dp"
@@ -56,91 +58,31 @@
                 </FrameLayout>
 
                 <TextView
+                    android:id="@+id/profileName"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="14dp"
                     android:fontFamily="sans-serif-black"
-                    android:text="Fakhar Rashid"
                     android:textColor="@color/home_text_primary"
-                    android:textSize="20sp" />
+                    android:textSize="20sp"
+                    tools:text="Fakhar Rashid" />
 
                 <TextView
+                    android:id="@+id/profileEmail"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="4dp"
-                    android:text="rbashir6666@gmail.com"
                     android:textColor="@color/home_text_hint"
-                    android:textSize="14sp" />
+                    android:textSize="14sp"
+                    tools:text="rbashir6666@gmail.com" />
             </LinearLayout>
 
-            <!-- Balance Card -->
-            <FrameLayout
+            <include
+                android:id="@+id/profileBalanceCard"
+                layout="@layout/view_balance_card"
                 android:layout_width="match_parent"
-                android:layout_height="88dp"
-                android:layout_marginTop="24dp"
-                android:background="@drawable/bg_balance_card"
-                android:elevation="6dp"
-                android:padding="16dp">
-
-                <androidx.constraintlayout.widget.ConstraintLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent">
-
-                    <TextView
-                        android:id="@+id/profileBalanceLabel"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/home_balance_label"
-                        android:textColor="@color/home_balance_label"
-                        android:textSize="12sp"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent" />
-
-                    <TextView
-                        android:id="@+id/profileBalanceAmount"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="4dp"
-                        android:fontFamily="sans-serif-medium"
-                        android:text="@string/home_balance_amount"
-                        android:textColor="@color/home_white"
-                        android:textSize="20sp"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@id/profileBalanceLabel" />
-
-                    <LinearLayout
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:background="@drawable/bg_top_up_button"
-                        android:gravity="center"
-                        android:minHeight="38dp"
-                        android:orientation="horizontal"
-                        android:paddingStart="14dp"
-                        android:paddingTop="10dp"
-                        android:paddingEnd="14dp"
-                        android:paddingBottom="10dp"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintTop_toTopOf="parent">
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginEnd="4dp"
-                            android:fontFamily="sans-serif-medium"
-                            android:text="@string/home_plus_symbol"
-                            android:textColor="@color/home_white"
-                            android:textSize="18sp" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="@string/home_top_up"
-                            android:textColor="@color/home_white"
-                            android:textSize="14sp" />
-                    </LinearLayout>
-                </androidx.constraintlayout.widget.ConstraintLayout>
-            </FrameLayout>
+                android:layout_height="@dimen/home_balance_card_height"
+                android:layout_marginTop="24dp" />
 
             <!-- ACCOUNT Section -->
             <TextView
@@ -251,17 +193,19 @@
                 android:paddingStart="16dp"
                 android:paddingEnd="16dp">
 
-                <!-- Notifications -->
                 <LinearLayout
+                    android:id="@+id/profileSettingsRow"
                     android:layout_width="match_parent"
                     android:layout_height="52dp"
+                    android:clickable="true"
+                    android:focusable="true"
                     android:gravity="center_vertical"
                     android:orientation="horizontal">
 
                     <ImageView
                         android:layout_width="20dp"
                         android:layout_height="20dp"
-                        android:contentDescription="Notifications"
+                        android:contentDescription="Settings"
                         android:tint="@color/home_text_secondary"
                         app:srcCompat="@drawable/ic_bell" />
 
@@ -270,16 +214,16 @@
                         android:layout_height="wrap_content"
                         android:layout_marginStart="14dp"
                         android:layout_weight="1"
-                        android:text="Notifications"
+                        android:text="Settings"
                         android:textColor="@color/home_text_primary"
                         android:textSize="15sp" />
 
-                    <com.google.android.material.materialswitch.MaterialSwitch
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:checked="true"
-                        app:trackTint="@color/switch_track_color"
-                        android:thumbTint="@android:color/white" />
+                    <ImageView
+                        android:layout_width="18dp"
+                        android:layout_height="18dp"
+                        android:contentDescription="Go"
+                        android:tint="@color/home_text_hint"
+                        app:srcCompat="@drawable/ic_chevron_right" />
                 </LinearLayout>
             </LinearLayout>
 
