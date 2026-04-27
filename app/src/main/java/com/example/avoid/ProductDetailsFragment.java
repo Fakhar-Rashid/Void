@@ -27,7 +27,6 @@ import com.example.avoid.model.Product;
 import com.example.avoid.model.Review;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class ProductDetailsFragment extends Fragment {
@@ -113,13 +112,13 @@ public class ProductDetailsFragment extends Fragment {
         ViewPager2 viewPager = view.findViewById(R.id.productImagesViewPager);
         LinearLayout dotsLayout = view.findViewById(R.id.dotIndicatorsLayout);
 
-        // Dummy image items
-        List<Integer> images = Arrays.asList(0, 0, 0); 
-        CarouselAdapter adapter = new CarouselAdapter(images);
+        List<String> imageUrls = (product != null && product.getImageUrls() != null && !product.getImageUrls().isEmpty())
+                ? product.getImageUrls()
+                : new ArrayList<>();
+        CarouselAdapter adapter = new CarouselAdapter(imageUrls);
         viewPager.setAdapter(adapter);
 
-        // Setup dots
-        ImageView[] dots = new ImageView[images.size()];
+        ImageView[] dots = new ImageView[imageUrls.size()];
         for (int i = 0; i < dots.length; i++) {
             dots[i] = new ImageView(requireContext());
             dots[i].setImageResource(R.drawable.bg_avatar_circle); // Reusing a simple shape

@@ -3,11 +3,13 @@ package com.example.avoid.adapter;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
 import com.example.avoid.R;
 import com.example.avoid.model.Product;
 
@@ -75,6 +77,7 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductV
 
     static class ProductViewHolder extends RecyclerView.ViewHolder {
 
+        private final ImageView productImageView;
         private final TextView productNameTextView;
         private final TextView productPriceTextView;
         private final TextView productLocationTextView;
@@ -82,6 +85,7 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductV
 
         ProductViewHolder(@NonNull View itemView) {
             super(itemView);
+            productImageView        = itemView.findViewById(R.id.productImageView);
             productNameTextView     = itemView.findViewById(R.id.productNameTextView);
             productPriceTextView    = itemView.findViewById(R.id.productPriceTextView);
             productLocationTextView = itemView.findViewById(R.id.productLocationTextView);
@@ -93,6 +97,14 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductV
             productPriceTextView.setText(product.getPrice());
             productLocationTextView.setText(product.getLocation());
             productRatingTextView.setText(product.getRatingSummary());
+
+            if (productImageView != null) {
+                Glide.with(productImageView.getContext())
+                        .load(product.getMainImageUrl())
+                        .placeholder(R.drawable.bg_product_placeholder)
+                        .error(R.drawable.bg_product_placeholder)
+                        .into(productImageView);
+            }
         }
     }
 }

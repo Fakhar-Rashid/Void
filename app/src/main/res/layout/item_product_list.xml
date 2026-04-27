@@ -7,11 +7,14 @@
     android:gravity="center_vertical"
     android:orientation="horizontal">
 
-    <View
-        android:id="@+id/productImagePlaceholder"
+    <com.google.android.material.imageview.ShapeableImageView
+        android:id="@+id/productImageView"
         android:layout_width="@dimen/home_recommendation_thumb_size"
         android:layout_height="@dimen/home_recommendation_thumb_size"
-        android:background="@drawable/bg_product_placeholder" />
+        android:background="@drawable/bg_product_placeholder"
+        android:contentDescription="@string/home_cd_location"
+        android:scaleType="centerCrop"
+        app:shapeAppearanceOverlay="@style/ShapeAppearance.Void.RoundedImage" />
 
     <LinearLayout
         android:layout_width="0dp"

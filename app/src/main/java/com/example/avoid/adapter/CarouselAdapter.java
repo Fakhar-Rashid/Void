@@ -8,16 +8,17 @@ import android.widget.ImageView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
 import com.example.avoid.R;
 
 import java.util.List;
 
 public class CarouselAdapter extends RecyclerView.Adapter<CarouselAdapter.CarouselViewHolder> {
 
-    private final List<Integer> imageResIds;
+    private final List<String> imageUrls;
 
-    public CarouselAdapter(List<Integer> imageResIds) {
-        this.imageResIds = imageResIds;
+    public CarouselAdapter(List<String> imageUrls) {
+        this.imageUrls = imageUrls;
     }
 
     @NonNull
@@ -30,17 +31,16 @@ public class CarouselAdapter extends RecyclerView.Adapter<CarouselAdapter.Carous
 
     @Override
     public void onBindViewHolder(@NonNull CarouselViewHolder holder, int position) {
-        // We use placeholders if imageResIds contains 0 or invalid id, but usually it's set
-        if (imageResIds.get(position) != 0) {
-            holder.imageView.setImageResource(imageResIds.get(position));
-        } else {
-            holder.imageView.setBackgroundResource(R.drawable.bg_product_placeholder);
-        }
+        Glide.with(holder.imageView.getContext())
+                .load(imageUrls.get(position))
+                .placeholder(R.drawable.bg_product_placeholder)
+                .error(R.drawable.bg_product_placeholder)
+                .into(holder.imageView);
     }
 
     @Override
     public int getItemCount() {
-        return imageResIds.size();
+        return imageUrls.size();
     }
 
     static class CarouselViewHolder extends RecyclerView.ViewHolder {

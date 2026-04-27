@@ -6,11 +6,14 @@
     android:layout_marginEnd="@dimen/home_product_card_spacing"
     android:orientation="vertical">
 
-    <View
-        android:id="@+id/productImagePlaceholder"
+    <com.google.android.material.imageview.ShapeableImageView
+        android:id="@+id/productImageView"
         android:layout_width="match_parent"
         android:layout_height="@dimen/home_product_image_height"
-        android:background="@drawable/bg_product_placeholder" />
+        android:background="@drawable/bg_product_placeholder"
+        android:contentDescription="@string/home_cd_location"
+        android:scaleType="centerCrop"
+        app:shapeAppearanceOverlay="@style/ShapeAppearance.Void.RoundedImage" />
 
     <TextView
         android:id="@+id/productNameTextView"
