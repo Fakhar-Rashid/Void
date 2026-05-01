@@ -13,6 +13,8 @@ public class Chat {
     private String storeName;
     private String lastMessage;
     private long lastMessageTimestamp;
+    private int unreadCountBuyer;
+    private int unreadCountStore;
 
     public Chat() {
         // Default constructor required for calls to DataSnapshot.getValue(Chat.class)
@@ -26,6 +28,8 @@ public class Chat {
         this.buyerName = buyerName;
         this.storeId = storeId;
         this.storeName = storeName;
+        this.unreadCountBuyer = 0;
+        this.unreadCountStore = 0;
     }
 
     public String getChatId() { return chatId; }
@@ -54,4 +58,10 @@ public class Chat {
 
     public long getLastMessageTimestamp() { return lastMessageTimestamp; }
     public void setLastMessageTimestamp(long lastMessageTimestamp) { this.lastMessageTimestamp = lastMessageTimestamp; }
+
+    public int getUnreadCountBuyer() { return unreadCountBuyer; }
+    public void setUnreadCountBuyer(int unreadCountBuyer) { this.unreadCountBuyer = unreadCountBuyer; }
+
+    public int getUnreadCountStore() { return unreadCountStore; }
+    public void setUnreadCountStore(int unreadCountStore) { this.unreadCountStore = unreadCountStore; }
 }

@@ -8,6 +8,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ServerValue;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
@@ -46,6 +47,11 @@ public class ChatRepository {
         void onError(Exception e);
     }
 
+    public interface UnreadCountCallback {
+        void onUnreadCountUpdated(int totalUnread);
+        void onError(Exception e);
+    }
+
     // Generate a consistent chat ID based on the participants and product
     public String generateChatId(String buyerId, String storeId, String productId) {
         return buyerId + "_" + storeId + "_" + productId;
@@ -69,10 +75,20 @@ public class ChatRepository {
         });
     }
 
+    public void markChatAsRead(String chatId, boolean isStoreOwner) {
+        DatabaseReference chatRef = db.getReference("chats").child(chatId);
+        if (isStoreOwner) {
+            chatRef.child("unreadCountStore").setValue(0);
+        } else {
+            chatRef.child("unreadCountBuyer").setValue(0);
+        }
+    }
+
     public void sendMessage(String chatId, ChatMessage message, Chat chatMetadata) {
         DatabaseReference chatRef = db.getReference("chats").child(chatId);
         DatabaseReference messagesRef = db.getReference("messages").child(chatId);
-        DatabaseReference userChatsRef = db.getReference("userChats");
+        DatabaseReference buyerChatsRef = db.getReference("buyerChats");
+        DatabaseReference storeChatsRef = db.getReference("storeChats");
 
         // Push new message
         String messageId = messagesRef.push().getKey();
@@ -81,15 +97,38 @@ public class ChatRepository {
             messagesRef.child(messageId).setValue(message);
         }
 
-        // Update chat metadata (last message, timestamp, participants info)
-        chatMetadata.setChatId(chatId);
-        chatMetadata.setLastMessage(message.getText());
-        chatMetadata.setLastMessageTimestamp(message.getTimestamp());
-        chatRef.setValue(chatMetadata);
+        // Determine who sent the message
+        boolean senderIsStore = message.getSenderId().equals(chatMetadata.getStoreId());
 
-        // Add to both users' chat lists
-        userChatsRef.child(chatMetadata.getBuyerId()).child(chatId).setValue(true);
-        userChatsRef.child(chatMetadata.getStoreId()).child(chatId).setValue(true);
+        // We fetch current chat to increment unread count properly without overwriting other fields.
+        // If chat doesn't exist, we create it.
+        chatRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                Chat existingChat = snapshot.exists() ? snapshot.getValue(Chat.class) : chatMetadata;
+                if (existingChat != null) {
+                    existingChat.setLastMessage(message.getText());
+                    existingChat.setLastMessageTimestamp(message.getTimestamp());
+                    
+                    if (senderIsStore) {
+                        existingChat.setUnreadCountBuyer(existingChat.getUnreadCountBuyer() + 1);
+                    } else {
+                        existingChat.setUnreadCountStore(existingChat.getUnreadCountStore() + 1);
+                    }
+                    
+                    chatRef.setValue(existingChat);
+
+                    // Add to separated indices
+                    buyerChatsRef.child(existingChat.getBuyerId()).child(chatId).setValue(true);
+                    storeChatsRef.child(existingChat.getStoreId()).child(chatId).setValue(true);
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                // Ignore
+            }
+        });
     }
 
     public ValueEventListener listenForMessages(String chatId, MessagesCallback callback) {
@@ -120,8 +159,10 @@ public class ChatRepository {
         }
     }
 
-    public ValueEventListener listenForUserChats(String userId, ChatListCallback callback) {
-        DatabaseReference userChatsRef = db.getReference("userChats").child(userId);
+    public ValueEventListener listenForUserChats(String userId, boolean isSellerMode, ChatListCallback callback) {
+        String indexNode = isSellerMode ? "storeChats" : "buyerChats";
+        DatabaseReference chatsIndexRef = db.getReference(indexNode).child(userId);
+        
         ValueEventListener listener = new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -164,13 +205,70 @@ public class ChatRepository {
                 callback.onError(error.toException());
             }
         };
-        userChatsRef.addValueEventListener(listener);
+        chatsIndexRef.addValueEventListener(listener);
         return listener;
     }
 
-    public void removeUserChatsListener(String userId, ValueEventListener listener) {
+    public void removeUserChatsListener(String userId, boolean isSellerMode, ValueEventListener listener) {
         if (listener != null) {
-            db.getReference("userChats").child(userId).removeEventListener(listener);
+            String indexNode = isSellerMode ? "storeChats" : "buyerChats";
+            db.getReference(indexNode).child(userId).removeEventListener(listener);
+        }
+    }
+
+    public ValueEventListener listenForTotalUnreadCount(String userId, boolean isSellerMode, UnreadCountCallback callback) {
+        String indexNode = isSellerMode ? "storeChats" : "buyerChats";
+        DatabaseReference chatsIndexRef = db.getReference(indexNode).child(userId);
+        
+        ValueEventListener listener = new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                List<String> chatIds = new ArrayList<>();
+                for (DataSnapshot doc : snapshot.getChildren()) {
+                    chatIds.add(doc.getKey());
+                }
+
+                if (chatIds.isEmpty()) {
+                    callback.onUnreadCountUpdated(0);
+                    return;
+                }
+
+                db.getReference("chats").addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot chatsSnapshot) {
+                        int totalUnread = 0;
+                        for (String chatId : chatIds) {
+                            DataSnapshot chatSnap = chatsSnapshot.child(chatId);
+                            if (chatSnap.exists()) {
+                                Chat chat = chatSnap.getValue(Chat.class);
+                                if (chat != null) {
+                                    totalUnread += isSellerMode ? chat.getUnreadCountStore() : chat.getUnreadCountBuyer();
+                                }
+                            }
+                        }
+                        callback.onUnreadCountUpdated(totalUnread);
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+                        callback.onError(error.toException());
+                    }
+                });
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                callback.onError(error.toException());
+            }
+        };
+        chatsIndexRef.addValueEventListener(listener);
+        return listener;
+    }
+
+    public void removeTotalUnreadCountListener(String userId, boolean isSellerMode, ValueEventListener listener) {
+        if (listener != null) {
+            String indexNode = isSellerMode ? "storeChats" : "buyerChats";
+            db.getReference(indexNode).child(userId).removeEventListener(listener);
         }
     }
 }

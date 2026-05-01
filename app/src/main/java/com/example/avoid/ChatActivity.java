@@ -90,6 +90,8 @@ public class ChatActivity extends AppCompatActivity {
                 if (!messages.isEmpty()) {
                     messagesRecyclerView.smoothScrollToPosition(messages.size() - 1);
                 }
+                boolean isStoreOwner = currentUser.getId().equals(storeId);
+                ChatRepository.getInstance().markChatAsRead(chatId, isStoreOwner);
             }
 
             @Override

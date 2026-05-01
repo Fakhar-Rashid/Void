@@ -3,6 +3,7 @@ package com.example.avoid;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import androidx.activity.EdgeToEdge;
 import androidx.annotation.IdRes;
@@ -35,6 +36,7 @@ public class SellerActivity extends AppCompatActivity {
     );
 
     @IdRes private int currentTabId = R.id.sellerTabHome;
+    private com.google.firebase.database.ValueEventListener unreadCountListener;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -55,6 +57,39 @@ public class SellerActivity extends AppCompatActivity {
 
         if (savedInstanceState == null) {
             selectTab(R.id.sellerTabHome);
+        }
+        
+        listenForUnreadCount();
+    }
+
+    private void listenForUnreadCount() {
+        String userId = UserSession.getInstance().getCurrentUser().getId();
+        unreadCountListener = ChatRepository.getInstance().listenForTotalUnreadCount(userId, true, new ChatRepository.UnreadCountCallback() {
+            @Override
+            public void onUnreadCountUpdated(int totalUnread) {
+                TextView badge = findViewById(R.id.sellerChatBadge);
+                if (badge != null) {
+                    if (totalUnread > 0) {
+                        badge.setVisibility(View.VISIBLE);
+                        badge.setText(totalUnread > 99 ? "99+" : String.valueOf(totalUnread));
+                    } else {
+                        badge.setVisibility(View.GONE);
+                    }
+                }
+            }
+
+            @Override
+            public void onError(Exception e) {
+            }
+        });
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (unreadCountListener != null) {
+            String userId = UserSession.getInstance().getCurrentUser().getId();
+            ChatRepository.getInstance().removeTotalUnreadCountListener(userId, true, unreadCountListener);
         }
     }
 
@@ -83,10 +118,6 @@ public class SellerActivity extends AppCompatActivity {
     }
 
     private void selectTab(@IdRes int tabId) {
-        if (tabId == R.id.sellerTabChat) {
-            startActivity(new android.content.Intent(this, ChatListActivity.class));
-            return;
-        }
         currentTabId = tabId;
         Fragment fragment = fragmentForTab(tabId);
         getSupportFragmentManager().beginTransaction()
@@ -113,9 +144,7 @@ public class SellerActivity extends AppCompatActivity {
         } else if (tabId == R.id.sellerTabOrders) {
             return new com.example.avoid.seller.SellerOrdersFragment();
         } else if (tabId == R.id.sellerTabChat) {
-            return SellerPlaceholderFragment.newInstance(
-                    "Chat with buyers",
-                    "Messages from interested buyers will land here.");
+            return ChatListFragment.newInstance(true);
         } else if (tabId == R.id.sellerTabProfile) {
             return new SellerProfileFragment();
         }
@@ -128,7 +157,13 @@ public class SellerActivity extends AppCompatActivity {
         for (int id : SWITCHABLE_TABS) {
             View tab = findViewById(id);
             if (tab == null) continue;
-            ImageView icon = (ImageView) ((android.view.ViewGroup) tab).getChildAt(0);
+            View child = ((android.view.ViewGroup) tab).getChildAt(0);
+            ImageView icon;
+            if (child instanceof android.widget.FrameLayout) {
+                icon = (ImageView) ((android.view.ViewGroup) child).getChildAt(0);
+            } else {
+                icon = (ImageView) child;
+            }
             icon.setColorFilter(id == currentTabId ? active : inactive);
         }
     }
