@@ -137,7 +137,30 @@ public class UserRepository {
                 });
     }
 
-    private interface OrdersDoneListener { void onDone(List<Order> orders); }
+    public void loadStoreOrders(String storeId, OrdersDoneListener cb) {
+        db.collection(ORDERS)
+                .whereArrayContains("storeIds", storeId)
+                .get()
+                .addOnSuccessListener(snap -> {
+                    List<Order> orders = new ArrayList<>();
+                    for (QueryDocumentSnapshot doc : snap) {
+                        Order o = doc.toObject(Order.class);
+                        orders.add(o);
+                    }
+                    Collections.sort(orders, new Comparator<Order>() {
+                        @Override public int compare(Order a, Order b) {
+                            return Long.compare(b.getOrderTimestamp(), a.getOrderTimestamp());
+                        }
+                    });
+                    cb.onDone(orders);
+                })
+                .addOnFailureListener(e -> {
+                    Log.e(TAG, "load store orders failed", e);
+                    cb.onDone(new ArrayList<>());
+                });
+    }
+
+    public interface OrdersDoneListener { void onDone(List<Order> orders); }
 
     private void loadStoreIfSeller(User user, Runnable next) {
         if (!user.isSeller()) { next.run(); return; }

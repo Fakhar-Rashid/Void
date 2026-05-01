@@ -405,19 +405,63 @@
             android:tint="@color/home_text_primary"
             android:padding="12dp" />
 
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/footerAddToCartButton"
+        <FrameLayout
             android:layout_width="0dp"
             android:layout_height="52dp"
             android:layout_weight="1"
-            android:layout_marginStart="16dp"
-            android:text="Add to Cart"
-            android:textAllCaps="false"
-            android:textSize="16sp"
-            android:fontFamily="sans-serif-medium"
-            app:cornerRadius="8dp"
-            app:backgroundTint="@color/black"
-            android:textColor="@color/home_white" />
+            android:layout_marginStart="16dp">
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/footerAddToCartButton"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:text="Add to Cart"
+                android:textAllCaps="false"
+                android:textSize="16sp"
+                android:fontFamily="sans-serif-medium"
+                app:cornerRadius="8dp"
+                app:backgroundTint="@color/black"
+                android:textColor="@color/home_white" />
+
+            <LinearLayout
+                android:id="@+id/quantityControlLayout"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:background="@drawable/bg_quantity_selector"
+                android:visibility="gone">
+
+                <ImageButton
+                    android:id="@+id/btnMinus"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:layout_marginStart="6dp"
+                    android:background="@drawable/bg_qty_button"
+                    android:src="@drawable/ic_minus"
+                    android:tint="@color/home_text_primary" />
+
+                <TextView
+                    android:id="@+id/tvQuantity"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:text="1"
+                    android:textColor="@color/home_text_primary"
+                    android:textSize="16sp"
+                    android:fontFamily="sans-serif-medium" />
+
+                <ImageButton
+                    android:id="@+id/btnPlus"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:layout_marginEnd="6dp"
+                    android:background="@drawable/bg_qty_button"
+                    android:src="@drawable/ic_plus"
+                    android:tint="@color/home_text_primary" />
+            </LinearLayout>
+        </FrameLayout>
     </LinearLayout>
 
 </FrameLayout>

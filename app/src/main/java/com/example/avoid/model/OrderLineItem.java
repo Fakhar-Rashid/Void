@@ -17,17 +17,19 @@ public class OrderLineItem implements Serializable {
     private String productImageUrl;
     private String color;
     private int quantity;
+    private String storeId;
 
     public OrderLineItem() {}
 
     public OrderLineItem(String productId, String productName, double productPrice,
-                         String productImageUrl, String color, int quantity) {
+                         String productImageUrl, String color, int quantity, String storeId) {
         this.productId = productId;
         this.productName = productName;
         this.productPrice = productPrice;
         this.productImageUrl = productImageUrl;
         this.color = color;
         this.quantity = quantity;
+        this.storeId = storeId;
     }
 
     public String getProductId() { return productId; }
@@ -47,6 +49,9 @@ public class OrderLineItem implements Serializable {
 
     public int getQuantity() { return quantity; }
     public void setQuantity(int quantity) { this.quantity = quantity; }
+
+    public String getStoreId() { return storeId; }
+    public void setStoreId(String storeId) { this.storeId = storeId; }
 
     @Exclude
     public double getLineTotal() { return productPrice * quantity; }

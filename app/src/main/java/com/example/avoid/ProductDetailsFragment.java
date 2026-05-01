@@ -227,6 +227,7 @@ public class ProductDetailsFragment extends Fragment {
             swatchContainer.setOnClickListener(v -> {
                 selectedColorIndex = position;
                 renderColorSwatches();
+                updateAddToCartUI();
             });
 
             colorSwatchesLayout.addView(swatchContainer);
@@ -289,6 +290,10 @@ public class ProductDetailsFragment extends Fragment {
 
     private void setupAddToCartSection(View view) {
         View addToCartButton = view.findViewById(R.id.footerAddToCartButton);
+        View quantityControlLayout = view.findViewById(R.id.quantityControlLayout);
+        ImageButton btnMinus = view.findViewById(R.id.btnMinus);
+        ImageButton btnPlus = view.findViewById(R.id.btnPlus);
+        
         if (product == null) return;
 
         boolean ownProduct = isOwnedByCurrentUser(product);
@@ -315,11 +320,86 @@ public class ProductDetailsFragment extends Fragment {
             UserRepository.getInstance().saveCartForCurrentUser();
             android.widget.Toast.makeText(requireContext(), "Added to cart",
                     android.widget.Toast.LENGTH_SHORT).show();
-
-            if (getActivity() instanceof CartBadgeUpdater) {
-                ((CartBadgeUpdater) getActivity()).updateCartBadge(cart.getTotalItemCount());
-            }
+            updateAddToCartUI();
         });
+
+        btnPlus.setOnClickListener(v -> {
+            String selectedColor = getSelectedColorString();
+            com.example.avoid.model.Cart cart = UserSession.getInstance().getCurrentUser().getCart();
+            
+            int currentQty = 0;
+            if (cart != null) {
+                for (com.example.avoid.model.CartItem item : cart.getItems()) {
+                    if (item.getProductId() != null && item.getProductId().equals(product.getId())
+                            && (item.getColor() == null ? selectedColor == null : item.getColor().equals(selectedColor))) {
+                        currentQty = item.getQuantity();
+                        break;
+                    }
+                }
+            }
+            if (currentQty >= product.getStock()) {
+                android.widget.Toast.makeText(requireContext(), "Cannot exceed available stock", android.widget.Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            cart.addItem(product.getId(), selectedColor, 1);
+            UserRepository.getInstance().saveCartForCurrentUser();
+            updateAddToCartUI();
+        });
+
+        btnMinus.setOnClickListener(v -> {
+            String selectedColor = getSelectedColorString();
+            com.example.avoid.model.Cart cart = UserSession.getInstance().getCurrentUser().getCart();
+            if (cart != null) {
+                for (com.example.avoid.model.CartItem item : cart.getItems()) {
+                    if (item.getProductId() != null && item.getProductId().equals(product.getId())
+                            && (item.getColor() == null ? selectedColor == null : item.getColor().equals(selectedColor))) {
+                        item.setQuantity(item.getQuantity() - 1);
+                        if (item.getQuantity() <= 0) {
+                            cart.removeItem(item);
+                        }
+                        UserRepository.getInstance().saveCartForCurrentUser();
+                        break;
+                    }
+                }
+            }
+            updateAddToCartUI();
+        });
+
+        updateAddToCartUI();
+    }
+
+    private void updateAddToCartUI() {
+        View view = getView();
+        if (view == null || product == null) return;
+        View addToCartButton = view.findViewById(R.id.footerAddToCartButton);
+        View quantityControlLayout = view.findViewById(R.id.quantityControlLayout);
+        TextView tvQuantity = view.findViewById(R.id.tvQuantity);
+
+        String selectedColor = getSelectedColorString();
+        com.example.avoid.model.Cart cart = UserSession.getInstance().getCurrentUser().getCart();
+        int qty = 0;
+        if (cart != null) {
+            for (com.example.avoid.model.CartItem item : cart.getItems()) {
+                if (item.getProductId() != null && item.getProductId().equals(product.getId())
+                        && (item.getColor() == null ? selectedColor == null : item.getColor().equals(selectedColor))) {
+                    qty = item.getQuantity();
+                    break;
+                }
+            }
+        }
+        if (qty > 0) {
+            addToCartButton.setVisibility(View.GONE);
+            quantityControlLayout.setVisibility(View.VISIBLE);
+            tvQuantity.setText(String.valueOf(qty));
+        } else {
+            addToCartButton.setVisibility(View.VISIBLE);
+            quantityControlLayout.setVisibility(View.GONE);
+        }
+
+        if (getActivity() instanceof CartBadgeUpdater) {
+            ((CartBadgeUpdater) getActivity()).updateCartBadge(cart != null ? cart.getTotalItemCount() : 0);
+        }
     }
 
     private void setupStockLabel(View view) {

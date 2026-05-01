@@ -107,9 +107,7 @@ public class SellerActivity extends AppCompatActivity {
         if (tabId == R.id.sellerTabHome) {
             return new SellerHomeFragment();
         } else if (tabId == R.id.sellerTabOrders) {
-            return SellerPlaceholderFragment.newInstance(
-                    "Incoming orders",
-                    "Orders from buyers will show up here once they start rolling in.");
+            return new com.example.avoid.seller.SellerOrdersFragment();
         } else if (tabId == R.id.sellerTabChat) {
             return SellerPlaceholderFragment.newInstance(
                     "Chat with buyers",

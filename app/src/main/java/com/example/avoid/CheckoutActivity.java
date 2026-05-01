@@ -121,6 +121,13 @@ public class CheckoutActivity extends AppCompatActivity {
             Toast.makeText(this, "Your cart is empty", Toast.LENGTH_SHORT).show();
             return;
         }
+        com.google.android.material.textfield.TextInputEditText addressInput = findViewById(R.id.checkoutAddressInput);
+        String address = addressInput.getText() != null ? addressInput.getText().toString().trim() : "";
+        if (address.isEmpty()) {
+            Toast.makeText(this, "Please provide a shipping address", Toast.LENGTH_LONG).show();
+            return;
+        }
+
         if (productsById.isEmpty()) {
             Toast.makeText(this, "Loading products… try again in a moment.", Toast.LENGTH_SHORT).show();
             return;
@@ -128,6 +135,7 @@ public class CheckoutActivity extends AppCompatActivity {
 
         // Build line items + total from current product snapshots.
         List<OrderLineItem> lineItems = new ArrayList<>();
+        List<String> storeIds = new ArrayList<>();
         double total = 0;
         for (CartItem item : cart.getItems()) {
             Product p = productsById.get(item.getProductId());
@@ -140,7 +148,10 @@ public class CheckoutActivity extends AppCompatActivity {
             }
             String img = p.getMainImageUrl();
             lineItems.add(new OrderLineItem(p.getId(), p.getName(), p.getPrice(), img,
-                    item.getColor(), item.getQuantity()));
+                    item.getColor(), item.getQuantity(), p.getStoreId()));
+            if (p.getStoreId() != null && !storeIds.contains(p.getStoreId())) {
+                storeIds.add(p.getStoreId());
+            }
             total += p.getPrice() * item.getQuantity();
         }
         if (lineItems.isEmpty()) {
@@ -166,7 +177,8 @@ public class CheckoutActivity extends AppCompatActivity {
                 Order.Status.CONFIRMED,
                 finalTotal,
                 DateFormat.getDateInstance(DateFormat.MEDIUM).format(new Date()),
-                System.currentTimeMillis()
+                System.currentTimeMillis(),
+                storeIds
         );
 
         UserRepository.getInstance().saveOrder(order, new UserRepository.Callback<Order>() {
@@ -194,6 +206,12 @@ public class CheckoutActivity extends AppCompatActivity {
     private void initializeViews() {
         cartItemsRecyclerView = findViewById(R.id.checkoutItemsRecyclerView);
         cartTotalPrice = findViewById(R.id.checkoutTotalPrice);
+
+        com.google.android.material.textfield.TextInputEditText addressInput = findViewById(R.id.checkoutAddressInput);
+        User user = UserSession.getInstance().getCurrentUser();
+        if (user != null && user.getAddress() != null) {
+            addressInput.setText(user.getAddress());
+        }
     }
 
     private void setupSystemBars() {
