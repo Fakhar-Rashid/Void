@@ -120,115 +120,22 @@
                     android:layout_height="wrap_content"
                     android:orientation="horizontal">
 
-                    <FrameLayout
+                    <com.google.android.material.imageview.ShapeableImageView
                         android:layout_width="@dimen/home_banner_width"
                         android:layout_height="@dimen/home_banner_height"
-                        android:background="@drawable/bg_banner_primary">
+                        android:layout_marginEnd="@dimen/home_banner_spacing"
+                        android:contentDescription="@null"
+                        android:scaleType="centerCrop"
+                        android:src="@drawable/banner_1"
+                        app:shapeAppearanceOverlay="@style/ShapeAppearance.Void.RoundedImage" />
 
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:gravity="center_vertical"
-                            android:orientation="horizontal"
-                            android:padding="@dimen/home_banner_padding">
-
-                            <LinearLayout
-                                android:layout_width="0dp"
-                                android:layout_height="match_parent"
-                                android:layout_weight="1"
-                                android:gravity="center_vertical"
-                                android:orientation="vertical">
-
-                                <LinearLayout
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:gravity="center_vertical"
-                                    android:orientation="horizontal">
-
-                                    <TextView
-                                        android:layout_width="wrap_content"
-                                        android:layout_height="wrap_content"
-                                        android:fontFamily="sans-serif-medium"
-                                        android:text="@string/home_promo_network"
-                                        android:textColor="@color/home_white"
-                                        android:textSize="@dimen/home_banner_network_size" />
-
-                                    <TextView
-                                        android:layout_width="wrap_content"
-                                        android:layout_height="wrap_content"
-                                        android:layout_marginStart="@dimen/home_banner_badge_spacing"
-                                        android:background="@drawable/bg_banner_badge"
-                                        android:paddingStart="@dimen/home_banner_badge_horizontal_padding"
-                                        android:paddingTop="@dimen/home_banner_badge_vertical_padding"
-                                        android:paddingEnd="@dimen/home_banner_badge_horizontal_padding"
-                                        android:paddingBottom="@dimen/home_banner_badge_vertical_padding"
-                                        android:text="@string/home_promo_speed"
-                                        android:textColor="@color/home_white"
-                                        android:textSize="@dimen/home_banner_badge_text_size" />
-                                </LinearLayout>
-
-                                <TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:layout_marginTop="@dimen/home_banner_caption_spacing"
-                                    android:text="@string/home_promo_caption"
-                                    android:textColor="@color/home_promo_caption"
-                                    android:textSize="@dimen/home_banner_caption_size" />
-                            </LinearLayout>
-
-                            <LinearLayout
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:gravity="center_vertical"
-                                android:orientation="vertical">
-
-                                <TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:text="@string/home_promo_discount_label"
-                                    android:textColor="@color/home_promo_discount"
-                                    android:textSize="@dimen/home_banner_discount_label_size" />
-
-                                <TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:layout_marginTop="@dimen/home_banner_discount_top_margin"
-                                    android:fontFamily="sans-serif-medium"
-                                    android:text="@string/home_promo_discount_amount"
-                                    android:textColor="@color/home_white"
-                                    android:textSize="@dimen/home_banner_discount_amount_size" />
-                            </LinearLayout>
-                        </LinearLayout>
-                    </FrameLayout>
-
-                    <FrameLayout
+                    <com.google.android.material.imageview.ShapeableImageView
                         android:layout_width="@dimen/home_banner_width"
                         android:layout_height="@dimen/home_banner_height"
-                        android:layout_marginStart="@dimen/home_banner_spacing"
-                        android:background="@drawable/bg_banner_secondary">
-
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:orientation="vertical"
-                            android:padding="@dimen/home_banner_padding">
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="@string/home_secondary_banner_title"
-                                android:textColor="@color/home_white"
-                                android:textSize="@dimen/home_secondary_banner_title_size" />
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginTop="@dimen/home_secondary_banner_subtitle_top_margin"
-                                android:text="@string/home_secondary_banner_subtitle"
-                                android:textColor="@color/home_white"
-                                android:textSize="@dimen/home_secondary_banner_subtitle_size" />
-                        </LinearLayout>
-                    </FrameLayout>
+                        android:contentDescription="@null"
+                        android:scaleType="centerCrop"
+                        android:src="@drawable/banner_2"
+                        app:shapeAppearanceOverlay="@style/ShapeAppearance.Void.RoundedImage" />
                 </LinearLayout>
             </HorizontalScrollView>
 
