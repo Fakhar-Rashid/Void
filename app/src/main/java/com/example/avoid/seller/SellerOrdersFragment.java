@@ -79,7 +79,7 @@ public class SellerOrdersFragment extends Fragment {
                     // Filter line items to only show those belonging to this store
                     // But OrderAdapter currently just shows the "first" item. 
                     // This is sufficient for MVP as the order reflects in the list.
-                    recyclerView.setAdapter(new OrderAdapter(orders));
+                    recyclerView.setAdapter(new OrderAdapter(orders, true));
                 }
             }
         });

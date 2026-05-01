@@ -19,9 +19,15 @@ import java.util.List;
 public class OrderAdapter extends RecyclerView.Adapter<OrderAdapter.OrderViewHolder> {
 
     private final List<Order> orders;
+    private final boolean isSeller;
 
     public OrderAdapter(List<Order> orders) {
+        this(orders, false);
+    }
+
+    public OrderAdapter(List<Order> orders, boolean isSeller) {
         this.orders = orders;
+        this.isSeller = isSeller;
     }
 
     @NonNull
@@ -34,7 +40,7 @@ public class OrderAdapter extends RecyclerView.Adapter<OrderAdapter.OrderViewHol
 
     @Override
     public void onBindViewHolder(@NonNull OrderViewHolder holder, int position) {
-        holder.bind(orders.get(position));
+        holder.bind(orders.get(position), isSeller, this, position);
     }
 
     @Override
@@ -53,6 +59,8 @@ public class OrderAdapter extends RecyclerView.Adapter<OrderAdapter.OrderViewHol
         private final View deliveredRow;
         private final TextView deliveredDate;
         private final View seg1, seg2, seg3, seg4;
+        private final View sellerActionRow;
+        private final com.google.android.material.button.MaterialButton btnUpdateStatus;
 
         OrderViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -68,9 +76,11 @@ public class OrderAdapter extends RecyclerView.Adapter<OrderAdapter.OrderViewHol
             seg2              = itemView.findViewById(R.id.orderSeg2);
             seg3              = itemView.findViewById(R.id.orderSeg3);
             seg4              = itemView.findViewById(R.id.orderSeg4);
+            sellerActionRow   = itemView.findViewById(R.id.sellerActionRow);
+            btnUpdateStatus   = itemView.findViewById(R.id.btnUpdateStatus);
         }
 
-        void bind(Order order) {
+        void bind(Order order, boolean isSeller, RecyclerView.Adapter adapter, int position) {
             Context ctx = itemView.getContext();
 
             com.example.avoid.model.OrderLineItem first = order.getFirstItem();
@@ -88,8 +98,65 @@ public class OrderAdapter extends RecyclerView.Adapter<OrderAdapter.OrderViewHol
 
             if (delivered) {
                 deliveredDate.setText("Delivered on: " + order.getOrderDate());
+
+                com.google.android.material.button.MaterialButton btnReview = itemView.findViewById(R.id.btnWriteReview);
+                if (isSeller) {
+                    if (order.isReviewed()) {
+                        btnReview.setText("Read Review");
+                        btnReview.setEnabled(true);
+                        btnReview.setTextColor(ContextCompat.getColor(ctx, R.color.home_balance_gold));
+                    } else {
+                        btnReview.setText("Waiting for Review");
+                        btnReview.setEnabled(false);
+                        btnReview.setTextColor(ContextCompat.getColor(ctx, R.color.home_text_hint));
+                    }
+                } else {
+                    if (order.isReviewed()) {
+                        btnReview.setText("Read Your Review");
+                        btnReview.setEnabled(true);
+                        btnReview.setTextColor(ContextCompat.getColor(ctx, R.color.home_balance_gold));
+                    } else {
+                        btnReview.setText("Write a Review");
+                        btnReview.setEnabled(true);
+                        btnReview.setTextColor(ContextCompat.getColor(ctx, R.color.home_balance_gold));
+                    }
+                }
+
+                btnReview.setOnClickListener(v -> {
+                    android.content.Intent intent = new android.content.Intent(ctx, com.example.avoid.ReviewOrderActivity.class);
+                    intent.putExtra("order", order);
+                    intent.putExtra("isReadOnly", isSeller || order.isReviewed());
+                    ctx.startActivity(intent);
+                });
+
             } else {
                 bindProgressSegments(ctx, order.getStatus());
+            }
+
+            if (isSeller && !delivered) {
+                sellerActionRow.setVisibility(View.VISIBLE);
+                if (order.getStatus() == Order.Status.CONFIRMED) {
+                    btnUpdateStatus.setText("Mark as Packed");
+                } else if (order.getStatus() == Order.Status.PACKED) {
+                    btnUpdateStatus.setText("Mark as On the Way");
+                } else if (order.getStatus() == Order.Status.ON_THE_WAY) {
+                    btnUpdateStatus.setText("Mark as Delivered");
+                }
+
+                btnUpdateStatus.setOnClickListener(v -> {
+                    Order.Status nextStatus = null;
+                    if (order.getStatus() == Order.Status.CONFIRMED) nextStatus = Order.Status.PACKED;
+                    else if (order.getStatus() == Order.Status.PACKED) nextStatus = Order.Status.ON_THE_WAY;
+                    else if (order.getStatus() == Order.Status.ON_THE_WAY) nextStatus = Order.Status.DELIVERED;
+
+                    if (nextStatus != null) {
+                        order.setStatus(nextStatus);
+                        com.example.avoid.UserRepository.getInstance().saveOrder(order, null);
+                        adapter.notifyItemChanged(position);
+                    }
+                });
+            } else {
+                sellerActionRow.setVisibility(View.GONE);
             }
         }
 

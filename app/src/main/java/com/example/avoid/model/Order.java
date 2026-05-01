@@ -22,6 +22,7 @@ public class Order implements Serializable {
     private String orderDate;
     private long orderTimestamp;
     private List<String> storeIds = new ArrayList<>();
+    private boolean reviewed;
 
     public Order() {}
 
@@ -35,6 +36,7 @@ public class Order implements Serializable {
         this.orderDate = orderDate;
         this.orderTimestamp = orderTimestamp;
         this.storeIds = storeIds != null ? storeIds : new ArrayList<>();
+        this.reviewed = false;
     }
 
     public String getOrderId() { return orderId; }
@@ -70,6 +72,9 @@ public class Order implements Serializable {
     public void setStoreIds(List<String> storeIds) {
         this.storeIds = storeIds != null ? storeIds : new ArrayList<>();
     }
+
+    public boolean isReviewed() { return reviewed; }
+    public void setReviewed(boolean reviewed) { this.reviewed = reviewed; }
 
     @Exclude
     public OrderLineItem getFirstItem() {

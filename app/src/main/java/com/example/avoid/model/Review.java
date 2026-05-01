@@ -14,15 +14,19 @@ public class Review implements Serializable {
     private String date;
     private String comment;
     private String productId;
+    private String orderId;
     private long createdAt;
 
     public Review() {}
 
-    public Review(String reviewerName, float rating, String date, String comment) {
+    public Review(String reviewerName, float rating, String date, String comment, String productId, String orderId) {
         this.reviewerName = reviewerName;
         this.rating = rating;
         this.date = date;
         this.comment = comment;
+        this.productId = productId;
+        this.orderId = orderId;
+        this.createdAt = System.currentTimeMillis();
     }
 
     public String getId() { return id; }
@@ -42,6 +46,9 @@ public class Review implements Serializable {
 
     public String getProductId() { return productId; }
     public void setProductId(String productId) { this.productId = productId; }
+
+    public String getOrderId() { return orderId; }
+    public void setOrderId(String orderId) { this.orderId = orderId; }
 
     public long getCreatedAt() { return createdAt; }
     public void setCreatedAt(long createdAt) { this.createdAt = createdAt; }
