@@ -88,4 +88,19 @@
     <string name="cart_empty_title">Your cart is empty</string>
     <string name="cart_empty_body">Browse products and add something you love.</string>
     <string name="explore_products_action">Explore products</string>
+
+    <string name="onboarding_title">Set up your store</string>
+    <string name="onboarding_subtitle">Just a few details so buyers know who they\'re buying from.</string>
+    <string name="onboarding_section_about">About your store</string>
+    <string name="onboarding_section_location">Where you sell from</string>
+    <string name="onboarding_section_contact">Contact</string>
+    <string name="onboarding_hint_name">Store name</string>
+    <string name="onboarding_hint_description">Short description (optional)</string>
+    <string name="onboarding_hint_location">Location (city)</string>
+    <string name="onboarding_hint_email">Contact email</string>
+    <string name="onboarding_hint_phone">Phone (optional)</string>
+    <string name="onboarding_submit">Open my store</string>
+    <string name="onboarding_error_name">Please enter a store name.</string>
+    <string name="onboarding_error_location">Please enter a location.</string>
+    <string name="onboarding_error_email">Please enter a valid contact email.</string>
 </resources>

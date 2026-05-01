@@ -420,6 +420,7 @@
         android:paddingBottom="16dp">
 
         <com.google.android.material.button.MaterialButton
+            android:id="@+id/profileBecomeSellerButton"
             android:layout_width="match_parent"
             android:layout_height="52dp"
             android:fontFamily="sans-serif-medium"

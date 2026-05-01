@@ -42,7 +42,22 @@ public class ProfileFragment extends Fragment {
         view.findViewById(R.id.profileGuestLoginButton).setOnClickListener(v ->
                 startActivity(new Intent(requireContext(), LoginActivity.class)));
 
+        view.findViewById(R.id.profileBecomeSellerButton).setOnClickListener(v -> openSeller());
+
         render(view);
+    }
+
+    private void openSeller() {
+        if (!UserSession.getInstance().isLoggedIn()) {
+            startActivity(new Intent(requireContext(), LoginActivity.class));
+            return;
+        }
+        User user = UserSession.getInstance().getCurrentUser();
+        if (user.getStore() == null) {
+            startActivity(new Intent(requireContext(), SellerOnboardingActivity.class));
+        } else {
+            startActivity(new Intent(requireContext(), SellerActivity.class));
+        }
     }
 
     private final Runnable sessionListener = () -> {

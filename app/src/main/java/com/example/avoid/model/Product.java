@@ -17,6 +17,7 @@ public class Product implements Serializable {
     private String location;
     private String ratingSummary;
     private String category;
+    private String storeId;
     private List<String> imageUrls = new ArrayList<>();
 
     public Product() {}
@@ -53,6 +54,9 @@ public class Product implements Serializable {
 
     public String getCategory() { return category; }
     public void setCategory(String category) { this.category = category; }
+
+    public String getStoreId() { return storeId; }
+    public void setStoreId(String storeId) { this.storeId = storeId; }
 
     public List<String> getImageUrls() { return imageUrls; }
     public void setImageUrls(List<String> imageUrls) {

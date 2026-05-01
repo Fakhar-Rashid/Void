@@ -9,6 +9,7 @@ import com.example.avoid.model.Cart;
 import com.example.avoid.model.CartProduct;
 import com.example.avoid.model.Order;
 import com.example.avoid.model.Settings;
+import com.example.avoid.model.Store;
 import com.example.avoid.model.User;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -34,6 +35,7 @@ public class UserRepository {
     private static final String USERS  = "users";
     private static final String CARTS  = "carts";
     private static final String ORDERS = "orders";
+    private static final String STORES = "stores";
 
     private static UserRepository instance;
     private final FirebaseFirestore db = FirebaseFirestore.getInstance();
@@ -90,7 +92,7 @@ public class UserRepository {
 
                                 loadOrders(uid, ordersResult -> {
                                     finalUser.setOrders(ordersResult);
-                                    callback.onSuccess(finalUser);
+                                    loadStoreIfSeller(finalUser, () -> callback.onSuccess(finalUser));
                                 });
                             })
                             .addOnFailureListener(e -> {
@@ -98,7 +100,7 @@ public class UserRepository {
                                 finalUser.setCart(new Cart(uid));
                                 loadOrders(uid, ordersResult -> {
                                     finalUser.setOrders(ordersResult);
-                                    callback.onSuccess(finalUser);
+                                    loadStoreIfSeller(finalUser, () -> callback.onSuccess(finalUser));
                                 });
                             });
                 })
@@ -137,6 +139,32 @@ public class UserRepository {
 
     private interface OrdersDoneListener { void onDone(List<Order> orders); }
 
+    private void loadStoreIfSeller(User user, Runnable next) {
+        if (!user.isSeller()) { next.run(); return; }
+        db.collection(STORES).document(user.getId()).get()
+                .addOnSuccessListener(doc -> {
+                    if (doc.exists()) user.setStore(doc.toObject(Store.class));
+                    next.run();
+                })
+                .addOnFailureListener(e -> {
+                    Log.e(TAG, "load store failed", e);
+                    next.run();
+                });
+    }
+
+    public void saveStore(@NonNull Store store, @Nullable Callback<Store> callback) {
+        if (store.getOwnerId() == null) {
+            if (callback != null) callback.onFailure(new IllegalArgumentException("ownerId required"));
+            return;
+        }
+        db.collection(STORES).document(store.getOwnerId()).set(store)
+                .addOnSuccessListener(v -> { if (callback != null) callback.onSuccess(store); })
+                .addOnFailureListener(e -> {
+                    Log.e(TAG, "save store failed", e);
+                    if (callback != null) callback.onFailure(e);
+                });
+    }
+
     public void saveCart(User user) {
         if (user == null || user.getId() == null || user.getCart() == null) return;
         Cart cart = user.getCart();
@@ -169,6 +197,14 @@ public class UserRepository {
         patch.put("balance", user.getBalance());
         db.collection(USERS).document(user.getId()).update(patch)
                 .addOnFailureListener(e -> Log.e(TAG, "save balance failed", e));
+    }
+
+    public void saveSellerStatus(User user) {
+        if (user == null || user.getId() == null) return;
+        Map<String, Object> patch = new HashMap<>();
+        patch.put("seller", user.isSeller());
+        db.collection(USERS).document(user.getId()).update(patch)
+                .addOnFailureListener(e -> Log.e(TAG, "save seller status failed", e));
     }
 
     public void saveOrder(@NonNull Order order, @Nullable Callback<Order> callback) {

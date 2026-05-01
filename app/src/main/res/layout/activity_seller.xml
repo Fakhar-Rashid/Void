@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/sellerRoot"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/home_background">
+
+    <FrameLayout
+        android:id="@+id/sellerFragmentContainer"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@id/sellerBottomBar" />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/sellerFab"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@id/sellerBottomBar"
+        android:layout_alignParentEnd="true"
+        android:layout_marginEnd="20dp"
+        android:layout_marginBottom="20dp"
+        android:contentDescription="Add product"
+        android:src="@drawable/ic_plus"
+        app:backgroundTint="@color/home_balance_background"
+        app:elevation="6dp"
+        app:fabSize="normal"
+        app:tint="@color/home_white" />
+
+    <LinearLayout
+        android:id="@+id/sellerBottomBar"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/home_bottom_nav_height"
+        android:layout_alignParentBottom="true"
+        android:background="@color/home_nav_background"
+        android:elevation="@dimen/home_nav_elevation"
+        android:orientation="horizontal"
+        android:weightSum="4">
+
+        <LinearLayout
+            android:id="@+id/sellerTabHome"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:clickable="true"
+            android:focusable="true"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <ImageView
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:contentDescription="Home"
+                android:tint="@color/home_nav_inactive"
+                app:srcCompat="@drawable/ic_home" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/sellerTabOrders"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:clickable="true"
+            android:focusable="true"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <ImageView
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:contentDescription="Orders"
+                android:tint="@color/home_nav_inactive"
+                app:srcCompat="@drawable/ic_orders" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/sellerTabChat"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:clickable="true"
+            android:focusable="true"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <ImageView
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:contentDescription="Chat"
+                android:tint="@color/home_nav_inactive"
+                app:srcCompat="@drawable/ic_chat" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/sellerTabProfile"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:clickable="true"
+            android:focusable="true"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <ImageView
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:contentDescription="Profile"
+                android:tint="@color/home_nav_inactive"
+                app:srcCompat="@drawable/ic_profile" />
+        </LinearLayout>
+    </LinearLayout>
+</RelativeLayout>

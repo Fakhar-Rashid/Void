@@ -18,6 +18,7 @@ public class User implements Serializable {
     private String address;
     private String profileImageUrl;
     private double balance;
+    private boolean seller;
     private Settings settings;
 
     @Exclude
@@ -25,6 +26,9 @@ public class User implements Serializable {
 
     @Exclude
     private List<Order> orders = new ArrayList<>();
+
+    @Exclude
+    private Store store;
 
     public User() {
         this.settings = new Settings();
@@ -65,6 +69,9 @@ public class User implements Serializable {
     public double getBalance() { return balance; }
     public void setBalance(double balance) { this.balance = balance; }
 
+    public boolean isSeller() { return seller; }
+    public void setSeller(boolean seller) { this.seller = seller; }
+
     public Settings getSettings() {
         if (settings == null) settings = new Settings();
         return settings;
@@ -92,6 +99,11 @@ public class User implements Serializable {
     public void setOrders(List<Order> orders) {
         this.orders = orders != null ? orders : new ArrayList<>();
     }
+
+    @Exclude
+    public Store getStore() { return store; }
+    @Exclude
+    public void setStore(Store store) { this.store = store; }
 
     @Exclude
     public String getInitials() {

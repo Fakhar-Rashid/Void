@@ -17,6 +17,13 @@
             android:name=".CheckoutActivity"
             android:exported="false" />
         <activity
+            android:name=".SellerActivity"
+            android:exported="false" />
+        <activity
+            android:name=".SellerOnboardingActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
+        <activity
             android:name=".LoginActivity"
             android:exported="false"
             android:theme="@style/Theme.Void.Auth"
