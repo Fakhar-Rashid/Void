@@ -76,6 +76,34 @@ public class ProductDetailsFragment extends Fragment {
         setupAddToCartSection(view);
         setupStockLabel(view);
         loadStoreInfo(view);
+
+        ImageButton chatButton = view.findViewById(R.id.footerChatButton);
+        chatButton.setOnClickListener(v -> openChat());
+    }
+
+    private void openChat() {
+        if (!UserSession.getInstance().isLoggedIn()) {
+            startActivity(new android.content.Intent(requireContext(), LoginActivity.class));
+            return;
+        }
+
+        com.example.avoid.model.User currentUser = UserSession.getInstance().getCurrentUser();
+        if (currentUser == null || product == null || product.getStoreId() == null) return;
+
+        if (currentUser.getId().equals(product.getStoreId())) {
+            android.widget.Toast.makeText(requireContext(), "You cannot chat with yourself", android.widget.Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        android.content.Intent intent = new android.content.Intent(requireContext(), ChatActivity.class);
+        intent.putExtra("productId", product.getId());
+        intent.putExtra("productName", product.getName());
+        intent.putExtra("storeId", product.getStoreId());
+        intent.putExtra("storeName", product.getStoreName() != null ? product.getStoreName() : "Store");
+        intent.putExtra("buyerId", currentUser.getId());
+        intent.putExtra("buyerName", currentUser.getName() != null ? currentUser.getName() : "Buyer");
+        
+        startActivity(intent);
     }
 
     private void populateProductDetails(View view) {

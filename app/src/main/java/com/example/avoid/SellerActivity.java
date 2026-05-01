@@ -83,6 +83,10 @@ public class SellerActivity extends AppCompatActivity {
     }
 
     private void selectTab(@IdRes int tabId) {
+        if (tabId == R.id.sellerTabChat) {
+            startActivity(new android.content.Intent(this, ChatListActivity.class));
+            return;
+        }
         currentTabId = tabId;
         Fragment fragment = fragmentForTab(tabId);
         getSupportFragmentManager().beginTransaction()

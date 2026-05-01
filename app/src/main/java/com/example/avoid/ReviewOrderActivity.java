@@ -43,6 +43,12 @@ public class ReviewOrderActivity extends AppCompatActivity {
     private RecyclerView reviewRecyclerView;
     private ReviewProductAdapter adapter;
     private View btnSubmitReview;
+    
+    private RatingBar overallRatingBar;
+    private com.google.android.material.textfield.TextInputLayout overallCommentLayout;
+    private com.google.android.material.textfield.TextInputEditText overallCommentInput;
+    private TextView overallCommentText;
+    private float overallRating = 0;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -60,18 +66,60 @@ public class ReviewOrderActivity extends AppCompatActivity {
 
         findViewById(R.id.btnBack).setOnClickListener(v -> finish());
         TextView tvTitle = findViewById(R.id.tvTitle);
-        tvTitle.setText(isReadOnly ? "Read Review" : "Write a Review");
+        tvTitle.setText(isReadOnly ? "Read Review" : "Rate Your Order");
+
+        TextView tvStoreName = findViewById(R.id.tvStoreName);
+        TextView tvOrderId = findViewById(R.id.tvOrderId);
+        TextView tvOrderCost = findViewById(R.id.tvOrderCost);
+
+        String shortOrderId = order.getOrderId();
+        if (shortOrderId != null && shortOrderId.length() > 6) {
+            shortOrderId = shortOrderId.substring(0, 6).toUpperCase();
+        }
+        tvOrderId.setText("Order ID: #" + shortOrderId);
+        tvOrderCost.setText(String.format(java.util.Locale.US, "Order Cost: $%.2f", order.getTotalAmount()));
+
+        if (order.getStoreIds() != null && !order.getStoreIds().isEmpty()) {
+            UserRepository.getInstance().loadStore(order.getStoreIds().get(0), new UserRepository.Callback<com.example.avoid.model.Store>() {
+                @Override
+                public void onSuccess(com.example.avoid.model.Store result) {
+                    if (!isDestroyed()) tvStoreName.setText("Store: " + result.getName());
+                }
+
+                @Override
+                public void onFailure(@NonNull Exception e) {
+                    if (!isDestroyed()) tvStoreName.setText("Store: Unknown");
+                }
+            });
+        } else {
+            tvStoreName.setText("Store: Unknown");
+        }
 
         reviewRecyclerView = findViewById(R.id.reviewRecyclerView);
         reviewRecyclerView.setLayoutManager(new LinearLayoutManager(this));
 
         btnSubmitReview = findViewById(R.id.btnSubmitReview);
+        
+        overallRatingBar = findViewById(R.id.overallRatingBar);
+        overallCommentLayout = findViewById(R.id.overallCommentLayout);
+        overallCommentInput = findViewById(R.id.overallCommentInput);
+        overallCommentText = findViewById(R.id.overallCommentText);
 
         if (isReadOnly) {
             btnSubmitReview.setVisibility(View.GONE);
+            overallRatingBar.setIsIndicator(true);
+            overallCommentLayout.setVisibility(View.GONE);
+            overallCommentText.setVisibility(View.VISIBLE);
             loadExistingReviews();
         } else {
             // Setup for writing reviews
+            overallRatingBar.setIsIndicator(false);
+            overallCommentLayout.setVisibility(View.VISIBLE);
+            overallCommentText.setVisibility(View.GONE);
+            overallRatingBar.setOnRatingBarChangeListener((ratingBar, rating, fromUser) -> {
+                if (fromUser) overallRating = rating;
+            });
+            
             adapter = new ReviewProductAdapter(order.getItems(), isReadOnly, null);
             reviewRecyclerView.setAdapter(adapter);
 
@@ -85,9 +133,24 @@ public class ReviewOrderActivity extends AppCompatActivity {
             public void onSuccess(List<Review> result) {
                 // Map product ID to review for easy lookup
                 Map<String, Review> reviewMap = new HashMap<>();
+                Review overall = null;
                 for (Review r : result) {
-                    reviewMap.put(r.getProductId(), r);
+                    if ("OVERALL".equals(r.getProductId())) {
+                        overall = r;
+                    } else {
+                        reviewMap.put(r.getProductId(), r);
+                    }
                 }
+                
+                if (overall != null) {
+                    overallRatingBar.setRating(overall.getRating());
+                    String comment = overall.getComment();
+                    overallCommentText.setText(comment != null && !comment.isEmpty() ? comment : "No comment provided.");
+                } else {
+                    overallRatingBar.setRating(0);
+                    overallCommentText.setText("No overall review provided.");
+                }
+                
                 adapter = new ReviewProductAdapter(order.getItems(), isReadOnly, reviewMap);
                 reviewRecyclerView.setAdapter(adapter);
             }
@@ -120,6 +183,17 @@ public class ReviewOrderActivity extends AppCompatActivity {
                         order.getOrderId()
                 ));
             }
+        }
+        
+        if (overallRating > 0) {
+            reviewsToSave.add(new Review(
+                    reviewerName,
+                    overallRating,
+                    dateStr,
+                    overallCommentInput.getText() != null ? overallCommentInput.getText().toString() : "",
+                    "OVERALL",
+                    order.getOrderId()
+            ));
         }
 
         if (reviewsToSave.isEmpty()) {
@@ -199,6 +273,7 @@ public class ReviewOrderActivity extends AppCompatActivity {
             ReviewData data = reviewDataList.get(position);
             
             holder.productName.setText(item.getProductName());
+            holder.productPrice.setText(item.getDisplayPrice());
             
             if (item.getProductImageUrl() != null && !item.getProductImageUrl().isEmpty()) {
                 Glide.with(holder.itemView.getContext())
@@ -211,18 +286,22 @@ public class ReviewOrderActivity extends AppCompatActivity {
 
             if (isReadOnly) {
                 holder.ratingBar.setIsIndicator(true);
-                holder.commentInput.setEnabled(false);
+                holder.commentLayout.setVisibility(View.GONE);
+                holder.commentText.setVisibility(View.VISIBLE);
                 
                 Review existingReview = reviewMap != null ? reviewMap.get(item.getProductId()) : null;
                 if (existingReview != null) {
                     holder.ratingBar.setRating(existingReview.getRating());
-                    holder.commentInput.setText(existingReview.getComment());
+                    String comment = existingReview.getComment();
+                    holder.commentText.setText(comment != null && !comment.isEmpty() ? comment : "No comment provided.");
                 } else {
                     holder.ratingBar.setRating(0);
-                    holder.commentInput.setText("No review provided.");
+                    holder.commentText.setText("No review provided.");
                 }
             } else {
                 holder.ratingBar.setIsIndicator(false);
+                holder.commentLayout.setVisibility(View.VISIBLE);
+                holder.commentText.setVisibility(View.GONE);
                 holder.commentInput.setEnabled(true);
                 
                 holder.ratingBar.setOnRatingBarChangeListener((ratingBar, rating, fromUser) -> {
@@ -247,15 +326,21 @@ public class ReviewOrderActivity extends AppCompatActivity {
         static class ViewHolder extends RecyclerView.ViewHolder {
             ImageView productImage;
             TextView productName;
+            TextView productPrice;
             RatingBar ratingBar;
+            com.google.android.material.textfield.TextInputLayout commentLayout;
             TextInputEditText commentInput;
+            TextView commentText;
 
             ViewHolder(@NonNull View itemView) {
                 super(itemView);
                 productImage = itemView.findViewById(R.id.reviewProductImage);
                 productName = itemView.findViewById(R.id.reviewProductName);
+                productPrice = itemView.findViewById(R.id.reviewProductPrice);
                 ratingBar = itemView.findViewById(R.id.reviewRatingBar);
+                commentLayout = itemView.findViewById(R.id.reviewCommentLayout);
                 commentInput = itemView.findViewById(R.id.reviewCommentInput);
+                commentText = itemView.findViewById(R.id.reviewCommentText);
             }
         }
     }

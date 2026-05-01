@@ -56,6 +56,13 @@ public class HomeFragment extends Fragment {
         recommendationsRecyclerView.setAdapter(new SkeletonAdapter(R.layout.item_product_list_skeleton, 4));
 
         view.findViewById(R.id.searchBar).setOnClickListener(v -> openExplore(null));
+        view.findViewById(R.id.messagesButton).setOnClickListener(v -> {
+            if (UserSession.getInstance().isLoggedIn()) {
+                startActivity(new Intent(requireContext(), ChatListActivity.class));
+            } else {
+                startActivity(new Intent(requireContext(), LoginActivity.class));
+            }
+        });
         wireCategoryChips(view);
         bindBalance(view);
 

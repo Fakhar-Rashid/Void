@@ -28,30 +28,45 @@
 
             <ImageView
                 android:id="@+id/reviewProductImage"
-                android:layout_width="56dp"
-                android:layout_height="56dp"
+                android:layout_width="64dp"
+                android:layout_height="64dp"
                 android:scaleType="centerCrop"
                 android:background="@color/home_placeholder" />
 
-            <TextView
-                android:id="@+id/reviewProductName"
+            <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="12dp"
                 android:layout_weight="1"
-                android:fontFamily="sans-serif-medium"
-                android:textColor="@color/home_text_primary"
-                android:textSize="15sp" />
-        </LinearLayout>
+                android:orientation="vertical">
 
-        <RatingBar
-            android:id="@+id/reviewRatingBar"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:layout_gravity="center_horizontal"
-            android:numStars="5"
-            android:stepSize="1" />
+                <TextView
+                    android:id="@+id/reviewProductName"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="sans-serif-medium"
+                    android:textColor="@color/home_text_primary"
+                    android:textSize="15sp" />
+
+                <TextView
+                    android:id="@+id/reviewProductPrice"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/home_text_primary"
+                    android:textSize="14sp"
+                    android:layout_marginTop="2dp" />
+
+                <RatingBar
+                    android:id="@+id/reviewRatingBar"
+                    style="?android:attr/ratingBarStyleIndicator"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:numStars="5"
+                    android:stepSize="1"
+                    android:progressTint="#D4AF37" />
+            </LinearLayout>
+        </LinearLayout>
 
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/reviewCommentLayout"
@@ -59,7 +74,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
-            android:hint="Write a comment">
+            android:hint="How did this product feel? (Optional)">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/reviewCommentInput"
@@ -70,5 +85,14 @@
                 android:minLines="3"
                 android:maxLines="5" />
         </com.google.android.material.textfield.TextInputLayout>
+
+        <TextView
+            android:id="@+id/reviewCommentText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:textColor="@color/home_text_primary"
+            android:textSize="14sp"
+            android:visibility="gone" />
     </LinearLayout>
 </com.google.android.material.card.MaterialCardView>
