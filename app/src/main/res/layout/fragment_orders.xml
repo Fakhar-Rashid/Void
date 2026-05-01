@@ -49,11 +49,125 @@
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/ordersRecyclerView"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
         android:clipToPadding="false"
         android:overScrollMode="never"
         android:paddingStart="24dp"
         android:paddingEnd="24dp"
         android:paddingBottom="24dp" />
+
+    <LinearLayout
+        android:id="@+id/ordersEmptyContainer"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:paddingStart="32dp"
+        android:paddingEnd="32dp"
+        android:visibility="gone">
+
+        <FrameLayout
+            android:layout_width="96dp"
+            android:layout_height="96dp"
+            android:layout_marginBottom="22dp"
+            android:background="@drawable/bg_explore_circle">
+
+            <ImageView
+                android:layout_width="44dp"
+                android:layout_height="44dp"
+                android:layout_gravity="center"
+                android:contentDescription="Explore"
+                android:tint="@color/home_text_secondary"
+                app:srcCompat="@drawable/ic_orders" />
+        </FrameLayout>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:fontFamily="serif"
+            android:gravity="center"
+            android:text="@string/orders_empty_title"
+            android:textColor="@color/home_text_primary"
+            android:textSize="22sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:gravity="center"
+            android:lineSpacingMultiplier="1.3"
+            android:text="@string/orders_empty_body"
+            android:textColor="@color/home_text_hint"
+            android:textSize="14sp" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/ordersExploreButton"
+            style="@style/Widget.Material3.Button.TextButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="14dp"
+            android:fontFamily="sans-serif-medium"
+            android:text="@string/explore_products_action"
+            android:textColor="@color/home_text_primary"
+            android:textSize="15sp"
+            app:icon="@drawable/ic_chevron_right"
+            app:iconGravity="textEnd"
+            app:iconPadding="6dp"
+            app:iconTint="@color/home_text_primary" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/ordersGuestContainer"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:paddingStart="32dp"
+        android:paddingEnd="32dp"
+        android:visibility="gone">
+
+        <ImageView
+            android:layout_width="64dp"
+            android:layout_height="64dp"
+            android:layout_marginBottom="20dp"
+            android:contentDescription="Orders"
+            android:tint="@color/home_text_hint"
+            app:srcCompat="@drawable/ic_orders" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:fontFamily="sans-serif-black"
+            android:gravity="center"
+            android:text="@string/orders_login_title"
+            android:textColor="@color/home_text_primary"
+            android:textSize="20sp" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:gravity="center"
+            android:lineSpacingMultiplier="1.3"
+            android:text="@string/orders_login_body"
+            android:textColor="@color/home_text_hint"
+            android:textSize="14sp" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/ordersGuestLoginButton"
+            android:layout_width="match_parent"
+            android:layout_height="52dp"
+            android:layout_marginTop="24dp"
+            android:fontFamily="sans-serif-medium"
+            android:text="@string/auth_login"
+            android:textColor="@color/home_white"
+            android:textSize="15sp"
+            app:backgroundTint="@color/home_balance_background"
+            app:cornerRadius="12dp" />
+    </LinearLayout>
 
 </LinearLayout>

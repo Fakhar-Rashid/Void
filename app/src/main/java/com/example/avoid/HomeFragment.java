@@ -1,5 +1,6 @@
 package com.example.avoid;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -14,6 +15,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.avoid.adapter.ProductAdapter;
+import com.example.avoid.adapter.SkeletonAdapter;
 import com.example.avoid.model.Product;
 import com.example.avoid.model.User;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -49,6 +51,9 @@ public class HomeFragment extends Fragment {
                 new LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false));
         recommendationsRecyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
 
+        bestSellersRecyclerView.setAdapter(new SkeletonAdapter(R.layout.item_product_card_skeleton, 4));
+        recommendationsRecyclerView.setAdapter(new SkeletonAdapter(R.layout.item_product_list_skeleton, 4));
+
         view.findViewById(R.id.searchBar).setOnClickListener(v -> openExplore(null));
         wireCategoryChips(view);
         bindBalance(view);
@@ -79,10 +84,48 @@ public class HomeFragment extends Fragment {
     }
 
     private void bindBalance(View root) {
-        User user = UserSession.getInstance().getCurrentUser();
-        if (user == null) return;
-        ((TextView) root.findViewById(R.id.balanceAmount))
-                .setText(String.format(Locale.US, "$%.3f", user.getBalance()));
+        UserSession session = UserSession.getInstance();
+        User user = session.getCurrentUser();
+
+        TextView amount   = root.findViewById(R.id.balanceAmount);
+        View topUpButton  = root.findViewById(R.id.topUpButton);
+        View topUpPlus    = root.findViewById(R.id.topUpPlus);
+        TextView topUpLabel = root.findViewById(R.id.topUpLabel);
+
+        amount.setText(String.format(Locale.US, "$%.3f", user.getBalance()));
+
+        if (session.isLoggedIn()) {
+            topUpPlus.setVisibility(View.VISIBLE);
+            topUpLabel.setText(R.string.home_top_up);
+            topUpButton.setOnClickListener(null);
+        } else {
+            topUpPlus.setVisibility(View.GONE);
+            topUpLabel.setText(R.string.balance_login_label);
+            topUpButton.setOnClickListener(v ->
+                    startActivity(new Intent(requireContext(), LoginActivity.class)));
+        }
+    }
+
+    private final Runnable sessionListener = () -> {
+        if (getView() != null) bindBalance(getView());
+    };
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        UserSession.getInstance().addListener(sessionListener);
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        UserSession.getInstance().removeListener(sessionListener);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (getView() != null) bindBalance(getView());
     }
 
     private void openExplore(@Nullable String initialQuery) {

@@ -240,6 +240,7 @@ public class ProductDetailsFragment extends Fragment {
                 String selectedColor = getSelectedColorString();
                 com.example.avoid.model.Cart cart = UserSession.getInstance().getCurrentUser().getCart();
                 cart.addItem(product, selectedColor, 1);
+                UserRepository.getInstance().saveCartForCurrentUser();
                 android.widget.Toast.makeText(requireContext(), "Added to cart", android.widget.Toast.LENGTH_SHORT).show();
 
                 if (getActivity() instanceof CartBadgeUpdater) {

@@ -46,4 +46,46 @@
     <string name="explore_search_results">Search Results</string>
     <string name="explore_no_results">No products match your search.</string>
     <string name="explore_cd_back">Back</string>
+
+    <string name="auth_brand">Void</string>
+    <string name="auth_login_headline">Welcome back\nto Void</string>
+    <string name="auth_signup_headline">Join Void</string>
+    <string name="auth_continue_google">Continue with Google</string>
+    <string name="auth_or">OR</string>
+    <string name="auth_email_hint">Enter your email</string>
+    <string name="auth_password_hint">Password</string>
+    <string name="auth_name_hint">Full name</string>
+    <string name="auth_login">Log in</string>
+    <string name="auth_create_account">Create account</string>
+    <string name="auth_no_account">Don\'t have an account? </string>
+    <string name="auth_sign_up_action">Sign up</string>
+    <string name="auth_have_account">Already have an account? </string>
+    <string name="auth_login_action">Log in</string>
+    <string name="auth_terms">By continuing, you agree to our Terms and Privacy Policy.</string>
+    <string name="auth_verify_title">Verify your email</string>
+    <string name="auth_verify_body">We sent a verification link to %1$s.\nTap the link, then come back and continue.</string>
+    <string name="auth_verify_continue">I\'ve verified my email</string>
+    <string name="auth_verify_resend">Resend email</string>
+    <string name="auth_error_generic">Something went wrong. Please try again.</string>
+    <string name="auth_error_email_required">Please enter your email.</string>
+    <string name="auth_error_password_required">Please enter your password.</string>
+    <string name="auth_error_password_short">Password must be at least 6 characters.</string>
+    <string name="auth_error_name_required">Please enter your name.</string>
+    <string name="auth_error_email_invalid">Please enter a valid email.</string>
+    <string name="auth_error_email_not_verified">Please verify your email first. Check your inbox.</string>
+
+    <string name="orders_login_title">Sign in to see your orders</string>
+    <string name="orders_login_body">Log in or create an account to view your order history.</string>
+
+    <string name="profile_login_title">Sign in to your account</string>
+    <string name="profile_login_body">Log in to access your profile, settings, and orders.</string>
+
+    <string name="balance_login_label">Login</string>
+    <string name="checkout_login_label">Login to continue</string>
+
+    <string name="orders_empty_title">No orders yet</string>
+    <string name="orders_empty_body">Explore our products and place your first order.</string>
+    <string name="cart_empty_title">Your cart is empty</string>
+    <string name="cart_empty_body">Browse products and add something you love.</string>
+    <string name="explore_products_action">Explore products</string>
 </resources>

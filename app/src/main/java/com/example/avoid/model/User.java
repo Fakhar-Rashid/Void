@@ -1,12 +1,17 @@
 package com.example.avoid.model;
 
+import com.google.firebase.firestore.DocumentId;
+import com.google.firebase.firestore.Exclude;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
 public class User implements Serializable {
 
+    @DocumentId
     private String id;
+
     private String name;
     private String email;
     private String phone;
@@ -14,7 +19,11 @@ public class User implements Serializable {
     private String profileImageUrl;
     private double balance;
     private Settings settings;
+
+    @Exclude
     private Cart cart;
+
+    @Exclude
     private List<Order> orders = new ArrayList<>();
 
     public User() {
@@ -56,27 +65,35 @@ public class User implements Serializable {
     public double getBalance() { return balance; }
     public void setBalance(double balance) { this.balance = balance; }
 
-    public Settings getSettings() { return settings; }
+    public Settings getSettings() {
+        if (settings == null) settings = new Settings();
+        return settings;
+    }
     public void setSettings(Settings settings) {
         this.settings = settings != null ? settings : new Settings();
     }
 
+    @Exclude
     public Cart getCart() {
         if (cart == null) cart = new Cart(id);
         return cart;
     }
+    @Exclude
     public void setCart(Cart cart) {
         this.cart = cart != null ? cart : new Cart(id);
     }
 
+    @Exclude
     public List<Order> getOrders() {
         if (orders == null) orders = new ArrayList<>();
         return orders;
     }
+    @Exclude
     public void setOrders(List<Order> orders) {
         this.orders = orders != null ? orders : new ArrayList<>();
     }
 
+    @Exclude
     public String getInitials() {
         if (name == null || name.trim().isEmpty()) return "?";
         String[] parts = name.trim().split("\\s+");

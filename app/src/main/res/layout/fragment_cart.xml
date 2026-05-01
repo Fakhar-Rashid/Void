@@ -46,6 +46,68 @@
             app:srcCompat="@drawable/ic_bell" />
     </LinearLayout>
 
+    <LinearLayout
+        android:id="@+id/cartEmptyContainer"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:paddingStart="32dp"
+        android:paddingEnd="32dp"
+        android:visibility="gone">
+
+        <FrameLayout
+            android:layout_width="96dp"
+            android:layout_height="96dp"
+            android:layout_marginBottom="22dp"
+            android:background="@drawable/bg_explore_circle">
+
+            <ImageView
+                android:layout_width="44dp"
+                android:layout_height="44dp"
+                android:layout_gravity="center"
+                android:contentDescription="Cart"
+                android:tint="@color/home_text_secondary"
+                app:srcCompat="@drawable/ic_bag" />
+        </FrameLayout>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:fontFamily="serif"
+            android:gravity="center"
+            android:text="@string/cart_empty_title"
+            android:textColor="@color/home_text_primary"
+            android:textSize="22sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:gravity="center"
+            android:lineSpacingMultiplier="1.3"
+            android:text="@string/cart_empty_body"
+            android:textColor="@color/home_text_hint"
+            android:textSize="14sp" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/cartExploreButton"
+            style="@style/Widget.Material3.Button.TextButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="14dp"
+            android:fontFamily="sans-serif-medium"
+            android:text="@string/explore_products_action"
+            android:textColor="@color/home_text_primary"
+            android:textSize="15sp"
+            app:icon="@drawable/ic_chevron_right"
+            app:iconGravity="textEnd"
+            app:iconPadding="6dp"
+            app:iconTint="@color/home_text_primary" />
+    </LinearLayout>
+
     <androidx.core.widget.NestedScrollView
         android:id="@+id/cartScrollView"
         android:layout_width="match_parent"

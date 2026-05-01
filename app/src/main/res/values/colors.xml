@@ -14,6 +14,16 @@
     <color name="home_chip_text">#2A2A2A</color>
     <color name="explore_trending_chip_bg">#EAF1FB</color>
     <color name="explore_trending_chip_text">#5C6470</color>
+
+    <color name="auth_bg">#0E0E10</color>
+    <color name="auth_text_primary">#FFFFFF</color>
+    <color name="auth_text_secondary">#B5B5B7</color>
+    <color name="auth_text_hint">#6E6E72</color>
+    <color name="auth_input_bg">#1B1B1D</color>
+    <color name="auth_input_stroke">#303033</color>
+    <color name="auth_divider">#2A2A2D</color>
+    <color name="auth_button_dark">#1B1B1D</color>
+    <color name="auth_error">#FF6B6B</color>
     <color name="home_balance_background">#1E1E1F</color>
     <color name="home_balance_label">#E5D7B6</color>
     <color name="home_balance_gold">#9A6B13</color>

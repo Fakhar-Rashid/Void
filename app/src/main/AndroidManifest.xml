@@ -17,6 +17,16 @@
             android:name=".CheckoutActivity"
             android:exported="false" />
         <activity
+            android:name=".LoginActivity"
+            android:exported="false"
+            android:theme="@style/Theme.Void.Auth"
+            android:windowSoftInputMode="adjustResize" />
+        <activity
+            android:name=".SignUpActivity"
+            android:exported="false"
+            android:theme="@style/Theme.Void.Auth"
+            android:windowSoftInputMode="adjustResize" />
+        <activity
             android:name=".MainActivity"
             android:exported="true">
             <intent-filter>

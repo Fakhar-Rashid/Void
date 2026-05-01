@@ -22,6 +22,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.avoid.adapter.ProductAdapter;
+import com.example.avoid.adapter.SkeletonAdapter;
 import com.example.avoid.model.Product;
 import com.google.android.material.chip.Chip;
 import com.google.android.material.chip.ChipGroup;
@@ -83,6 +84,7 @@ public class ExploreProductsFragment extends Fragment {
         emptyState            = view.findViewById(R.id.exploreEmptyState);
 
         resultsRecyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
+        resultsRecyclerView.setAdapter(new SkeletonAdapter(R.layout.item_product_list_skeleton, 5));
 
         wireCategoryChips(view);
         wireTrendingSearchChips(view.findViewById(R.id.trendingSearchGroup));

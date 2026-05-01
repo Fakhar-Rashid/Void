@@ -1,5 +1,6 @@
 package com.example.avoid;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -26,19 +27,56 @@ public class ProfileFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        bindUser(view);
 
         view.findViewById(R.id.profileSettingsRow).setOnClickListener(v ->
                 requireActivity().getSupportFragmentManager().beginTransaction()
                         .add(R.id.fragment_container, new SettingsFragment())
                         .addToBackStack(null)
                         .commit());
+
+        view.findViewById(R.id.profileLogoutRow).setOnClickListener(v -> {
+            UserSession.getInstance().logout();
+            render(view);
+        });
+
+        view.findViewById(R.id.profileGuestLoginButton).setOnClickListener(v ->
+                startActivity(new Intent(requireContext(), LoginActivity.class)));
+
+        render(view);
+    }
+
+    private final Runnable sessionListener = () -> {
+        if (getView() != null) render(getView());
+    };
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        UserSession.getInstance().addListener(sessionListener);
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        UserSession.getInstance().removeListener(sessionListener);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (getView() != null) render(getView());
+    }
+
+    private void render(View view) {
+        boolean loggedIn = UserSession.getInstance().isLoggedIn();
+        view.findViewById(R.id.profileScrollView).setVisibility(loggedIn ? View.VISIBLE : View.GONE);
+        view.findViewById(R.id.profileBottomBar).setVisibility(loggedIn ? View.VISIBLE : View.GONE);
+        view.findViewById(R.id.profileGuestContainer).setVisibility(loggedIn ? View.GONE : View.VISIBLE);
+        if (loggedIn) bindUser(view);
     }
 
     private void bindUser(View view) {
         User user = UserSession.getInstance().getCurrentUser();
-        if (user == null) return;
-
         ((TextView) view.findViewById(R.id.profileAvatarInitials)).setText(user.getInitials());
         ((TextView) view.findViewById(R.id.profileName)).setText(user.getName());
         ((TextView) view.findViewById(R.id.profileEmail)).setText(user.getEmail());

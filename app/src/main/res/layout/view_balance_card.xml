@@ -51,6 +51,7 @@
             app:layout_constraintTop_toTopOf="parent">
 
             <TextView
+                android:id="@+id/topUpPlus"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="@dimen/home_top_up_plus_spacing"
@@ -60,6 +61,7 @@
                 android:textSize="@dimen/home_top_up_plus_size" />
 
             <TextView
+                android:id="@+id/topUpLabel"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/home_top_up"

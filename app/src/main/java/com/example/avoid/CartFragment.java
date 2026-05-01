@@ -27,6 +27,9 @@ public class CartFragment extends Fragment {
     private RecyclerView cartItemsRecyclerView;
     private RecyclerView lastSeenRecyclerView;
     private TextView cartTotalPrice;
+    private View cartScrollView;
+    private View cartBottomBar;
+    private View cartEmptyContainer;
     private List<CartProduct> cartItems;
 
     @Nullable
@@ -42,13 +45,39 @@ public class CartFragment extends Fragment {
         cartItemsRecyclerView = view.findViewById(R.id.cartItemsRecyclerView);
         lastSeenRecyclerView  = view.findViewById(R.id.lastSeenRecyclerView);
         cartTotalPrice        = view.findViewById(R.id.cartTotalPrice);
+        cartScrollView        = view.findViewById(R.id.cartScrollView);
+        cartBottomBar         = view.findViewById(R.id.cartBottomBar);
+        cartEmptyContainer    = view.findViewById(R.id.cartEmptyContainer);
 
         view.findViewById(R.id.btnCheckout).setOnClickListener(v ->
                 startActivity(new Intent(requireContext(), CheckoutActivity.class)));
 
+        view.findViewById(R.id.cartExploreButton).setOnClickListener(v -> openExplore());
+
         setupCartItems();
         setupLastSeen();
         updateTotal();
+        renderEmptyState();
+    }
+
+    private final Runnable sessionListener = () -> {
+        if (cartItemsRecyclerView != null) {
+            setupCartItems();
+            updateTotal();
+            renderEmptyState();
+        }
+    };
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        UserSession.getInstance().addListener(sessionListener);
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        UserSession.getInstance().removeListener(sessionListener);
     }
 
     @Override
@@ -57,7 +86,22 @@ public class CartFragment extends Fragment {
         if (cartItemsRecyclerView != null) {
             setupCartItems();
             updateTotal();
+            renderEmptyState();
         }
+    }
+
+    private void renderEmptyState() {
+        boolean empty = cartItems == null || cartItems.isEmpty();
+        cartScrollView.setVisibility(empty ? View.GONE : View.VISIBLE);
+        cartBottomBar.setVisibility(empty ? View.GONE : View.VISIBLE);
+        cartEmptyContainer.setVisibility(empty ? View.VISIBLE : View.GONE);
+    }
+
+    private void openExplore() {
+        requireActivity().getSupportFragmentManager().beginTransaction()
+                .add(R.id.fragment_container, ExploreProductsFragment.newInstance(null))
+                .addToBackStack(null)
+                .commit();
     }
 
     private void setupCartItems() {
@@ -98,6 +142,8 @@ public class CartFragment extends Fragment {
             count += item.getQuantity();
         }
         cartTotalPrice.setText(String.format(Locale.US, "$ %,.2f", total));
+        renderEmptyState();
+        UserRepository.getInstance().saveCartForCurrentUser();
 
         if (getActivity() instanceof CartBadgeUpdater) {
             ((CartBadgeUpdater) getActivity()).updateCartBadge(count);

@@ -57,6 +57,9 @@ public class SettingsFragment extends Fragment {
     private void bindSwitch(View root, int switchId, boolean initial, BoolSetter setter) {
         MaterialSwitch sw = root.findViewById(switchId);
         sw.setChecked(initial);
-        sw.setOnCheckedChangeListener((button, checked) -> setter.set(checked));
+        sw.setOnCheckedChangeListener((button, checked) -> {
+            setter.set(checked);
+            UserRepository.getInstance().saveSettingsForCurrentUser();
+        });
     }
 }

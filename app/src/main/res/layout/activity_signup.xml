@@ -1,0 +1,263 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/auth_bg">
+
+    <ImageButton
+        android:id="@+id/signupCloseButton"
+        android:layout_width="44dp"
+        android:layout_height="44dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="12dp"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:contentDescription="Close"
+        android:padding="10dp"
+        android:tint="@color/auth_text_primary"
+        app:srcCompat="@drawable/ic_arrow_back"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:fillViewport="true"
+        android:overScrollMode="never"
+        app:layout_constraintTop_toBottomOf="@id/signupCloseButton"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingStart="28dp"
+            android:paddingEnd="28dp"
+            android:paddingBottom="32dp">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:fontFamily="serif"
+                android:gravity="center"
+                android:text="@string/auth_brand"
+                android:textColor="@color/auth_text_primary"
+                android:textSize="22sp"
+                android:textStyle="bold" />
+
+            <!-- FORM STATE -->
+            <LinearLayout
+                android:id="@+id/signupFormContainer"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="64dp"
+                    android:fontFamily="serif"
+                    android:lineSpacingMultiplier="1.05"
+                    android:text="@string/auth_signup_headline"
+                    android:textColor="@color/auth_text_primary"
+                    android:textSize="32sp"
+                    android:textStyle="bold" />
+
+                <EditText
+                    android:id="@+id/signupNameInput"
+                    android:layout_width="match_parent"
+                    android:layout_height="56dp"
+                    android:layout_marginTop="40dp"
+                    android:background="@drawable/bg_auth_input"
+                    android:hint="@string/auth_name_hint"
+                    android:imeOptions="actionNext"
+                    android:autofillHints="name"
+                    android:inputType="textPersonName|textCapWords"
+                    android:maxLines="1"
+                    android:paddingStart="18dp"
+                    android:paddingEnd="18dp"
+                    android:textColor="@color/auth_text_primary"
+                    android:textColorHint="@color/auth_text_hint"
+                    android:textSize="15sp" />
+
+                <EditText
+                    android:id="@+id/signupEmailInput"
+                    android:layout_width="match_parent"
+                    android:layout_height="56dp"
+                    android:layout_marginTop="12dp"
+                    android:background="@drawable/bg_auth_input"
+                    android:hint="@string/auth_email_hint"
+                    android:imeOptions="actionNext"
+                    android:autofillHints="emailAddress"
+                    android:inputType="textEmailAddress"
+                    android:maxLines="1"
+                    android:paddingStart="18dp"
+                    android:paddingEnd="18dp"
+                    android:textColor="@color/auth_text_primary"
+                    android:textColorHint="@color/auth_text_hint"
+                    android:textSize="15sp" />
+
+                <EditText
+                    android:id="@+id/signupPasswordInput"
+                    android:layout_width="match_parent"
+                    android:layout_height="56dp"
+                    android:layout_marginTop="12dp"
+                    android:background="@drawable/bg_auth_input"
+                    android:hint="@string/auth_password_hint"
+                    android:imeOptions="actionDone"
+                    android:autofillHints="newPassword"
+                    android:inputType="textPassword"
+                    android:maxLines="1"
+                    android:paddingStart="18dp"
+                    android:paddingEnd="18dp"
+                    android:textColor="@color/auth_text_primary"
+                    android:textColorHint="@color/auth_text_hint"
+                    android:textSize="15sp" />
+
+                <TextView
+                    android:id="@+id/signupErrorText"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:textColor="@color/auth_error"
+                    android:textSize="13sp"
+                    android:visibility="gone" />
+
+                <LinearLayout
+                    android:id="@+id/btnCreateAccount"
+                    android:layout_width="match_parent"
+                    android:layout_height="56dp"
+                    android:layout_marginTop="20dp"
+                    android:background="@drawable/bg_auth_button_dark"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:gravity="center"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="sans-serif-medium"
+                        android:text="@string/auth_create_account"
+                        android:textColor="@color/auth_text_primary"
+                        android:textSize="16sp" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_marginTop="24dp"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/auth_have_account"
+                        android:textColor="@color/auth_text_secondary"
+                        android:textSize="14sp" />
+
+                    <TextView
+                        android:id="@+id/btnGoLogin"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="sans-serif-medium"
+                        android:text="@string/auth_login_action"
+                        android:textColor="@color/auth_text_primary"
+                        android:textSize="14sp" />
+                </LinearLayout>
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="24dp"
+                    android:gravity="center"
+                    android:text="@string/auth_terms"
+                    android:textColor="@color/auth_text_hint"
+                    android:textSize="12sp" />
+            </LinearLayout>
+
+            <!-- VERIFY STATE -->
+            <LinearLayout
+                android:id="@+id/signupVerifyContainer"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:visibility="gone">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="64dp"
+                    android:fontFamily="serif"
+                    android:lineSpacingMultiplier="1.05"
+                    android:text="@string/auth_verify_title"
+                    android:textColor="@color/auth_text_primary"
+                    android:textSize="32sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/verifyBodyText"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="20dp"
+                    android:lineSpacingMultiplier="1.3"
+                    android:textColor="@color/auth_text_secondary"
+                    android:textSize="15sp" />
+
+                <TextView
+                    android:id="@+id/verifyErrorText"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="14dp"
+                    android:textColor="@color/auth_error"
+                    android:textSize="13sp"
+                    android:visibility="gone" />
+
+                <LinearLayout
+                    android:id="@+id/btnVerifyContinue"
+                    android:layout_width="match_parent"
+                    android:layout_height="56dp"
+                    android:layout_marginTop="32dp"
+                    android:background="@drawable/bg_auth_button_dark"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:gravity="center"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="sans-serif-medium"
+                        android:text="@string/auth_verify_continue"
+                        android:textColor="@color/auth_text_primary"
+                        android:textSize="16sp" />
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/btnVerifyResend"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_marginTop="20dp"
+                    android:fontFamily="sans-serif-medium"
+                    android:padding="6dp"
+                    android:text="@string/auth_verify_resend"
+                    android:textColor="@color/auth_text_primary"
+                    android:textSize="14sp" />
+            </LinearLayout>
+
+            <ProgressBar
+                android:id="@+id/signupProgress"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="14dp"
+                android:indeterminateTint="@color/auth_text_primary"
+                android:visibility="gone" />
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+</androidx.constraintlayout.widget.ConstraintLayout>

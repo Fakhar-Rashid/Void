@@ -37,6 +37,8 @@ public class MainActivity extends AppCompatActivity implements CartBadgeUpdater 
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_main);
 
+        UserSession.getInstance().initFromAuth();
+
         setupSystemBars();
         applyWindowInsets();
         setupTabs();
