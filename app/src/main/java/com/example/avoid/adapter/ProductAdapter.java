@@ -94,9 +94,9 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductV
 
         void bind(Product product) {
             productNameTextView.setText(product.getName());
-            productPriceTextView.setText(product.getPrice());
+            productPriceTextView.setText(product.getDisplayPrice());
             productLocationTextView.setText(product.getLocation());
-            productRatingTextView.setText(product.getRatingSummary());
+            productRatingTextView.setText(product.getDisplayRatingSummary());
 
             if (productImageView != null) {
                 Glide.with(productImageView.getContext())

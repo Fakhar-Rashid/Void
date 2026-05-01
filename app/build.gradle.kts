@@ -1,7 +1,15 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     id("com.google.gms.google-services")
 }
+
+val localProps = Properties().apply {
+    val f = rootProject.file("local.properties")
+    if (f.exists()) f.inputStream().use { load(it) }
+}
+fun localProp(key: String): String = localProps.getProperty(key, "")
 
 android {
     namespace = "com.example.avoid"
@@ -15,6 +23,14 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        buildConfigField("String", "CLOUDINARY_CLOUD_NAME", "\"${localProp("cloudinary.cloud_name")}\"")
+        buildConfigField("String", "CLOUDINARY_API_KEY",    "\"${localProp("cloudinary.api_key")}\"")
+        buildConfigField("String", "CLOUDINARY_API_SECRET", "\"${localProp("cloudinary.api_secret")}\"")
+    }
+
+    buildFeatures {
+        buildConfig = true
     }
 
     buildTypes {
@@ -47,6 +63,7 @@ dependencies {
     implementation("com.google.android.gms:play-services-auth:21.4.0")
 
     implementation("com.github.bumptech.glide:glide:4.16.0")
+    implementation("com.cloudinary:cloudinary-android:2.5.0")
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)

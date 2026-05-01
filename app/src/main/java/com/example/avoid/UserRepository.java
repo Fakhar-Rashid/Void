@@ -6,7 +6,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.example.avoid.model.Cart;
-import com.example.avoid.model.CartProduct;
+import com.example.avoid.model.CartItem;
 import com.example.avoid.model.Order;
 import com.example.avoid.model.Settings;
 import com.example.avoid.model.Store;
@@ -83,8 +83,8 @@ public class UserRepository {
 
                                 boolean cartChanged = false;
                                 if (guestCart != null && !guestCart.getItems().isEmpty()) {
-                                    for (CartProduct item : guestCart.getItems()) {
-                                        finalUser.getCart().addItem(item.getProduct(), item.getColor(), item.getQuantity());
+                                    for (CartItem item : guestCart.getItems()) {
+                                        finalUser.getCart().addItem(item.getProductId(), item.getColor(), item.getQuantity());
                                     }
                                     cartChanged = true;
                                 }
@@ -150,6 +150,18 @@ public class UserRepository {
                     Log.e(TAG, "load store failed", e);
                     next.run();
                 });
+    }
+
+    public void loadStore(@NonNull String storeId, @NonNull Callback<Store> callback) {
+        db.collection(STORES).document(storeId).get()
+                .addOnSuccessListener(doc -> {
+                    if (!doc.exists()) {
+                        callback.onFailure(new IllegalStateException("Store not found"));
+                        return;
+                    }
+                    callback.onSuccess(doc.toObject(Store.class));
+                })
+                .addOnFailureListener(callback::onFailure);
     }
 
     public void saveStore(@NonNull Store store, @Nullable Callback<Store> callback) {

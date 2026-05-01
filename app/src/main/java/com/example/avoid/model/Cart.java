@@ -10,7 +10,7 @@ import java.util.List;
 public class Cart implements Serializable {
 
     private String userId;
-    private List<CartProduct> items = new ArrayList<>();
+    private List<CartItem> items = new ArrayList<>();
 
     public Cart() {}
 
@@ -21,27 +21,28 @@ public class Cart implements Serializable {
     public String getUserId() { return userId; }
     public void setUserId(String userId) { this.userId = userId; }
 
-    public List<CartProduct> getItems() {
+    public List<CartItem> getItems() {
         if (items == null) items = new ArrayList<>();
         return items;
     }
-    public void setItems(List<CartProduct> items) {
+    public void setItems(List<CartItem> items) {
         this.items = items != null ? items : new ArrayList<>();
     }
 
-    public void addItem(Product product, String color, int quantity) {
-        for (CartProduct existing : getItems()) {
-            if (existing.getProduct().getName().equals(product.getName())
-                    && existing.getColor().equals(color)) {
+    public void addItem(String productId, String color, int quantity) {
+        for (CartItem existing : getItems()) {
+            if (existing.getProductId() != null
+                    && existing.getProductId().equals(productId)
+                    && safeEquals(existing.getColor(), color)) {
                 existing.setQuantity(existing.getQuantity() + quantity);
                 return;
             }
         }
-        getItems().add(new CartProduct(product, color, quantity));
+        getItems().add(new CartItem(productId, color, quantity));
     }
 
-    public void removeItem(CartProduct item) {
-        Iterator<CartProduct> it = getItems().iterator();
+    public void removeItem(CartItem item) {
+        Iterator<CartItem> it = getItems().iterator();
         while (it.hasNext()) {
             if (it.next() == item) { it.remove(); return; }
         }
@@ -52,14 +53,20 @@ public class Cart implements Serializable {
     @Exclude
     public int getTotalItemCount() {
         int n = 0;
-        for (CartProduct item : getItems()) n += item.getQuantity();
+        for (CartItem item : getItems()) n += item.getQuantity();
         return n;
     }
 
     @Exclude
-    public double getTotal() {
-        double total = 0;
-        for (CartProduct item : getItems()) total += item.getPriceValue() * item.getQuantity();
-        return total;
+    public boolean contains(String productId) {
+        if (productId == null) return false;
+        for (CartItem item : getItems()) {
+            if (productId.equals(item.getProductId())) return true;
+        }
+        return false;
+    }
+
+    private static boolean safeEquals(String a, String b) {
+        return a == null ? b == null : a.equals(b);
     }
 }

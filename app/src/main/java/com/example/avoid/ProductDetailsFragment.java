@@ -36,12 +36,6 @@ public class ProductDetailsFragment extends Fragment {
     private boolean isDescriptionExpanded = false;
 
     private LinearLayout colorSwatchesLayout;
-    private final int[] swatchColors = {
-            Color.parseColor("#1C1C1E"), // Black
-            Color.parseColor("#E5E5EA"), // Silver
-            Color.parseColor("#FFD700"), // Gold
-            Color.parseColor("#007AFF")  // Blue
-    };
     private int selectedColorIndex = 0;
 
     public static ProductDetailsFragment newInstance(Product product) {
@@ -80,32 +74,46 @@ public class ProductDetailsFragment extends Fragment {
         setupColorSwatches(view);
         setupReviewsSection(view);
         setupAddToCartSection(view);
+        setupStockLabel(view);
+        loadStoreInfo(view);
     }
 
     private void populateProductDetails(View view) {
         if (product == null) return;
 
-        TextView nameText = view.findViewById(R.id.detailProductName);
-        TextView priceText = view.findViewById(R.id.detailProductPrice);
-        TextView ratingText = view.findViewById(R.id.detailProductRating);
-        TextView soldCountText = view.findViewById(R.id.detailProductSoldCount);
-        TextView storefrontText = view.findViewById(R.id.detailProductStorefront);
+        ((TextView) view.findViewById(R.id.detailProductName)).setText(product.getName());
+        ((TextView) view.findViewById(R.id.detailProductPrice)).setText(product.getDisplayPrice());
+        ((TextView) view.findViewById(R.id.detailProductRating)).setText(product.getDisplayRating());
 
-        nameText.setText(product.getName());
-        priceText.setText(product.getPrice());
-        
-        // Extract rating and sold count from "4.8 | Sold 250+"
-        String ratingSummary = product.getRatingSummary();
-        if (ratingSummary != null && ratingSummary.contains("|")) {
-            String[] parts = ratingSummary.split("\\|");
-            ratingText.setText(parts[0].trim());
-            soldCountText.setText("| " + parts[1].trim());
+        TextView soldCountText = view.findViewById(R.id.detailProductSoldCount);
+        if (product.getItemsSold() > 0) {
+            soldCountText.setText("| Sold " + formatSold(product.getItemsSold()));
         } else {
-            ratingText.setText(ratingSummary != null ? ratingSummary : "0.0");
             soldCountText.setText("");
         }
 
-        storefrontText.setText(product.getLocation());
+        ((TextView) view.findViewById(R.id.detailProductDescription))
+                .setText(product.getDescription() != null ? product.getDescription() : "");
+
+        TextView conditionText = view.findViewById(R.id.detailProductCondition);
+        conditionText.setText(product.getCondition() != null
+                ? product.getCondition().getDisplayName() : "—");
+
+        TextView weightText = view.findViewById(R.id.detailProductWeight);
+        weightText.setText(product.getWeight() > 0 ? product.getDisplayWeight() : "—");
+
+        TextView categoryText = view.findViewById(R.id.detailProductCategory);
+        categoryText.setText(product.getCategory() != null
+                ? product.getCategory().getDisplayName() : "—");
+
+        TextView storefrontText = view.findViewById(R.id.detailProductStorefront);
+        storefrontText.setText(product.getStoreName() != null ? product.getStoreName()
+                : (product.getLocation() != null ? product.getLocation() : ""));
+
+        ((TextView) view.findViewById(R.id.storeNameText))
+                .setText(product.getStoreName() != null ? product.getStoreName() : "");
+        ((TextView) view.findViewById(R.id.storeLocationText))
+                .setText(product.getLocation() != null ? " · " + product.getLocation() : "");
     }
 
     private void setupImageCarousel(View view) {
@@ -168,10 +176,23 @@ public class ProductDetailsFragment extends Fragment {
 
     private void renderColorSwatches() {
         colorSwatchesLayout.removeAllViews();
-        int size = dpToPx(36);
+        if (product == null) return;
+        java.util.List<com.example.avoid.model.Color> colors = product.getAvailableColors();
+        if (colors == null || colors.isEmpty()) {
+            colorSwatchesLayout.setVisibility(View.GONE);
+            return;
+        }
+        colorSwatchesLayout.setVisibility(View.VISIBLE);
 
-        for (int i = 0; i < swatchColors.length; i++) {
-            int color = swatchColors[i];
+        int size = dpToPx(36);
+        if (selectedColorIndex >= colors.size()) selectedColorIndex = 0;
+
+        for (int i = 0; i < colors.size(); i++) {
+            com.example.avoid.model.Color color = colors.get(i);
+            int parsed;
+            try { parsed = Color.parseColor(color.getHex()); }
+            catch (IllegalArgumentException e) { parsed = Color.parseColor("#CCCCCC"); }
+
             boolean isSelected = (i == selectedColorIndex);
 
             FrameLayout swatchContainer = new FrameLayout(requireContext());
@@ -179,15 +200,13 @@ public class ProductDetailsFragment extends Fragment {
             containerParams.setMargins(0, 0, dpToPx(12), 0);
             swatchContainer.setLayoutParams(containerParams);
 
-            // The color circle
             View colorView = new View(requireContext());
             GradientDrawable shape = new GradientDrawable();
             shape.setShape(GradientDrawable.OVAL);
-            shape.setColor(color);
+            shape.setColor(parsed);
             colorView.setBackground(shape);
             swatchContainer.addView(colorView, new FrameLayout.LayoutParams(size, size));
 
-            // Selection ring and checkmark
             if (isSelected) {
                 View ringView = new View(requireContext());
                 ringView.setBackgroundResource(R.drawable.bg_color_swatch_selected);
@@ -195,13 +214,9 @@ public class ProductDetailsFragment extends Fragment {
 
                 ImageView checkIcon = new ImageView(requireContext());
                 checkIcon.setImageResource(R.drawable.ic_check);
-                // Invert checkmark color if the background is light
-                if (color == Color.parseColor("#E5E5EA")) {
-                    checkIcon.setImageTintList(ColorStateList.valueOf(Color.BLACK));
-                } else {
-                    checkIcon.setImageTintList(ColorStateList.valueOf(Color.WHITE));
-                }
-                
+                int luminance = (Color.red(parsed) + Color.green(parsed) + Color.blue(parsed)) / 3;
+                checkIcon.setImageTintList(ColorStateList.valueOf(luminance > 180 ? Color.BLACK : Color.WHITE));
+
                 int checkSize = dpToPx(18);
                 FrameLayout.LayoutParams checkParams = new FrameLayout.LayoutParams(checkSize, checkSize);
                 checkParams.gravity = android.view.Gravity.CENTER;
@@ -220,47 +235,130 @@ public class ProductDetailsFragment extends Fragment {
 
     private void setupReviewsSection(View view) {
         RecyclerView reviewsRecycler = view.findViewById(R.id.reviewsRecyclerView);
-        reviewsRecycler.setLayoutManager(new LinearLayoutManager(requireContext()));
-        
-        List<Review> dummyReviews = new ArrayList<>();
-        dummyReviews.add(new Review("Alex Johnson", 5.0f, "Today", "Amazing product! Exceeded all my expectations."));
-        dummyReviews.add(new Review("Maria Lopez", 4.5f, "Yesterday", "Very good quality, arrived quickly."));
-        dummyReviews.add(new Review("Sam Smith", 4.0f, "2 days ago", "Works exactly as described. Happy with my purchase."));
-        dummyReviews.add(new Review("Emily Wong", 5.0f, "Last week", "Best purchase ever! Highly recommend to everyone."));
-        dummyReviews.add(new Review("Michael Brown", 4.0f, "Last week", "It is pretty decent, no major issues so far."));
+        TextView noReviewsLabel = view.findViewById(R.id.noReviewsLabel);
 
-        ReviewAdapter adapter = new ReviewAdapter(dummyReviews);
-        reviewsRecycler.setAdapter(adapter);
+        reviewsRecycler.setLayoutManager(new LinearLayoutManager(requireContext()));
+        reviewsRecycler.setAdapter(new ReviewAdapter(new ArrayList<>()));
+
+        if (product == null || product.getReviewIds() == null || product.getReviewIds().isEmpty()) {
+            reviewsRecycler.setVisibility(View.GONE);
+            noReviewsLabel.setVisibility(View.VISIBLE);
+            return;
+        }
+
+        ReviewRepository.getInstance().loadReviewsByIds(product.getReviewIds(),
+                new ReviewRepository.Callback<List<Review>>() {
+                    @Override public void onSuccess(List<Review> reviews) {
+                        if (getView() == null) return;
+                        if (reviews.isEmpty()) {
+                            reviewsRecycler.setVisibility(View.GONE);
+                            noReviewsLabel.setVisibility(View.VISIBLE);
+                        } else {
+                            reviewsRecycler.setVisibility(View.VISIBLE);
+                            noReviewsLabel.setVisibility(View.GONE);
+                            reviewsRecycler.setAdapter(new ReviewAdapter(reviews));
+                        }
+                    }
+                    @Override public void onFailure(@androidx.annotation.NonNull Exception e) {
+                        if (getView() == null) return;
+                        reviewsRecycler.setVisibility(View.GONE);
+                        noReviewsLabel.setVisibility(View.VISIBLE);
+                    }
+                });
+    }
+
+    private void loadStoreInfo(View view) {
+        if (product == null || product.getStoreId() == null) return;
+        TextView storefrontText = view.findViewById(R.id.detailProductStorefront);
+        TextView storeNameText  = view.findViewById(R.id.storeNameText);
+        TextView storeLocText   = view.findViewById(R.id.storeLocationText);
+
+        UserRepository.getInstance().loadStore(product.getStoreId(),
+                new UserRepository.Callback<com.example.avoid.model.Store>() {
+                    @Override public void onSuccess(com.example.avoid.model.Store store) {
+                        if (getView() == null || store == null) return;
+                        String name = store.getName() != null ? store.getName() : "";
+                        String loc  = store.getLocation() != null ? store.getLocation() : "";
+                        storefrontText.setText(loc.isEmpty() ? name : name + " · " + loc);
+                        storeNameText.setText(name);
+                        storeLocText.setText(loc.isEmpty() ? "" : " · " + loc);
+                    }
+                    @Override public void onFailure(@androidx.annotation.NonNull Exception e) {}
+                });
     }
 
     private void setupAddToCartSection(View view) {
         View addToCartButton = view.findViewById(R.id.footerAddToCartButton);
-        addToCartButton.setOnClickListener(v -> {
-            if (product != null) {
-                String selectedColor = getSelectedColorString();
-                com.example.avoid.model.Cart cart = UserSession.getInstance().getCurrentUser().getCart();
-                cart.addItem(product, selectedColor, 1);
-                UserRepository.getInstance().saveCartForCurrentUser();
-                android.widget.Toast.makeText(requireContext(), "Added to cart", android.widget.Toast.LENGTH_SHORT).show();
+        if (product == null) return;
 
-                if (getActivity() instanceof CartBadgeUpdater) {
-                    ((CartBadgeUpdater) getActivity()).updateCartBadge(cart.getTotalItemCount());
-                }
+        boolean ownProduct = isOwnedByCurrentUser(product);
+        boolean outOfStock = product.isOutOfStock();
+        boolean disabled = ownProduct || outOfStock;
+
+        addToCartButton.setEnabled(!disabled);
+        addToCartButton.setAlpha(disabled ? 0.4f : 1.0f);
+
+        addToCartButton.setOnClickListener(v -> {
+            if (ownProduct) {
+                android.widget.Toast.makeText(requireContext(), R.string.self_purchase_blocked,
+                        android.widget.Toast.LENGTH_SHORT).show();
+                return;
+            }
+            if (outOfStock) {
+                android.widget.Toast.makeText(requireContext(), R.string.out_of_stock_label,
+                        android.widget.Toast.LENGTH_SHORT).show();
+                return;
+            }
+            String selectedColor = getSelectedColorString();
+            com.example.avoid.model.Cart cart = UserSession.getInstance().getCurrentUser().getCart();
+            cart.addItem(product.getId(), selectedColor, 1);
+            UserRepository.getInstance().saveCartForCurrentUser();
+            android.widget.Toast.makeText(requireContext(), "Added to cart",
+                    android.widget.Toast.LENGTH_SHORT).show();
+
+            if (getActivity() instanceof CartBadgeUpdater) {
+                ((CartBadgeUpdater) getActivity()).updateCartBadge(cart.getTotalItemCount());
             }
         });
     }
 
-    private String getSelectedColorString() {
-        switch (selectedColorIndex) {
-            case 0: return "Black";
-            case 1: return "Silver";
-            case 2: return "Gold";
-            case 3: return "Blue";
-            default: return "Unknown";
+    private void setupStockLabel(View view) {
+        TextView stockLabel = view.findViewById(R.id.detailStockLabel);
+        if (product == null) { stockLabel.setVisibility(View.GONE); return; }
+        if (product.isOutOfStock()) {
+            stockLabel.setText(R.string.out_of_stock_label);
+            stockLabel.setVisibility(View.VISIBLE);
+        } else if (product.isLowStock()) {
+            stockLabel.setText(getString(R.string.low_stock_label, product.getStock()));
+            stockLabel.setVisibility(View.VISIBLE);
+        } else {
+            stockLabel.setVisibility(View.GONE);
         }
+    }
+
+    private boolean isOwnedByCurrentUser(com.example.avoid.model.Product p) {
+        if (p == null || p.getStoreId() == null) return false;
+        com.example.avoid.model.User u = UserSession.getInstance().getCurrentUser();
+        return UserSession.getInstance().isLoggedIn()
+                && u != null
+                && p.getStoreId().equals(u.getId());
+    }
+
+    private String getSelectedColorString() {
+        if (product == null) return null;
+        java.util.List<com.example.avoid.model.Color> colors = product.getAvailableColors();
+        if (colors == null || colors.isEmpty()) return null;
+        int index = Math.min(Math.max(selectedColorIndex, 0), colors.size() - 1);
+        return colors.get(index).getName();
     }
 
     private int dpToPx(int dp) {
         return (int) (dp * getResources().getDisplayMetrics().density);
+    }
+
+    private static String formatSold(int n) {
+        if (n >= 1000) return (n / 100) / 10.0 + "k+";
+        if (n >= 100)  return ((n / 100) * 100) + "+";
+        return String.valueOf(n);
     }
 }

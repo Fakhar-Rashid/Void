@@ -16,6 +16,7 @@ import androidx.core.view.WindowInsetsCompat;
 import androidx.core.view.WindowInsetsControllerCompat;
 import androidx.fragment.app.Fragment;
 
+import com.example.avoid.seller.SellerHomeFragment;
 import com.example.avoid.seller.SellerPlaceholderFragment;
 import com.example.avoid.seller.SellerProfileFragment;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -99,22 +100,12 @@ public class SellerActivity extends AppCompatActivity {
     }
 
     private void openAddProduct() {
-        Fragment fragment = SellerPlaceholderFragment.newInstance(
-                "Add a product",
-                "Listing flow will live here.");
-        getSupportFragmentManager().beginTransaction()
-                .replace(R.id.sellerFragmentContainer, fragment)
-                .commit();
-        // The + tab is an action, not a switchable tab — clear all underline tints.
-        currentTabId = 0;
-        updateTabTints();
+        startActivity(new android.content.Intent(this, AddProductActivity.class));
     }
 
     private Fragment fragmentForTab(@IdRes int tabId) {
         if (tabId == R.id.sellerTabHome) {
-            return SellerPlaceholderFragment.newInstance(
-                    "Welcome, seller",
-                    "Your storefront, sales, and product list will appear here.");
+            return new SellerHomeFragment();
         } else if (tabId == R.id.sellerTabOrders) {
             return SellerPlaceholderFragment.newInstance(
                     "Incoming orders",

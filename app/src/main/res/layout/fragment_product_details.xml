@@ -141,33 +141,44 @@
                     android:stretchColumns="1">
                     <TableRow android:paddingBottom="8dp">
                         <TextView android:text="Condition" android:textColor="@color/home_text_hint" android:textSize="14sp" />
-                        <TextView android:text="New" android:textColor="@color/home_text_primary" android:textSize="14sp" android:layout_marginStart="24dp" />
+                        <TextView android:id="@+id/detailProductCondition" android:textColor="@color/home_text_primary" android:textSize="14sp" android:layout_marginStart="24dp" tools:text="New" />
                     </TableRow>
                     <TableRow android:paddingBottom="8dp">
                         <TextView android:text="Weight" android:textColor="@color/home_text_hint" android:textSize="14sp" />
-                        <TextView android:text="250 g" android:textColor="@color/home_text_primary" android:textSize="14sp" android:layout_marginStart="24dp" />
+                        <TextView android:id="@+id/detailProductWeight" android:textColor="@color/home_text_primary" android:textSize="14sp" android:layout_marginStart="24dp" tools:text="250 g" />
                     </TableRow>
                     <TableRow android:paddingBottom="8dp">
                         <TextView android:text="Category" android:textColor="@color/home_text_hint" android:textSize="14sp" />
-                        <TextView android:text="Smartphone" android:textColor="@color/home_section_link" android:textSize="14sp" android:layout_marginStart="24dp" />
+                        <TextView android:id="@+id/detailProductCategory" android:textColor="@color/home_section_link" android:textSize="14sp" android:layout_marginStart="24dp" tools:text="Smartphone" />
                     </TableRow>
                     <TableRow>
                         <TextView android:text="Storefront" android:textColor="@color/home_text_hint" android:textSize="14sp" />
-                        <TextView android:id="@+id/detailProductStorefront" android:text="Unknown" android:textColor="@color/home_section_link" android:textSize="14sp" android:layout_marginStart="24dp" />
+                        <TextView android:id="@+id/detailProductStorefront" android:textColor="@color/home_section_link" android:textSize="14sp" android:layout_marginStart="24dp" tools:text="Unknown" />
                     </TableRow>
                 </TableLayout>
+
+                <TextView
+                    android:id="@+id/detailStockLabel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:fontFamily="sans-serif-medium"
+                    android:textColor="@color/profile_logout"
+                    android:textSize="13sp"
+                    android:visibility="gone"
+                    tools:text="Only 3 left in stock" />
 
                 <TextView
                     android:id="@+id/detailProductDescription"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="16dp"
-                    android:text="This is a detailed description of the product. It has many features and comes in various configurations. The screen is vibrant and the battery life is amazing."
                     android:textColor="@color/home_text_secondary"
                     android:textSize="14sp"
                     android:lineSpacingExtra="4dp"
                     android:maxLines="3"
-                    android:ellipsize="end" />
+                    android:ellipsize="end"
+                    tools:text="This is a detailed description…" />
 
                 <TextView
                     android:id="@+id/toggleDescriptionButton"
@@ -236,6 +247,17 @@
                     android:overScrollMode="never" />
 
                 <TextView
+                    android:id="@+id/noReviewsLabel"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:text="No reviews yet"
+                    android:textColor="@color/home_text_hint"
+                    android:textSize="14sp"
+                    android:textStyle="italic"
+                    android:visibility="gone" />
+
+                <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="32dp"
@@ -280,9 +302,9 @@
                                 android:id="@+id/storeNameText"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="AlfinasStore"
                                 android:textColor="@color/home_text_primary"
-                                android:textSize="15sp" />
+                                android:textSize="15sp"
+                                tools:text="AlfinasStore" />
 
                             <!-- Status + Location -->
                             <LinearLayout
@@ -300,11 +322,12 @@
                                     android:textSize="12sp" />
 
                                 <TextView
+                                    android:id="@+id/storeLocationText"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
-                                    android:text=" . North Jakarta"
                                     android:textColor="@color/home_text_hint"
-                                    android:textSize="12sp" />
+                                    android:textSize="12sp"
+                                    tools:text=" · North Jakarta" />
                             </LinearLayout>
 
                         </LinearLayout>

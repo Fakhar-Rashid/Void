@@ -16,7 +16,7 @@ public class Order implements Serializable {
     @DocumentId
     private String orderId;
     private String userId;
-    private List<CartProduct> items = new ArrayList<>();
+    private List<OrderLineItem> items = new ArrayList<>();
     private Status status;
     private double totalAmount;
     private String orderDate;
@@ -24,7 +24,7 @@ public class Order implements Serializable {
 
     public Order() {}
 
-    public Order(String orderId, String userId, List<CartProduct> items,
+    public Order(String orderId, String userId, List<OrderLineItem> items,
                  Status status, double totalAmount, String orderDate, long orderTimestamp) {
         this.orderId = orderId;
         this.userId = userId;
@@ -41,8 +41,11 @@ public class Order implements Serializable {
     public String getUserId() { return userId; }
     public void setUserId(String userId) { this.userId = userId; }
 
-    public List<CartProduct> getItems() { return items; }
-    public void setItems(List<CartProduct> items) {
+    public List<OrderLineItem> getItems() {
+        if (items == null) items = new ArrayList<>();
+        return items;
+    }
+    public void setItems(List<OrderLineItem> items) {
         this.items = items != null ? items : new ArrayList<>();
     }
 
@@ -59,14 +62,14 @@ public class Order implements Serializable {
     public void setOrderTimestamp(long orderTimestamp) { this.orderTimestamp = orderTimestamp; }
 
     @Exclude
-    public CartProduct getFirstItem() {
-        return items == null || items.isEmpty() ? null : items.get(0);
+    public OrderLineItem getFirstItem() {
+        return getItems().isEmpty() ? null : getItems().get(0);
     }
 
     @Exclude
     public int getTotalItemCount() {
         int n = 0;
-        if (items != null) for (CartProduct item : items) n += item.getQuantity();
+        for (OrderLineItem item : getItems()) n += item.getQuantity();
         return n;
     }
 }

@@ -19,6 +19,7 @@ import com.example.avoid.adapter.SkeletonAdapter;
 import com.example.avoid.model.Product;
 import com.example.avoid.model.User;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 import java.util.ArrayList;
@@ -58,8 +59,27 @@ public class HomeFragment extends Fragment {
         wireCategoryChips(view);
         bindBalance(view);
 
-        loadProducts(Product.CATEGORY_BEST_SELLER, ProductAdapter.LayoutMode.CARD, bestSellersRecyclerView);
-        loadProducts(Product.CATEGORY_RECOMMENDATION, ProductAdapter.LayoutMode.LIST, recommendationsRecyclerView);
+        loadTopProducts();
+    }
+
+    private void loadTopProducts() {
+        db.collection(COLLECTION)
+                .orderBy("createdAt", Query.Direction.DESCENDING)
+                .limit(8)
+                .get()
+                .addOnSuccessListener(snapshot -> {
+                    List<Product> products = new ArrayList<>();
+                    for (QueryDocumentSnapshot doc : snapshot) {
+                        Product p = doc.toObject(Product.class);
+                        p.setId(doc.getId());
+                        products.add(p);
+                    }
+                    bestSellersRecyclerView.setAdapter(new ProductAdapter(
+                            products, ProductAdapter.LayoutMode.CARD, this::openProductDetails));
+                    recommendationsRecyclerView.setAdapter(new ProductAdapter(
+                            products, ProductAdapter.LayoutMode.LIST, this::openProductDetails));
+                })
+                .addOnFailureListener(e -> Log.e(TAG, "Failed to load top products", e));
     }
 
     private void wireCategoryChips(View root) {
@@ -133,22 +153,6 @@ public class HomeFragment extends Fragment {
                 .add(R.id.fragment_container, ExploreProductsFragment.newInstance(initialQuery))
                 .addToBackStack(null)
                 .commit();
-    }
-
-    private void loadProducts(String category, ProductAdapter.LayoutMode mode, RecyclerView target) {
-        db.collection(COLLECTION)
-                .whereEqualTo("category", category)
-                .get()
-                .addOnSuccessListener(snapshot -> {
-                    List<Product> products = new ArrayList<>();
-                    for (QueryDocumentSnapshot doc : snapshot) {
-                        Product p = doc.toObject(Product.class);
-                        p.setId(doc.getId());
-                        products.add(p);
-                    }
-                    target.setAdapter(new ProductAdapter(products, mode, this::openProductDetails));
-                })
-                .addOnFailureListener(e -> Log.e(TAG, "Failed to load " + category, e));
     }
 
     private void openProductDetails(Product product) {

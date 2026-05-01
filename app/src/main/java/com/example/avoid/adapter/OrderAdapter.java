@@ -73,11 +73,11 @@ public class OrderAdapter extends RecyclerView.Adapter<OrderAdapter.OrderViewHol
         void bind(Order order) {
             Context ctx = itemView.getContext();
 
-            com.example.avoid.model.CartProduct first = order.getFirstItem();
+            com.example.avoid.model.OrderLineItem first = order.getFirstItem();
             if (first != null) {
-                productName.setText(first.getProduct().getName());
+                productName.setText(first.getProductName());
                 colorQty.setText(first.getColor() + "  ·  Qty: " + first.getQuantity());
-                price.setText(first.getProduct().getPrice());
+                price.setText(first.getDisplayPrice());
             }
             orderDate.setText(order.getOrderDate());
 

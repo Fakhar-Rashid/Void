@@ -2,6 +2,7 @@ package com.example.avoid;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,14 +16,21 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.avoid.adapter.CartAdapter;
 import com.example.avoid.adapter.ProductAdapter;
-import com.example.avoid.model.CartProduct;
+import com.example.avoid.adapter.SkeletonAdapter;
+import com.example.avoid.model.CartItem;
 import com.example.avoid.model.Product;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
 
 public class CartFragment extends Fragment {
+
+    private static final String TAG = "CartFragment";
 
     private RecyclerView cartItemsRecyclerView;
     private RecyclerView lastSeenRecyclerView;
@@ -30,7 +38,9 @@ public class CartFragment extends Fragment {
     private View cartScrollView;
     private View cartBottomBar;
     private View cartEmptyContainer;
-    private List<CartProduct> cartItems;
+
+    private List<CartItem> cartItems = new ArrayList<>();
+    private final Map<String, Product> productsById = new HashMap<>();
 
     @Nullable
     @Override
@@ -49,24 +59,19 @@ public class CartFragment extends Fragment {
         cartBottomBar         = view.findViewById(R.id.cartBottomBar);
         cartEmptyContainer    = view.findViewById(R.id.cartEmptyContainer);
 
+        cartItemsRecyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
+        cartItemsRecyclerView.setNestedScrollingEnabled(false);
+
         view.findViewById(R.id.btnCheckout).setOnClickListener(v ->
                 startActivity(new Intent(requireContext(), CheckoutActivity.class)));
 
         view.findViewById(R.id.cartExploreButton).setOnClickListener(v -> openExplore());
 
-        setupCartItems();
+        loadCart();
         setupLastSeen();
-        updateTotal();
-        renderEmptyState();
     }
 
-    private final Runnable sessionListener = () -> {
-        if (cartItemsRecyclerView != null) {
-            setupCartItems();
-            updateTotal();
-            renderEmptyState();
-        }
-    };
+    private final Runnable sessionListener = this::loadCart;
 
     @Override
     public void onStart() {
@@ -83,10 +88,64 @@ public class CartFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        if (cartItemsRecyclerView != null) {
-            setupCartItems();
-            updateTotal();
-            renderEmptyState();
+        loadCart();
+    }
+
+    private void loadCart() {
+        if (cartItemsRecyclerView == null) return;
+
+        cartItems = UserSession.getInstance().getCurrentUser().getCart().getItems();
+
+        Set<String> ids = new LinkedHashSet<>();
+        for (CartItem item : cartItems) {
+            if (item.getProductId() != null) ids.add(item.getProductId());
+        }
+
+        if (ids.isEmpty()) {
+            productsById.clear();
+            cartItemsRecyclerView.setAdapter(new CartAdapter(cartItems, productsById, this::onCartChanged));
+            updateTotalAndEmpty();
+            return;
+        }
+
+        cartItemsRecyclerView.setAdapter(new SkeletonAdapter(R.layout.item_product_list_skeleton, Math.min(ids.size(), 4)));
+
+        ProductRepository.getInstance().loadProductsByIds(new ArrayList<>(ids),
+                new ProductRepository.Callback<List<Product>>() {
+                    @Override public void onSuccess(List<Product> products) {
+                        productsById.clear();
+                        for (Product p : products) productsById.put(p.getId(), p);
+                        cartItemsRecyclerView.setAdapter(new CartAdapter(cartItems, productsById,
+                                CartFragment.this::onCartChanged));
+                        updateTotalAndEmpty();
+                    }
+                    @Override public void onFailure(@NonNull Exception e) {
+                        Log.e(TAG, "Failed to load cart products", e);
+                        cartItemsRecyclerView.setAdapter(new CartAdapter(cartItems, productsById,
+                                CartFragment.this::onCartChanged));
+                        updateTotalAndEmpty();
+                    }
+                });
+    }
+
+    private void onCartChanged() {
+        UserRepository.getInstance().saveCartForCurrentUser();
+        updateTotalAndEmpty();
+    }
+
+    private void updateTotalAndEmpty() {
+        double total = 0;
+        int count = 0;
+        for (CartItem item : cartItems) {
+            Product p = productsById.get(item.getProductId());
+            if (p != null) total += p.getPrice() * item.getQuantity();
+            count += item.getQuantity();
+        }
+        cartTotalPrice.setText(String.format(Locale.US, "$ %,.2f", total));
+        renderEmptyState();
+
+        if (getActivity() instanceof CartBadgeUpdater) {
+            ((CartBadgeUpdater) getActivity()).updateCartBadge(count);
         }
     }
 
@@ -104,27 +163,19 @@ public class CartFragment extends Fragment {
                 .commit();
     }
 
-    private void setupCartItems() {
-        cartItems = UserSession.getInstance().getCurrentUser().getCart().getItems();
-
-        CartAdapter cartAdapter = new CartAdapter(cartItems, this::updateTotal);
-        cartItemsRecyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
-        cartItemsRecyclerView.setAdapter(cartAdapter);
-        cartItemsRecyclerView.setNestedScrollingEnabled(false);
-    }
-
     private void setupLastSeen() {
-        List<Product> lastSeen = new ArrayList<>();
-        lastSeen.add(new Product("Redmi 9A",    "$ 348",    "South Jakarta",   "4.8 | Sold 250+"));
-        lastSeen.add(new Product("Redmi 11T",   "$ 508.42", "South Jakarta",   "4.8 | Sold 250+"));
-        lastSeen.add(new Product("iPhone 13",   "$ 999",    "Central Jakarta", "4.9 | Sold 300+"));
-        lastSeen.add(new Product("Dell XPS 13", "$ 1325",   "West Jakarta",    "4.7 | Sold 190+"));
-
-        lastSeenRecyclerView.setLayoutManager(
-                new LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false));
-        lastSeenRecyclerView.setAdapter(
-                new ProductAdapter(lastSeen, ProductAdapter.LayoutMode.CARD, this::openProductDetails));
-        lastSeenRecyclerView.setNestedScrollingEnabled(false);
+        ProductRepository.getInstance().loadTopProducts(8, new ProductRepository.Callback<List<Product>>() {
+            @Override public void onSuccess(List<Product> products) {
+                lastSeenRecyclerView.setLayoutManager(
+                        new LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false));
+                lastSeenRecyclerView.setAdapter(new ProductAdapter(products,
+                        ProductAdapter.LayoutMode.CARD, CartFragment.this::openProductDetails));
+                lastSeenRecyclerView.setNestedScrollingEnabled(false);
+            }
+            @Override public void onFailure(@NonNull Exception e) {
+                Log.e(TAG, "Failed to load last seen", e);
+            }
+        });
     }
 
     private void openProductDetails(Product product) {
@@ -132,21 +183,5 @@ public class CartFragment extends Fragment {
                 .add(R.id.fragment_container, ProductDetailsFragment.newInstance(product))
                 .addToBackStack(null)
                 .commit();
-    }
-
-    private void updateTotal() {
-        double total = 0;
-        int count = 0;
-        for (CartProduct item : cartItems) {
-            total += item.getPriceValue() * item.getQuantity();
-            count += item.getQuantity();
-        }
-        cartTotalPrice.setText(String.format(Locale.US, "$ %,.2f", total));
-        renderEmptyState();
-        UserRepository.getInstance().saveCartForCurrentUser();
-
-        if (getActivity() instanceof CartBadgeUpdater) {
-            ((CartBadgeUpdater) getActivity()).updateCartBadge(count);
-        }
     }
 }

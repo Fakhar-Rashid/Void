@@ -103,4 +103,50 @@
     <string name="onboarding_error_name">Please enter a store name.</string>
     <string name="onboarding_error_location">Please enter a location.</string>
     <string name="onboarding_error_email">Please enter a valid contact email.</string>
+
+    <string name="add_product_title_new">Add a product</string>
+    <string name="add_product_title_edit">Edit product</string>
+    <string name="add_product_section_images">Photos</string>
+    <string name="add_product_section_basics">Basics</string>
+    <string name="add_product_section_details">Details</string>
+    <string name="add_product_section_variants">Variants</string>
+    <string name="add_product_section_inventory">Inventory</string>
+    <string name="add_product_add_image">+ Add photo</string>
+    <string name="add_product_hint_name">Product name</string>
+    <string name="add_product_hint_price">Price</string>
+    <string name="add_product_hint_description">Description</string>
+    <string name="add_product_hint_category">Category</string>
+    <string name="add_product_hint_condition">Condition</string>
+    <string name="add_product_hint_weight">Weight</string>
+    <string name="add_product_hint_weight_unit">Unit</string>
+    <string name="add_product_hint_stock">Stock</string>
+    <string name="add_product_hint_color_name">Color name</string>
+    <string name="add_product_hint_color_hex">#RRGGBB</string>
+    <string name="add_product_add_color">+ Add color</string>
+    <string name="add_product_submit_create">Publish product</string>
+    <string name="add_product_submit_update">Save changes</string>
+    <string name="add_product_delete">Delete product</string>
+    <string name="add_product_error_image">Please add at least one photo.</string>
+    <string name="add_product_error_name">Please enter a product name.</string>
+    <string name="add_product_error_price">Please enter a valid price.</string>
+    <string name="add_product_error_category">Please pick a category.</string>
+    <string name="add_product_error_condition">Please pick a condition.</string>
+    <string name="add_product_error_weight">Please enter a valid weight.</string>
+    <string name="add_product_error_stock">Please enter a stock count.</string>
+    <string name="add_product_error_color_hex">Color hex must look like #RRGGBB.</string>
+    <string name="add_product_error_description">Description must be at least 250 characters.</string>
+    <string name="add_product_error_colors">Please pick at least one color.</string>
+    <string name="add_product_uploading">Uploading photos…</string>
+    <string name="add_product_saving">Saving…</string>
+    <string name="add_product_no_images">No photos yet</string>
+
+    <string name="seller_home_empty_title">No products yet</string>
+    <string name="seller_home_empty_body">Tap the + button to publish your first listing.</string>
+    <string name="seller_product_delete_confirm">Delete this product? This can\'t be undone.</string>
+    <string name="seller_product_action_edit">Edit</string>
+    <string name="seller_product_action_delete">Delete</string>
+
+    <string name="self_purchase_blocked">You can\'t buy your own product.</string>
+    <string name="out_of_stock_label">Out of stock</string>
+    <string name="low_stock_label">Only %1$d left in stock</string>
 </resources>

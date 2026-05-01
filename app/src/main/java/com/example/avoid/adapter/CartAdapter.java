@@ -9,10 +9,14 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
 import com.example.avoid.R;
-import com.example.avoid.model.CartProduct;
+import com.example.avoid.model.CartItem;
+import com.example.avoid.model.Product;
+import com.google.android.material.imageview.ShapeableImageView;
 
 import java.util.List;
+import java.util.Map;
 
 public class CartAdapter extends RecyclerView.Adapter<CartAdapter.CartViewHolder> {
 
@@ -20,11 +24,14 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.CartViewHolder
         void onCartChanged();
     }
 
-    private final List<CartProduct> items;
+    private final List<CartItem> items;
+    private final Map<String, Product> productsById;
     private final OnCartChangedListener listener;
 
-    public CartAdapter(List<CartProduct> items, OnCartChangedListener listener) {
+    public CartAdapter(List<CartItem> items, Map<String, Product> productsById,
+                       OnCartChangedListener listener) {
         this.items = items;
+        this.productsById = productsById;
         this.listener = listener;
     }
 
@@ -38,7 +45,9 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.CartViewHolder
 
     @Override
     public void onBindViewHolder(@NonNull CartViewHolder holder, int position) {
-        holder.bind(items.get(position));
+        CartItem item = items.get(position);
+        Product product = productsById.get(item.getProductId());
+        holder.bind(item, product);
     }
 
     @Override
@@ -48,6 +57,7 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.CartViewHolder
 
     class CartViewHolder extends RecyclerView.ViewHolder {
 
+        private final ShapeableImageView productImage;
         private final TextView productName;
         private final TextView productColor;
         private final TextView productPrice;
@@ -58,6 +68,7 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.CartViewHolder
 
         CartViewHolder(@NonNull View itemView) {
             super(itemView);
+            productImage = itemView.findViewById(R.id.cartProductImage);
             productName  = itemView.findViewById(R.id.cartProductName);
             productColor = itemView.findViewById(R.id.cartProductColor);
             productPrice = itemView.findViewById(R.id.cartProductPrice);
@@ -67,25 +78,48 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.CartViewHolder
             btnDelete    = itemView.findViewById(R.id.btnDeleteProduct);
         }
 
-        void bind(CartProduct item) {
-            productName.setText(item.getProduct().getName());
-            productColor.setText(item.getColor());
-            productPrice.setText(item.getProduct().getPrice());
-            productQty.setText(String.valueOf(item.getQuantity()));
+        void bind(CartItem item, Product product) {
+            if (product == null) {
+                productName.setText("Product unavailable");
+                productColor.setText("");
+                productPrice.setText("");
+                productQty.setText(String.valueOf(item.getQuantity()));
+                productImage.setImageDrawable(null);
+                btnIncrease.setEnabled(false);
+                btnDecrease.setEnabled(false);
+            } else {
+                productName.setText(product.getName());
+                productColor.setText(item.getColor() != null ? item.getColor() : "");
+                productPrice.setText(product.getDisplayPrice());
+                productQty.setText(String.valueOf(item.getQuantity()));
+
+                Glide.with(productImage.getContext())
+                        .load(product.getMainImageUrl())
+                        .placeholder(R.drawable.bg_product_placeholder)
+                        .error(R.drawable.bg_product_placeholder)
+                        .into(productImage);
+
+                int maxStock = product.getStock();
+                btnIncrease.setEnabled(item.getQuantity() < maxStock);
+                btnDecrease.setEnabled(true);
+            }
 
             btnIncrease.setOnClickListener(v -> {
                 int pos = getBindingAdapterPosition();
                 if (pos == RecyclerView.NO_POSITION) return;
-                CartProduct current = items.get(pos);
-                current.setQuantity(current.getQuantity() + 1);
-                productQty.setText(String.valueOf(current.getQuantity()));
-                listener.onCartChanged();
+                CartItem current = items.get(pos);
+                int max = product != null ? product.getStock() : Integer.MAX_VALUE;
+                if (current.getQuantity() < max) {
+                    current.setQuantity(current.getQuantity() + 1);
+                    productQty.setText(String.valueOf(current.getQuantity()));
+                    listener.onCartChanged();
+                }
             });
 
             btnDecrease.setOnClickListener(v -> {
                 int pos = getBindingAdapterPosition();
                 if (pos == RecyclerView.NO_POSITION) return;
-                CartProduct current = items.get(pos);
+                CartItem current = items.get(pos);
                 if (current.getQuantity() > 1) {
                     current.setQuantity(current.getQuantity() - 1);
                     productQty.setText(String.valueOf(current.getQuantity()));
