@@ -107,8 +107,11 @@
 
                 <!-- Edit Profile -->
                 <LinearLayout
+                    android:id="@+id/profileEditProfileRow"
                     android:layout_width="match_parent"
                     android:layout_height="52dp"
+                    android:clickable="true"
+                    android:focusable="true"
                     android:gravity="center_vertical"
                     android:orientation="horizontal">
 
@@ -143,8 +146,11 @@
 
                 <!-- Edit Address -->
                 <LinearLayout
+                    android:id="@+id/profileEditAddressRow"
                     android:layout_width="match_parent"
                     android:layout_height="52dp"
+                    android:clickable="true"
+                    android:focusable="true"
                     android:gravity="center_vertical"
                     android:orientation="horizontal">
 

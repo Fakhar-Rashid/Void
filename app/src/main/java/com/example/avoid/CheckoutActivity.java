@@ -1,9 +1,15 @@
 package com.example.avoid;
 
 import android.content.Intent;
+import android.content.res.ColorStateList;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
+import android.widget.RadioButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -12,6 +18,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 import androidx.core.graphics.Insets;
+import androidx.core.widget.CompoundButtonCompat;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowCompat;
 import androidx.core.view.WindowInsetsCompat;
@@ -20,6 +27,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.avoid.adapter.CartAdapter;
+import com.example.avoid.model.Address;
 import com.example.avoid.model.Cart;
 import com.example.avoid.model.CartItem;
 import com.example.avoid.model.Order;
@@ -27,6 +35,7 @@ import com.example.avoid.model.OrderLineItem;
 import com.example.avoid.model.Product;
 import com.example.avoid.model.User;
 import com.google.android.material.button.MaterialButton;
+import com.google.android.material.textfield.TextInputEditText;
 
 import java.text.DateFormat;
 import java.util.ArrayList;
@@ -47,6 +56,19 @@ public class CheckoutActivity extends AppCompatActivity {
     private List<CartItem> cartItems = new ArrayList<>();
     private final Map<String, Product> productsById = new HashMap<>();
 
+    private LinearLayout addressList;
+    private View addressForm;
+    private TextView addressManageHint;
+    private TextInputEditText inputHouseNumber, inputStreetNumber, inputArea, inputProvince, inputCountry;
+
+    private RadioButton radioEzpay;
+    private RadioButton radioCOD;
+
+    private static final ColorStateList BLACK_TINT = ColorStateList.valueOf(Color.BLACK);
+
+    /** Index into the user's saved address list — only meaningful when the list view is shown. */
+    private int selectedAddressIndex = 0;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -64,12 +86,16 @@ public class CheckoutActivity extends AppCompatActivity {
         cartItemsRecyclerView.setNestedScrollingEnabled(false);
 
         loadCart();
+        renderShipping();
+        renderPaymentOptions();
         configureCheckoutButton();
     }
 
     @Override
     protected void onResume() {
         super.onResume();
+        renderShipping();
+        renderPaymentOptions();
         configureCheckoutButton();
     }
 
@@ -83,6 +109,71 @@ public class CheckoutActivity extends AppCompatActivity {
             btnOrderNow.setOnClickListener(v ->
                     startActivity(new Intent(this, LoginActivity.class)));
         }
+    }
+
+    private void renderShipping() {
+        User user = UserSession.getInstance().getCurrentUser();
+        boolean loggedIn = UserSession.getInstance().isLoggedIn();
+        boolean hasSaved = loggedIn && user.hasSavedAddresses();
+
+        addressList.setVisibility(hasSaved ? View.VISIBLE : View.GONE);
+        addressManageHint.setVisibility(hasSaved ? View.VISIBLE : View.GONE);
+        addressForm.setVisibility(hasSaved ? View.GONE : View.VISIBLE);
+
+        if (hasSaved) bindSavedAddresses(user.getAddresses());
+    }
+
+    private void bindSavedAddresses(List<Address> addresses) {
+        addressList.removeAllViews();
+        if (selectedAddressIndex >= addresses.size()) selectedAddressIndex = 0;
+
+        LayoutInflater inflater = LayoutInflater.from(this);
+        for (int i = 0; i < addresses.size(); i++) {
+            Address addr = addresses.get(i);
+            View row = inflater.inflate(R.layout.item_checkout_address, addressList, false);
+            RadioButton radio = row.findViewById(R.id.checkoutAddressRadio);
+            TextView label = row.findViewById(R.id.checkoutAddressLabel);
+            TextView body  = row.findViewById(R.id.checkoutAddressBody);
+
+            radio.setId(View.generateViewId());
+            CompoundButtonCompat.setButtonTintList(radio, BLACK_TINT);
+            radio.setChecked(i == selectedAddressIndex);
+            label.setText("Address " + (i + 1));
+            body.setText(addr.getMultiLine());
+
+            final int index = i;
+            View.OnClickListener selectThis = v -> {
+                selectedAddressIndex = index;
+                for (int j = 0; j < addressList.getChildCount(); j++) {
+                    RadioButton rb = addressList.getChildAt(j).findViewById(R.id.checkoutAddressRadio);
+                    if (rb != null) rb.setChecked(j == index);
+                }
+            };
+            row.setOnClickListener(selectThis);
+            radio.setOnClickListener(selectThis);
+
+            addressList.addView(row);
+        }
+    }
+
+    private void renderPaymentOptions() {
+        User user = UserSession.getInstance().getCurrentUser();
+        TextView ezpayBalance = findViewById(R.id.checkoutEzpayBalance);
+        ezpayBalance.setText(String.format(Locale.US, "Balance $%,.2f", user.getBalance()));
+    }
+
+    private Address readAddressForm() {
+        return new Address(
+                text(inputHouseNumber),
+                text(inputStreetNumber),
+                text(inputArea),
+                text(inputProvince),
+                text(inputCountry)
+        );
+    }
+
+    private static String text(TextInputEditText input) {
+        return input != null && input.getText() != null ? input.getText().toString().trim() : "";
     }
 
     private void loadCart() {
@@ -121,11 +212,20 @@ public class CheckoutActivity extends AppCompatActivity {
             Toast.makeText(this, "Your cart is empty", Toast.LENGTH_SHORT).show();
             return;
         }
-        com.google.android.material.textfield.TextInputEditText addressInput = findViewById(R.id.checkoutAddressInput);
-        String address = addressInput.getText() != null ? addressInput.getText().toString().trim() : "";
-        if (address.isEmpty()) {
-            Toast.makeText(this, "Please provide a shipping address", Toast.LENGTH_LONG).show();
-            return;
+
+        boolean usingSaved = user.hasSavedAddresses();
+        Address shipping;
+        Address newAddressToPersist = null;
+        if (usingSaved) {
+            int idx = Math.max(0, Math.min(selectedAddressIndex, user.getAddresses().size() - 1));
+            shipping = user.getAddresses().get(idx);
+        } else {
+            shipping = readAddressForm();
+            if (!shipping.isComplete()) {
+                Toast.makeText(this, "Please fill in all address fields", Toast.LENGTH_LONG).show();
+                return;
+            }
+            newAddressToPersist = shipping;
         }
 
         if (productsById.isEmpty()) {
@@ -133,14 +233,15 @@ public class CheckoutActivity extends AppCompatActivity {
             return;
         }
 
-        // Build line items + total from current product snapshots.
+        String paymentMethod = radioCOD.isChecked() ? Order.PAYMENT_COD : Order.PAYMENT_EZPAY;
+
         long now = System.currentTimeMillis();
         List<OrderLineItem> lineItems = new ArrayList<>();
         List<String> storeIds = new ArrayList<>();
         double total = 0;
         for (CartItem item : cart.getItems()) {
             Product p = productsById.get(item.getProductId());
-            if (p == null) continue; // skip missing
+            if (p == null) continue;
             if (p.getStock() < item.getQuantity()) {
                 Toast.makeText(this,
                         "Not enough stock for " + p.getName() + " (only " + p.getStock() + " left)",
@@ -163,16 +264,19 @@ public class CheckoutActivity extends AppCompatActivity {
             return;
         }
 
-        if (user.getBalance() < total) {
+        // Ezpay requires sufficient balance; COD does not.
+        if (Order.PAYMENT_EZPAY.equals(paymentMethod) && user.getBalance() < total) {
             double shortBy = total - user.getBalance();
             Toast.makeText(this,
-                    String.format(Locale.US, "Insufficient balance. You need $%.2f more — top up to continue.", shortBy),
+                    String.format(Locale.US, "Insufficient balance. You need $%.2f more — top up or pick Cash on Delivery.", shortBy),
                     Toast.LENGTH_LONG).show();
             return;
         }
 
         final double finalTotal = total;
         final List<OrderLineItem> finalLineItems = lineItems;
+        final String finalPayment = paymentMethod;
+        final Address finalAddressToPersist = newAddressToPersist;
 
         Order order = new Order(
                 null,
@@ -181,18 +285,25 @@ public class CheckoutActivity extends AppCompatActivity {
                 finalTotal,
                 DateFormat.getDateInstance(DateFormat.MEDIUM).format(new Date()),
                 now,
-                storeIds
+                storeIds,
+                shipping,
+                finalPayment
         );
 
         UserRepository.getInstance().saveOrder(order, new UserRepository.Callback<Order>() {
             @Override public void onSuccess(Order placed) {
-                // Decrement stock per line item (atomic, server-side).
                 for (OrderLineItem li : finalLineItems) {
                     ProductRepository.getInstance().decrementStock(li.getProductId(), li.getQuantity());
                 }
                 user.getOrders().add(0, placed);
-                user.setBalance(user.getBalance() - finalTotal);
-                UserRepository.getInstance().saveBalance(user);
+                if (Order.PAYMENT_EZPAY.equals(finalPayment)) {
+                    user.setBalance(user.getBalance() - finalTotal);
+                    UserRepository.getInstance().saveBalance(user);
+                }
+                if (finalAddressToPersist != null && user.canAddAddress()) {
+                    user.getAddresses().add(finalAddressToPersist);
+                    UserRepository.getInstance().saveAddresses(user, null);
+                }
                 cart.clear();
                 UserRepository.getInstance().saveCartForCurrentUser();
                 Toast.makeText(CheckoutActivity.this, "Order placed", Toast.LENGTH_SHORT).show();
@@ -210,11 +321,21 @@ public class CheckoutActivity extends AppCompatActivity {
         cartItemsRecyclerView = findViewById(R.id.checkoutItemsRecyclerView);
         cartTotalPrice = findViewById(R.id.checkoutTotalPrice);
 
-        com.google.android.material.textfield.TextInputEditText addressInput = findViewById(R.id.checkoutAddressInput);
-        User user = UserSession.getInstance().getCurrentUser();
-        if (user != null && user.getAddress() != null) {
-            addressInput.setText(user.getAddress());
-        }
+        addressList         = findViewById(R.id.checkoutAddressList);
+        addressForm         = findViewById(R.id.checkoutAddressForm);
+        addressManageHint   = findViewById(R.id.checkoutAddressManageHint);
+        inputHouseNumber    = findViewById(R.id.inputHouseNumber);
+        inputStreetNumber   = findViewById(R.id.inputStreetNumber);
+        inputArea           = findViewById(R.id.inputArea);
+        inputProvince       = findViewById(R.id.inputProvince);
+        inputCountry        = findViewById(R.id.inputCountry);
+
+        radioEzpay          = findViewById(R.id.radioEzpay);
+        radioCOD            = findViewById(R.id.radioCOD);
+        CompoundButtonCompat.setButtonTintList(radioEzpay, BLACK_TINT);
+        CompoundButtonCompat.setButtonTintList(radioCOD,   BLACK_TINT);
+        radioEzpay.setOnClickListener(v -> { radioEzpay.setChecked(true); radioCOD.setChecked(false); });
+        radioCOD.setOnClickListener(v ->   { radioCOD.setChecked(true);   radioEzpay.setChecked(false); });
     }
 
     private void setupSystemBars() {

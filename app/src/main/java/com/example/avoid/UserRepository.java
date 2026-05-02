@@ -234,6 +234,37 @@ public class UserRepository {
                 .addOnFailureListener(e -> Log.e(TAG, "save balance failed", e));
     }
 
+    public void saveProfile(User user, @Nullable Callback<User> callback) {
+        if (user == null || user.getId() == null) {
+            if (callback != null) callback.onFailure(new IllegalArgumentException("user/id required"));
+            return;
+        }
+        Map<String, Object> patch = new HashMap<>();
+        patch.put("name", user.getName());
+        patch.put("phone", user.getPhone());
+        db.collection(USERS).document(user.getId()).update(patch)
+                .addOnSuccessListener(v -> { if (callback != null) callback.onSuccess(user); })
+                .addOnFailureListener(e -> {
+                    Log.e(TAG, "save profile failed", e);
+                    if (callback != null) callback.onFailure(e);
+                });
+    }
+
+    public void saveAddresses(User user, @Nullable Callback<User> callback) {
+        if (user == null || user.getId() == null) {
+            if (callback != null) callback.onFailure(new IllegalArgumentException("user/id required"));
+            return;
+        }
+        Map<String, Object> patch = new HashMap<>();
+        patch.put("addresses", user.getAddresses());
+        db.collection(USERS).document(user.getId()).update(patch)
+                .addOnSuccessListener(v -> { if (callback != null) callback.onSuccess(user); })
+                .addOnFailureListener(e -> {
+                    Log.e(TAG, "save addresses failed", e);
+                    if (callback != null) callback.onFailure(e);
+                });
+    }
+
     public void saveSellerStatus(User user) {
         if (user == null || user.getId() == null) return;
         Map<String, Object> patch = new HashMap<>();
@@ -269,7 +300,6 @@ public class UserRepository {
                 fbUser.getDisplayName() != null && !fbUser.getDisplayName().isEmpty()
                         ? fbUser.getDisplayName() : "Buyer",
                 fbUser.getEmail() != null ? fbUser.getEmail() : "",
-                null,
                 null,
                 fbUser.getPhotoUrl() != null ? fbUser.getPhotoUrl().toString() : null,
                 0.0,

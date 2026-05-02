@@ -9,13 +9,15 @@ import java.util.List;
 
 public class User implements Serializable {
 
+    public static final int MAX_ADDRESSES = 3;
+
     @DocumentId
     private String id;
 
     private String name;
     private String email;
     private String phone;
-    private String address;
+    private List<Address> addresses = new ArrayList<>();
     private String profileImageUrl;
     private double balance;
     private boolean seller;
@@ -35,13 +37,12 @@ public class User implements Serializable {
         this.cart = new Cart();
     }
 
-    public User(String id, String name, String email, String phone, String address,
+    public User(String id, String name, String email, String phone,
                 String profileImageUrl, double balance, Settings settings) {
         this.id = id;
         this.name = name;
         this.email = email;
         this.phone = phone;
-        this.address = address;
         this.profileImageUrl = profileImageUrl;
         this.balance = balance;
         this.settings = settings != null ? settings : new Settings();
@@ -60,8 +61,13 @@ public class User implements Serializable {
     public String getPhone() { return phone; }
     public void setPhone(String phone) { this.phone = phone; }
 
-    public String getAddress() { return address; }
-    public void setAddress(String address) { this.address = address; }
+    public List<Address> getAddresses() {
+        if (addresses == null) addresses = new ArrayList<>();
+        return addresses;
+    }
+    public void setAddresses(List<Address> addresses) {
+        this.addresses = addresses != null ? addresses : new ArrayList<>();
+    }
 
     public String getProfileImageUrl() { return profileImageUrl; }
     public void setProfileImageUrl(String profileImageUrl) { this.profileImageUrl = profileImageUrl; }
@@ -104,6 +110,16 @@ public class User implements Serializable {
     public Store getStore() { return store; }
     @Exclude
     public void setStore(Store store) { this.store = store; }
+
+    @Exclude
+    public boolean hasSavedAddresses() {
+        return addresses != null && !addresses.isEmpty();
+    }
+
+    @Exclude
+    public boolean canAddAddress() {
+        return getAddresses().size() < MAX_ADDRESSES;
+    }
 
     @Exclude
     public String getInitials() {

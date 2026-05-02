@@ -79,10 +79,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:nestedScrollingEnabled="false" />
-
             </LinearLayout>
 
-            <!-- Divider -->
             <View
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
@@ -105,31 +103,130 @@
                     android:layout_marginTop="8dp"
                     android:layout_marginBottom="12dp"
                     android:fontFamily="sans-serif-medium"
-                    android:text="Shipping"
+                    android:text="Shipping address"
                     android:textColor="@color/home_text_primary"
                     android:textSize="18sp" />
 
-                <com.google.android.material.textfield.TextInputLayout
+                <!-- Saved-addresses list (visible when user has 1+ saved addresses).
+                     Single-select is enforced manually in code. -->
+                <LinearLayout
+                    android:id="@+id/checkoutAddressList"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="12dp"
-                    android:hint="Street Address"
-                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+                    android:orientation="vertical"
+                    android:visibility="gone" />
 
-                    <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/checkoutAddressInput"
+                <TextView
+                    android:id="@+id/checkoutAddressManageHint"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="6dp"
+                    android:text="Manage saved addresses in your profile."
+                    android:textColor="@color/home_text_hint"
+                    android:textSize="12sp"
+                    android:visibility="gone" />
+
+                <!-- First-time entry form (visible when no addresses saved) -->
+                <LinearLayout
+                    android:id="@+id/checkoutAddressForm"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:inputType="textMultiLine"
-                        android:minLines="3"
-                        android:maxLines="5"
-                        android:gravity="top|start"
-                        android:scrollbars="vertical" />
-                </com.google.android.material.textfield.TextInputLayout>
+                        android:orientation="horizontal">
 
+                        <com.google.android.material.textfield.TextInputLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginEnd="6dp"
+                            android:layout_weight="1"
+                            android:hint="House #"
+                            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+
+                            <com.google.android.material.textfield.TextInputEditText
+                                android:id="@+id/inputHouseNumber"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:inputType="text"
+                                android:maxLines="1" />
+                        </com.google.android.material.textfield.TextInputLayout>
+
+                        <com.google.android.material.textfield.TextInputLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="6dp"
+                            android:layout_weight="1"
+                            android:hint="Street #"
+                            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+
+                            <com.google.android.material.textfield.TextInputEditText
+                                android:id="@+id/inputStreetNumber"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:inputType="text"
+                                android:maxLines="1" />
+                        </com.google.android.material.textfield.TextInputLayout>
+                    </LinearLayout>
+
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:hint="Area"
+                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/inputArea"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:inputType="text"
+                            android:maxLines="1" />
+                    </com.google.android.material.textfield.TextInputLayout>
+
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:hint="Province"
+                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/inputProvince"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:inputType="text"
+                            android:maxLines="1" />
+                    </com.google.android.material.textfield.TextInputLayout>
+
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:hint="Country"
+                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/inputCountry"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:inputType="text"
+                            android:maxLines="1"
+                            android:text="Pakistan" />
+                    </com.google.android.material.textfield.TextInputLayout>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="6dp"
+                        android:text="We'll save this address to your profile after ordering."
+                        android:textColor="@color/home_text_hint"
+                        android:textSize="12sp" />
+                </LinearLayout>
             </LinearLayout>
 
-            <!-- Divider -->
             <View
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
@@ -158,57 +255,53 @@
                 <com.google.android.material.card.MaterialCardView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    app:cardBackgroundColor="@android:color/white"
                     app:cardCornerRadius="12dp"
                     app:cardElevation="0dp"
-                    app:cardBackgroundColor="@android:color/white"
-                    app:strokeWidth="1dp"
-                    app:strokeColor="@color/black">
+                    app:strokeColor="@color/black"
+                    app:strokeWidth="1dp">
 
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:orientation="horizontal"
                         android:gravity="center_vertical"
+                        android:orientation="horizontal"
                         android:paddingStart="16dp"
-                        android:paddingEnd="12dp"
                         android:paddingTop="14dp"
+                        android:paddingEnd="12dp"
                         android:paddingBottom="14dp">
 
                         <ImageView
                             android:layout_width="22dp"
                             android:layout_height="22dp"
-                            app:tint="#4CAF50"
-                            android:layout_marginEnd="12dp" />
+                            android:layout_marginEnd="12dp"
+                            app:tint="#4CAF50" />
 
                         <TextView
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
+                            android:fontFamily="sans-serif-medium"
                             android:text="EZLHAPPYS"
                             android:textColor="@color/home_text_primary"
-                            android:textSize="15sp"
-                            android:fontFamily="sans-serif-medium" />
+                            android:textSize="15sp" />
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            android:layout_marginEnd="8dp"
                             android:text="Discount 20%"
                             android:textColor="#888888"
-                            android:textSize="13sp"
-                            android:layout_marginEnd="8dp" />
+                            android:textSize="13sp" />
 
                         <ImageView
                             android:layout_width="18dp"
                             android:layout_height="18dp"
                             app:tint="#BBBBBB" />
-
                     </LinearLayout>
-
                 </com.google.android.material.card.MaterialCardView>
-
             </LinearLayout>
 
-            <!-- Divider -->
             <View
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
@@ -238,9 +331,9 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal"
+                    android:layout_marginBottom="16dp"
                     android:gravity="center_vertical"
-                    android:layout_marginBottom="16dp">
+                    android:orientation="horizontal">
 
                     <ImageView
                         android:layout_width="44dp"
@@ -258,45 +351,45 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            android:fontFamily="sans-serif-medium"
                             android:text="Ezpay"
                             android:textColor="@color/home_text_primary"
-                            android:textSize="15sp"
-                            android:fontFamily="sans-serif-medium" />
+                            android:textSize="15sp" />
 
                         <TextView
+                            android:id="@+id/checkoutEzpayBalance"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Balance $58.309"
                             android:textColor="#888888"
-                            android:textSize="13sp" />
-
+                            android:textSize="13sp"
+                            tools:text="Balance $58.31" />
                     </LinearLayout>
 
                     <RadioButton
                         android:id="@+id/radioEzpay"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:buttonTint="#000000"
                         android:checked="true"
-                        android:buttonTint="#000000" />
-
+                        app:useMaterialThemeColors="false" />
                 </LinearLayout>
 
                 <!-- Other Method Label -->
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_marginBottom="8dp"
+                    android:fontFamily="sans-serif-medium"
                     android:text="Other Method"
                     android:textColor="@color/home_text_primary"
-                    android:textSize="15sp"
-                    android:fontFamily="sans-serif-medium"
-                    android:layout_marginBottom="8dp" />
+                    android:textSize="15sp" />
 
-                <!-- BCA Row -->
+                <!-- Cash on Delivery Row -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal"
                     android:gravity="center_vertical"
+                    android:orientation="horizontal"
                     android:paddingTop="4dp"
                     android:paddingBottom="4dp">
 
@@ -304,53 +397,19 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:text="BCA"
+                        android:text="Cash on Delivery"
                         android:textColor="@color/home_text_primary"
                         android:textSize="15sp" />
 
                     <RadioButton
-                        android:id="@+id/radioBCA"
+                        android:id="@+id/radioCOD"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:buttonTint="#000000"
                         android:checked="false"
-                        android:buttonTint="#000000" />
-
+                        app:useMaterialThemeColors="false" />
                 </LinearLayout>
-
-                <!-- Divider -->
-                <View
-                    android:layout_width="match_parent"
-                    android:layout_height="1dp"
-                    android:background="#F0F0F0" />
-
-                <!-- Paypal Row -->
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:gravity="center_vertical"
-                    android:paddingTop="4dp"
-                    android:paddingBottom="4dp">
-
-                    <TextView
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="Paypal"
-                        android:textColor="@color/home_text_primary"
-                        android:textSize="15sp" />
-
-                    <RadioButton
-                        android:id="@+id/radioPaypal"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:checked="false"
-                        android:buttonTint="#000000" />
-
-                </LinearLayout>
-
             </LinearLayout>
-
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
 
@@ -403,5 +462,4 @@
             app:backgroundTint="@color/home_nav_background"
             app:cornerRadius="24dp" />
     </LinearLayout>
-
 </LinearLayout>

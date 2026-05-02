@@ -104,7 +104,6 @@ public class UserSession {
                 "",
                 null,
                 null,
-                null,
                 0.0,
                 new Settings()
         );

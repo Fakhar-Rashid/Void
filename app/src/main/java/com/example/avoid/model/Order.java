@@ -13,6 +13,9 @@ public class Order implements Serializable {
         CONFIRMED, PACKED, ON_THE_WAY, DELIVERED
     }
 
+    public static final String PAYMENT_EZPAY = "EZPAY";
+    public static final String PAYMENT_COD   = "COD";
+
     @DocumentId
     private String orderId;
     private String userId;
@@ -22,11 +25,21 @@ public class Order implements Serializable {
     private long orderTimestamp;
     /** Stores that contributed at least one product to this order (denormalized for cheap querying). */
     private List<String> storeIds = new ArrayList<>();
+    /** Snapshot of the shipping address at the time the order was placed. */
+    private Address shippingAddress;
+    /** {@link #PAYMENT_EZPAY} or {@link #PAYMENT_COD}. */
+    private String paymentMethod;
+    /** Denormalized buyer fields — copied from the user doc when the order is placed
+     *  so sellers can render details without reading another user's doc. */
+    private String buyerName;
+    private String buyerEmail;
+    private String buyerPhone;
 
     public Order() {}
 
     public Order(String orderId, String userId, List<OrderLineItem> items,
-                 double totalAmount, String orderDate, long orderTimestamp, List<String> storeIds) {
+                 double totalAmount, String orderDate, long orderTimestamp, List<String> storeIds,
+                 Address shippingAddress, String paymentMethod) {
         this.orderId = orderId;
         this.userId = userId;
         this.items = items != null ? items : new ArrayList<>();
@@ -34,6 +47,8 @@ public class Order implements Serializable {
         this.orderDate = orderDate;
         this.orderTimestamp = orderTimestamp;
         this.storeIds = storeIds != null ? storeIds : new ArrayList<>();
+        this.shippingAddress = shippingAddress;
+        this.paymentMethod = paymentMethod;
     }
 
     public String getOrderId() { return orderId; }
@@ -65,6 +80,18 @@ public class Order implements Serializable {
     }
     public void setStoreIds(List<String> storeIds) {
         this.storeIds = storeIds != null ? storeIds : new ArrayList<>();
+    }
+
+    public Address getShippingAddress() { return shippingAddress; }
+    public void setShippingAddress(Address shippingAddress) { this.shippingAddress = shippingAddress; }
+
+    public String getPaymentMethod() { return paymentMethod; }
+    public void setPaymentMethod(String paymentMethod) { this.paymentMethod = paymentMethod; }
+
+    @Exclude
+    public String getPaymentMethodLabel() {
+        if (PAYMENT_COD.equals(paymentMethod)) return "Cash on Delivery";
+        return "Ezpay";
     }
 
     @Exclude

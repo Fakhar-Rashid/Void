@@ -34,6 +34,18 @@ public class ProfileFragment extends Fragment {
                         .addToBackStack(null)
                         .commit());
 
+        view.findViewById(R.id.profileEditProfileRow).setOnClickListener(v ->
+                requireActivity().getSupportFragmentManager().beginTransaction()
+                        .add(R.id.fragment_container, new EditProfileFragment())
+                        .addToBackStack(null)
+                        .commit());
+
+        view.findViewById(R.id.profileEditAddressRow).setOnClickListener(v ->
+                requireActivity().getSupportFragmentManager().beginTransaction()
+                        .add(R.id.fragment_container, new EditAddressFragment())
+                        .addToBackStack(null)
+                        .commit());
+
         view.findViewById(R.id.profileLogoutRow).setOnClickListener(v -> {
             UserSession.getInstance().logout();
             render(view);
