@@ -65,9 +65,11 @@ public class AddProductActivity extends AppCompatActivity {
 
     private TextInputEditText nameInput, priceInput, descInput, weightInput, stockInput;
     private AutoCompleteTextView categoryInput, conditionInput, weightUnitInput;
+    private com.google.android.material.textfield.TextInputLayout nameLayout, priceLayout, categoryLayout,
+            descriptionLayout, conditionLayout, weightLayout, weightUnitLayout, stockLayout;
     private ViewGroup colorPaletteContainer;
     private ViewGroup imageThumbsContainer;
-    private TextView errorText, titleText;
+    private TextView errorText, titleText, imagesErrorText, colorsErrorText;
     private MaterialButton submitButton, deleteButton;
     private View loadingOverlay;
     private TextView loadingText;
@@ -119,14 +121,50 @@ public class AddProductActivity extends AppCompatActivity {
         categoryInput          = findViewById(R.id.inputCategory);
         conditionInput         = findViewById(R.id.inputCondition);
         weightUnitInput        = findViewById(R.id.inputWeightUnit);
+        nameLayout             = findViewById(R.id.inputNameLayout);
+        priceLayout            = findViewById(R.id.inputPriceLayout);
+        categoryLayout         = findViewById(R.id.inputCategoryLayout);
+        descriptionLayout      = findViewById(R.id.inputDescriptionLayout);
+        conditionLayout        = findViewById(R.id.inputConditionLayout);
+        weightLayout           = findViewById(R.id.inputWeightLayout);
+        weightUnitLayout       = findViewById(R.id.inputWeightUnitLayout);
+        stockLayout            = findViewById(R.id.inputStockLayout);
         colorPaletteContainer  = findViewById(R.id.colorPaletteContainer);
         imageThumbsContainer   = findViewById(R.id.imageThumbsContainer);
         errorText              = findViewById(R.id.addProductErrorText);
+        imagesErrorText        = findViewById(R.id.imagesErrorText);
+        colorsErrorText        = findViewById(R.id.colorsErrorText);
         titleText              = findViewById(R.id.addProductTitle);
         submitButton           = findViewById(R.id.btnSubmitProduct);
         deleteButton           = findViewById(R.id.btnDeleteProduct);
         loadingOverlay         = findViewById(R.id.addProductLoading);
         loadingText            = findViewById(R.id.addProductLoadingText);
+
+        wireErrorClearOnEdit();
+    }
+
+    /** Clear a field's red error as soon as the user starts editing it. */
+    private void wireErrorClearOnEdit() {
+        attachClearer(nameInput, nameLayout);
+        attachClearer(priceInput, priceLayout);
+        attachClearer(descInput, descriptionLayout);
+        attachClearer(weightInput, weightLayout);
+        attachClearer(stockInput, stockLayout);
+        attachClearer(categoryInput, categoryLayout);
+        attachClearer(conditionInput, conditionLayout);
+        attachClearer(weightUnitInput, weightUnitLayout);
+    }
+
+    private void attachClearer(EditText input,
+                               com.google.android.material.textfield.TextInputLayout layout) {
+        if (input == null || layout == null) return;
+        input.addTextChangedListener(new android.text.TextWatcher() {
+            @Override public void beforeTextChanged(CharSequence s, int a, int b, int c) {}
+            @Override public void onTextChanged(CharSequence s, int a, int b, int c) {
+                if (layout.getError() != null) layout.setError(null);
+            }
+            @Override public void afterTextChanged(android.text.Editable s) {}
+        });
     }
 
     private void setupCategoryDropdown() {
@@ -152,6 +190,7 @@ public class AddProductActivity extends AppCompatActivity {
         UriOrUrl entry = new UriOrUrl(uri, null);
         images.add(entry);
         renderThumb(entry);
+        if (imagesErrorText != null) imagesErrorText.setVisibility(View.GONE);
     }
 
     private void addRemoteImage(@NonNull String url) {
@@ -196,12 +235,42 @@ public class AddProductActivity extends AppCompatActivity {
         });
     }
 
+    /**
+     * Lay swatches into rows that wrap based on the container's measured width.
+     * Container is a vertical LinearLayout; each row inside is a horizontal LinearLayout.
+     */
     private void setupColorPalette() {
         colorPaletteContainer.removeAllViews();
-        for (Color color : PALETTE) addPaletteSwatch(color);
+        // Defer until the container has a width — we need it to compute swatches-per-row.
+        colorPaletteContainer.post(this::layoutPaletteRows);
     }
 
-    private void addPaletteSwatch(Color color) {
+    private void layoutPaletteRows() {
+        colorPaletteContainer.removeAllViews();
+        float density = getResources().getDisplayMetrics().density;
+        int swatchSize = (int) (44 * density);
+        int marginEnd  = (int) (10 * density);
+        int width = colorPaletteContainer.getWidth();
+        if (width <= 0) width = (int) (300 * density); // Sane fallback.
+        int swatchesPerRow = Math.max(1, (width + marginEnd) / (swatchSize + marginEnd));
+
+        LinearLayout currentRow = null;
+        for (int i = 0; i < PALETTE.size(); i++) {
+            if (i % swatchesPerRow == 0) {
+                currentRow = new LinearLayout(this);
+                currentRow.setOrientation(LinearLayout.HORIZONTAL);
+                LinearLayout.LayoutParams rowParams = new LinearLayout.LayoutParams(
+                        LinearLayout.LayoutParams.MATCH_PARENT,
+                        LinearLayout.LayoutParams.WRAP_CONTENT);
+                if (i > 0) rowParams.topMargin = (int) (10 * density);
+                currentRow.setLayoutParams(rowParams);
+                colorPaletteContainer.addView(currentRow);
+            }
+            addPaletteSwatch(PALETTE.get(i), currentRow);
+        }
+    }
+
+    private void addPaletteSwatch(Color color, ViewGroup parent) {
         float density = getResources().getDisplayMetrics().density;
         int swatchSize = (int) (44 * density);
         int marginEnd  = (int) (10 * density);
@@ -242,7 +311,7 @@ public class AddProductActivity extends AppCompatActivity {
         // Initial selection state.
         renderSwatchSelection(ring, check, color);
 
-        colorPaletteContainer.addView(container);
+        parent.addView(container);
     }
 
     private void toggleColor(Color color, View ring, ImageView check) {
@@ -250,6 +319,9 @@ public class AddProductActivity extends AppCompatActivity {
         if (selectedColors.containsKey(key)) selectedColors.remove(key);
         else selectedColors.put(key, color);
         renderSwatchSelection(ring, check, color);
+        if (!selectedColors.isEmpty() && colorsErrorText != null) {
+            colorsErrorText.setVisibility(View.GONE);
+        }
     }
 
     private void renderSwatchSelection(View ring, ImageView check, Color color) {
@@ -269,14 +341,24 @@ public class AddProductActivity extends AppCompatActivity {
     }
 
     private void refreshAllSwatches() {
-        for (int i = 0; i < colorPaletteContainer.getChildCount(); i++) {
-            ViewGroup container = (ViewGroup) colorPaletteContainer.getChildAt(i);
-            Object tag = container.getTag(R.id.addProductRoot);
-            if (!(tag instanceof Color)) continue;
-            Color color = (Color) tag;
-            View ring = container.getChildAt(1);
-            ImageView check = (ImageView) container.getChildAt(2);
-            renderSwatchSelection(ring, check, color);
+        // setupColorPalette posts the row layout, so this can be called before swatches exist.
+        if (colorPaletteContainer.getChildCount() == 0) {
+            colorPaletteContainer.post(this::refreshAllSwatches);
+            return;
+        }
+        for (int r = 0; r < colorPaletteContainer.getChildCount(); r++) {
+            View rowView = colorPaletteContainer.getChildAt(r);
+            if (!(rowView instanceof ViewGroup)) continue;
+            ViewGroup row = (ViewGroup) rowView;
+            for (int i = 0; i < row.getChildCount(); i++) {
+                ViewGroup container = (ViewGroup) row.getChildAt(i);
+                Object tag = container.getTag(R.id.addProductRoot);
+                if (!(tag instanceof Color)) continue;
+                Color color = (Color) tag;
+                View ring = container.getChildAt(1);
+                ImageView check = (ImageView) container.getChildAt(2);
+                renderSwatchSelection(ring, check, color);
+            }
         }
     }
 
@@ -285,48 +367,64 @@ public class AddProductActivity extends AppCompatActivity {
     }
 
     private void submit() {
-        clearError();
+        clearAllErrors();
 
-        if (images.isEmpty()) { showError(getString(R.string.add_product_error_image)); return; }
+        boolean ok = true;
+
+        if (images.isEmpty()) {
+            showSectionError(imagesErrorText, "Please add at least one image.");
+            ok = false;
+        }
+
         String name = textOf(nameInput);
-        if (TextUtils.isEmpty(name)) { showError(getString(R.string.add_product_error_name)); return; }
+        if (TextUtils.isEmpty(name)) { nameLayout.setError("Required"); ok = false; }
 
-        double price;
-        try { price = Double.parseDouble(textOf(priceInput)); }
-        catch (NumberFormatException e) { showError(getString(R.string.add_product_error_price)); return; }
-        if (price <= 0) { showError(getString(R.string.add_product_error_price)); return; }
+        double price = 0;
+        boolean priceOk = false;
+        try { price = Double.parseDouble(textOf(priceInput)); priceOk = price > 0; }
+        catch (NumberFormatException ignore) {}
+        if (!priceOk) { priceLayout.setError("Enter a valid price"); ok = false; }
 
         ProductCategory category = pickEnum(ProductCategory.values(),
                 ProductCategory::getDisplayName, textOf(categoryInput));
-        if (category == null) { showError(getString(R.string.add_product_error_category)); return; }
+        if (category == null) { categoryLayout.setError("Pick a category"); ok = false; }
 
         String description = textOf(descInput);
         if (description.length() < DESCRIPTION_MIN) {
-            showError(getString(R.string.add_product_error_description));
-            return;
+            descriptionLayout.setError("At least " + DESCRIPTION_MIN + " characters required");
+            ok = false;
         }
 
         Condition condition = pickEnum(Condition.values(),
                 Condition::getDisplayName, textOf(conditionInput));
-        if (condition == null) { showError(getString(R.string.add_product_error_condition)); return; }
+        if (condition == null) { conditionLayout.setError("Pick a condition"); ok = false; }
 
-        double weight;
-        try { weight = Double.parseDouble(textOf(weightInput)); }
-        catch (NumberFormatException e) { showError(getString(R.string.add_product_error_weight)); return; }
-        if (weight <= 0) { showError(getString(R.string.add_product_error_weight)); return; }
+        double weight = 0;
+        boolean weightOk = false;
+        try { weight = Double.parseDouble(textOf(weightInput)); weightOk = weight > 0; }
+        catch (NumberFormatException ignore) {}
+        if (!weightOk) { weightLayout.setError("Enter a valid weight"); ok = false; }
 
         WeightUnit weightUnit = pickWeightUnit(textOf(weightUnitInput));
-        if (weightUnit == null) weightUnit = WeightUnit.KILOGRAMS;
+        if (weightUnit == null) { weightUnitLayout.setError("Pick a unit"); ok = false; }
 
         if (selectedColors.isEmpty()) {
-            showError(getString(R.string.add_product_error_colors));
-            return;
+            showSectionError(colorsErrorText, "Pick at least one color.");
+            ok = false;
         }
 
-        int stock;
-        try { stock = Integer.parseInt(textOf(stockInput)); }
-        catch (NumberFormatException e) { showError(getString(R.string.add_product_error_stock)); return; }
-        if (stock < 0) { showError(getString(R.string.add_product_error_stock)); return; }
+        int stock = 0;
+        boolean stockOk = false;
+        try { stock = Integer.parseInt(textOf(stockInput)); stockOk = stock >= 0; }
+        catch (NumberFormatException ignore) {}
+        if (!stockOk) { stockLayout.setError("Enter a valid stock"); ok = false; }
+
+        if (!ok) {
+            Toast.makeText(this, "Please fill in every field correctly.", Toast.LENGTH_LONG).show();
+            errorText.setText("Some fields need attention. Check the highlighted ones above.");
+            errorText.setVisibility(View.VISIBLE);
+            return;
+        }
 
         User user = UserSession.getInstance().getCurrentUser();
         Store store = user != null ? user.getStore() : null;
@@ -351,6 +449,27 @@ public class AddProductActivity extends AppCompatActivity {
         if (product.getCreatedAt() == 0) product.setCreatedAt(System.currentTimeMillis());
 
         uploadAndSave(product);
+    }
+
+    private void showSectionError(TextView target, String message) {
+        target.setText(message);
+        target.setVisibility(View.VISIBLE);
+    }
+
+    /** Clears every per-field error and the bottom error summary. Called at the start of submit
+     *  and whenever the user adds an image or picks a color, so those errors disappear immediately. */
+    private void clearAllErrors() {
+        clearError();
+        nameLayout.setError(null);
+        priceLayout.setError(null);
+        categoryLayout.setError(null);
+        descriptionLayout.setError(null);
+        conditionLayout.setError(null);
+        weightLayout.setError(null);
+        weightUnitLayout.setError(null);
+        stockLayout.setError(null);
+        if (imagesErrorText != null) imagesErrorText.setVisibility(View.GONE);
+        if (colorsErrorText != null) colorsErrorText.setVisibility(View.GONE);
     }
 
     private void uploadAndSave(Product product) {

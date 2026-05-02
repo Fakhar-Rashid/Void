@@ -88,9 +88,19 @@
                 android:textColor="@color/home_text_primary"
                 app:strokeColor="@color/home_chip_border" />
 
+            <TextView
+                android:id="@+id/imagesErrorText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:textColor="@color/auth_error"
+                android:textSize="12sp"
+                android:visibility="gone" />
+
             <TextView style="@style/AddProductSectionLabel" android:text="@string/add_product_section_basics" />
 
             <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/inputNameLayout"
                 style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -105,6 +115,7 @@
             </com.google.android.material.textfield.TextInputLayout>
 
             <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/inputPriceLayout"
                 style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -121,6 +132,7 @@
             </com.google.android.material.textfield.TextInputLayout>
 
             <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/inputCategoryLayout"
                 style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -155,6 +167,7 @@
             </com.google.android.material.textfield.TextInputLayout>
 
             <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/inputConditionLayout"
                 style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -175,6 +188,7 @@
                 android:orientation="horizontal">
 
                 <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/inputWeightLayout"
                     style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
@@ -190,6 +204,7 @@
                 </com.google.android.material.textfield.TextInputLayout>
 
                 <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/inputWeightUnitLayout"
                     style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
@@ -214,24 +229,26 @@
                 android:textColor="@color/home_text_hint"
                 android:textSize="12sp" />
 
-            <HorizontalScrollView
+            <LinearLayout
+                android:id="@+id/colorPaletteContainer"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
-                android:overScrollMode="never"
-                android:scrollbars="none">
+                android:orientation="vertical" />
 
-                <LinearLayout
-                    android:id="@+id/colorPaletteContainer"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal" />
-            </HorizontalScrollView>
+            <TextView
+                android:id="@+id/colorsErrorText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:textColor="@color/auth_error"
+                android:textSize="12sp"
+                android:visibility="gone" />
 
             <TextView style="@style/AddProductSectionLabel" android:text="@string/add_product_section_inventory" />
 
             <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/inputStockLayout"
                 style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
