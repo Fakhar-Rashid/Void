@@ -1,33 +1,32 @@
 package com.example.avoid.adapter;
 
-import android.content.Context;
-import android.graphics.drawable.GradientDrawable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.core.content.ContextCompat;
+import androidx.fragment.app.FragmentActivity;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.avoid.OrderDetailsFragment;
 import com.example.avoid.R;
 import com.example.avoid.model.Order;
 
 import java.util.List;
+import java.util.Locale;
 
+/**
+ * Buyer's "My Orders" list. Each row is an order summary card:
+ * order id + placement date, item/store count, total, overall status.
+ * Tap → {@link OrderDetailsFragment} added on top of MainActivity's fragment_container.
+ */
 public class OrderAdapter extends RecyclerView.Adapter<OrderAdapter.OrderViewHolder> {
 
     private final List<Order> orders;
-    private final boolean isSeller;
 
     public OrderAdapter(List<Order> orders) {
-        this(orders, false);
-    }
-
-    public OrderAdapter(List<Order> orders, boolean isSeller) {
         this.orders = orders;
-        this.isSeller = isSeller;
     }
 
     @NonNull
@@ -40,7 +39,7 @@ public class OrderAdapter extends RecyclerView.Adapter<OrderAdapter.OrderViewHol
 
     @Override
     public void onBindViewHolder(@NonNull OrderViewHolder holder, int position) {
-        holder.bind(orders.get(position), isSeller, this, position);
+        holder.bind(orders.get(position));
     }
 
     @Override
@@ -50,126 +49,65 @@ public class OrderAdapter extends RecyclerView.Adapter<OrderAdapter.OrderViewHol
 
     static class OrderViewHolder extends RecyclerView.ViewHolder {
 
-        private final TextView productName;
-        private final TextView orderDate;
-        private final TextView colorQty;
-        private final TextView price;
-        private final View progressContainer;
-        private final View labelsContainer;
-        private final View deliveredRow;
-        private final TextView deliveredDate;
-        private final View seg1, seg2, seg3, seg4;
-        private final View sellerActionRow;
-        private final com.google.android.material.button.MaterialButton btnUpdateStatus;
+        private final TextView orderId;
+        private final TextView statusBadge;
+        private final TextView date;
+        private final TextView summary;
+        private final TextView total;
 
         OrderViewHolder(@NonNull View itemView) {
             super(itemView);
-            productName       = itemView.findViewById(R.id.orderProductName);
-            orderDate         = itemView.findViewById(R.id.orderDate);
-            colorQty          = itemView.findViewById(R.id.orderColorQty);
-            price             = itemView.findViewById(R.id.orderPrice);
-            progressContainer = itemView.findViewById(R.id.orderProgressContainer);
-            labelsContainer   = itemView.findViewById(R.id.orderLabelsContainer);
-            deliveredRow      = itemView.findViewById(R.id.orderDeliveredRow);
-            deliveredDate     = itemView.findViewById(R.id.orderDeliveredDate);
-            seg1              = itemView.findViewById(R.id.orderSeg1);
-            seg2              = itemView.findViewById(R.id.orderSeg2);
-            seg3              = itemView.findViewById(R.id.orderSeg3);
-            seg4              = itemView.findViewById(R.id.orderSeg4);
-            sellerActionRow   = itemView.findViewById(R.id.sellerActionRow);
-            btnUpdateStatus   = itemView.findViewById(R.id.btnUpdateStatus);
+            orderId     = itemView.findViewById(R.id.orderListId);
+            statusBadge = itemView.findViewById(R.id.orderListStatusBadge);
+            date        = itemView.findViewById(R.id.orderListDate);
+            summary     = itemView.findViewById(R.id.orderListSummary);
+            total       = itemView.findViewById(R.id.orderListTotal);
         }
 
-        void bind(Order order, boolean isSeller, RecyclerView.Adapter adapter, int position) {
-            Context ctx = itemView.getContext();
+        void bind(Order order) {
+            String idShort = order.getOrderId() != null && order.getOrderId().length() > 8
+                    ? order.getOrderId().substring(0, 8).toUpperCase()
+                    : (order.getOrderId() != null ? order.getOrderId() : "—");
+            orderId.setText("Order #" + idShort);
 
-            com.example.avoid.model.OrderLineItem first = order.getFirstItem();
-            if (first != null) {
-                productName.setText(first.getProductName());
-                colorQty.setText(first.getColor() + "  ·  Qty: " + first.getQuantity());
-                price.setText(first.getDisplayPrice());
-            }
-            orderDate.setText(order.getOrderDate());
+            date.setText(order.getOrderDate() != null
+                    ? "Placed " + order.getOrderDate()
+                    : "Placed —");
 
-            boolean delivered = order.getStatus() == Order.Status.DELIVERED;
-            progressContainer.setVisibility(delivered ? View.GONE : View.VISIBLE);
-            labelsContainer.setVisibility(delivered ? View.GONE : View.VISIBLE);
-            deliveredRow.setVisibility(delivered ? View.VISIBLE : View.GONE);
+            int itemCount = order.getTotalItemCount();
+            int storeCount = order.getStoreIds().size();
+            String summaryText = itemCount + " item" + (itemCount == 1 ? "" : "s");
+            if (storeCount > 1) summaryText += " · " + storeCount + " stores";
+            summary.setText(summaryText);
 
-            if (delivered) {
-                deliveredDate.setText("Delivered on: " + order.getOrderDate());
+            total.setText(String.format(Locale.US, "$%,.2f", order.getTotalAmount()));
 
-                com.google.android.material.button.MaterialButton btnReview = itemView.findViewById(R.id.btnWriteReview);
-                if (isSeller) {
-                    if (order.isReviewed()) {
-                        btnReview.setText("Read Review");
-                        btnReview.setEnabled(true);
-                        btnReview.setTextColor(ContextCompat.getColor(ctx, R.color.home_balance_gold));
-                    } else {
-                        btnReview.setText("Waiting for Review");
-                        btnReview.setEnabled(false);
-                        btnReview.setTextColor(ContextCompat.getColor(ctx, R.color.home_text_hint));
-                    }
-                } else {
-                    if (order.isReviewed()) {
-                        btnReview.setText("Read Your Review");
-                        btnReview.setEnabled(true);
-                        btnReview.setTextColor(ContextCompat.getColor(ctx, R.color.home_balance_gold));
-                    } else {
-                        btnReview.setText("Write a Review");
-                        btnReview.setEnabled(true);
-                        btnReview.setTextColor(ContextCompat.getColor(ctx, R.color.home_balance_gold));
-                    }
-                }
+            statusBadge.setText(displayStatus(order));
 
-                btnReview.setOnClickListener(v -> {
-                    if (!(ctx instanceof androidx.fragment.app.FragmentActivity)) return;
-                    androidx.fragment.app.FragmentActivity activity = (androidx.fragment.app.FragmentActivity) ctx;
-                    boolean readOnly = isSeller || order.isReviewed();
-                    com.example.avoid.ReviewOrderBottomSheet.show(
-                            activity.getSupportFragmentManager(), order, readOnly);
-                });
-
-            } else {
-                bindProgressSegments(ctx, order.getStatus());
-            }
-
-            if (isSeller && !delivered) {
-                sellerActionRow.setVisibility(View.VISIBLE);
-                if (order.getStatus() == Order.Status.CONFIRMED) {
-                    btnUpdateStatus.setText("Mark as Packed");
-                } else if (order.getStatus() == Order.Status.PACKED) {
-                    btnUpdateStatus.setText("Mark as On the Way");
-                } else if (order.getStatus() == Order.Status.ON_THE_WAY) {
-                    btnUpdateStatus.setText("Mark as Delivered");
-                }
-
-                btnUpdateStatus.setOnClickListener(v -> {
-                    Order.Status nextStatus = null;
-                    if (order.getStatus() == Order.Status.CONFIRMED) nextStatus = Order.Status.PACKED;
-                    else if (order.getStatus() == Order.Status.PACKED) nextStatus = Order.Status.ON_THE_WAY;
-                    else if (order.getStatus() == Order.Status.ON_THE_WAY) nextStatus = Order.Status.DELIVERED;
-
-                    if (nextStatus != null) {
-                        order.setStatus(nextStatus);
-                        com.example.avoid.UserRepository.getInstance().saveOrder(order, null);
-                        adapter.notifyItemChanged(position);
-                    }
-                });
-            } else {
-                sellerActionRow.setVisibility(View.GONE);
-            }
+            itemView.setOnClickListener(v -> {
+                if (!(itemView.getContext() instanceof FragmentActivity)) return;
+                FragmentActivity activity = (FragmentActivity) itemView.getContext();
+                activity.getSupportFragmentManager().beginTransaction()
+                        .add(R.id.fragment_container, OrderDetailsFragment.newInstance(order))
+                        .addToBackStack(null)
+                        .commit();
+            });
         }
 
-        private void bindProgressSegments(Context ctx, Order.Status status) {
-            int activeCount = status.ordinal() + 1;
-            int activeColor   = ContextCompat.getColor(ctx, R.color.home_balance_background);
-            int inactiveColor = ContextCompat.getColor(ctx, R.color.home_placeholder);
-            View[] segs = {seg1, seg2, seg3, seg4};
-            for (int i = 0; i < segs.length; i++) {
-                ((GradientDrawable) segs[i].getBackground().mutate())
-                        .setColor(i < activeCount ? activeColor : inactiveColor);
+        private static String displayStatus(Order order) {
+            if (order.isFullyDelivered()) return "Delivered";
+            // Mixed-status orders read "Partially shipped" if any items are en route or beyond.
+            boolean anyPacked = false, anyOnTheWay = false, anyDelivered = false;
+            for (com.example.avoid.model.OrderLineItem item : order.getItems()) {
+                Order.Status s = item.getStatus();
+                if (s == Order.Status.PACKED) anyPacked = true;
+                else if (s == Order.Status.ON_THE_WAY) anyOnTheWay = true;
+                else if (s == Order.Status.DELIVERED) anyDelivered = true;
             }
+            if (anyDelivered)  return "Partially delivered";
+            if (anyOnTheWay)   return "On the way";
+            if (anyPacked)     return "Packed";
+            return "Confirmed";
         }
     }
 }

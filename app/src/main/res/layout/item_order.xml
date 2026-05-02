@@ -1,227 +1,103 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<com.google.android.material.card.MaterialCardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginBottom="12dp"
-    android:orientation="vertical"
-    android:paddingTop="16dp"
-    android:paddingBottom="16dp">
+    android:clickable="true"
+    android:focusable="true"
+    android:foreground="?attr/selectableItemBackground"
+    app:cardBackgroundColor="@android:color/white"
+    app:cardCornerRadius="14dp"
+    app:cardElevation="0dp"
+    app:strokeColor="@color/home_chip_border"
+    app:strokeWidth="1dp">
 
-    <!-- Product row -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:gravity="center_vertical"
-        android:orientation="horizontal">
-
-        <View
-            android:layout_width="76dp"
-            android:layout_height="76dp"
-            android:background="@drawable/bg_product_placeholder" />
+        android:orientation="vertical"
+        android:padding="16dp">
 
         <LinearLayout
-            android:layout_width="0dp"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginStart="12dp"
-            android:layout_weight="1"
-            android:orientation="vertical">
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
 
-            <!-- Name + status badge -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center_vertical"
-                android:orientation="horizontal">
+            <ImageView
+                android:layout_width="18dp"
+                android:layout_height="18dp"
+                android:layout_marginEnd="8dp"
+                android:contentDescription="@null"
+                android:tint="@color/home_text_primary"
+                app:srcCompat="@drawable/ic_orders" />
 
-                <TextView
-                    android:id="@+id/orderProductName"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:ellipsize="end"
-                    android:fontFamily="sans-serif-medium"
-                    android:maxLines="1"
-                    android:textColor="@color/home_text_primary"
-                    android:textSize="15sp" />
-
-                <TextView
-                    android:id="@+id/orderDate"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="8dp"
-                    android:textColor="@color/home_text_hint"
-                    android:textSize="12sp" />
-            </LinearLayout>
-
-            <!-- Color + quantity -->
             <TextView
-                android:id="@+id/orderColorQty"
+                android:id="@+id/orderListId"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:textColor="@color/home_text_primary"
+                android:textSize="15sp"
+                android:textStyle="bold"
+                tools:text="Order #VD-1A2B3" />
+
+            <TextView
+                android:id="@+id/orderListStatusBadge"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
-                android:textColor="@color/home_text_hint"
-                android:textSize="13sp" />
+                android:background="@drawable/bg_status_badge"
+                android:paddingStart="10dp"
+                android:paddingTop="4dp"
+                android:paddingEnd="10dp"
+                android:paddingBottom="4dp"
+                android:textColor="@color/home_text_primary"
+                android:textSize="11sp"
+                tools:text="Delivered" />
+        </LinearLayout>
 
-            <!-- Price + order info -->
-            <LinearLayout
-                android:layout_width="match_parent"
+        <TextView
+            android:id="@+id/orderListDate"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            android:textColor="@color/home_text_hint"
+            android:textSize="12sp"
+            tools:text="Placed Apr 30, 2026" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginTop="14dp"
+            android:layout_marginBottom="12dp"
+            android:background="@color/home_chip_border" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/orderListSummary"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="6dp"
-                android:gravity="center_vertical"
-                android:orientation="horizontal">
+                android:layout_weight="1"
+                android:textColor="@color/home_text_hint"
+                android:textSize="13sp"
+                tools:text="3 items · 2 stores" />
 
-                <TextView
-                    android:id="@+id/orderPrice"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:fontFamily="sans-serif-medium"
-                    android:textColor="@color/home_text_primary"
-                    android:textSize="16sp"
-                    android:textStyle="bold" />
-            </LinearLayout>
+            <TextView
+                android:id="@+id/orderListTotal"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/home_text_primary"
+                android:textSize="17sp"
+                android:textStyle="bold"
+                tools:text="$234.56" />
         </LinearLayout>
     </LinearLayout>
-
-    <!-- Progress segments -->
-    <LinearLayout
-        android:id="@+id/orderProgressContainer"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="14dp"
-        android:orientation="horizontal">
-
-        <View
-            android:id="@+id/orderSeg1"
-            android:layout_width="0dp"
-            android:layout_height="4dp"
-            android:layout_marginEnd="2dp"
-            android:layout_weight="1"
-            android:background="@drawable/bg_step_segment" />
-
-        <View
-            android:id="@+id/orderSeg2"
-            android:layout_width="0dp"
-            android:layout_height="4dp"
-            android:layout_marginStart="2dp"
-            android:layout_marginEnd="2dp"
-            android:layout_weight="1"
-            android:background="@drawable/bg_step_segment" />
-
-        <View
-            android:id="@+id/orderSeg3"
-            android:layout_width="0dp"
-            android:layout_height="4dp"
-            android:layout_marginStart="2dp"
-            android:layout_marginEnd="2dp"
-            android:layout_weight="1"
-            android:background="@drawable/bg_step_segment" />
-
-        <View
-            android:id="@+id/orderSeg4"
-            android:layout_width="0dp"
-            android:layout_height="4dp"
-            android:layout_marginStart="2dp"
-            android:layout_weight="1"
-            android:background="@drawable/bg_step_segment" />
-    </LinearLayout>
-
-    <!-- Step labels -->
-    <LinearLayout
-        android:id="@+id/orderLabelsContainer"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="5dp"
-        android:orientation="horizontal">
-
-        <TextView
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:gravity="start"
-            android:text="Confirmed"
-            android:textColor="@color/home_text_hint"
-            android:textSize="10sp" />
-
-        <TextView
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:gravity="center"
-            android:text="Packed"
-            android:textColor="@color/home_text_hint"
-            android:textSize="10sp" />
-
-        <TextView
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:gravity="center"
-            android:text="On the Way"
-            android:textColor="@color/home_text_hint"
-            android:textSize="10sp" />
-
-        <TextView
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:gravity="end"
-            android:text="Delivered"
-            android:textColor="@color/home_text_hint"
-            android:textSize="10sp" />
-    </LinearLayout>
-
-    <!-- Delivered row — only visible when DELIVERED -->
-    <LinearLayout
-        android:id="@+id/orderDeliveredRow"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
-        android:gravity="center_vertical"
-        android:orientation="horizontal"
-        android:visibility="gone">
-
-        <TextView
-            android:id="@+id/orderDeliveredDate"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:textColor="@color/home_text_hint"
-            android:textSize="13sp" />
-
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnWriteReview"
-            style="@style/Widget.Material3.Button.TextButton"
-            android:layout_width="wrap_content"
-            android:layout_height="36dp"
-            android:fontFamily="sans-serif-medium"
-            android:minWidth="0dp"
-            android:paddingStart="0dp"
-            android:paddingEnd="0dp"
-            android:text="Write a Review"
-            android:textColor="@color/home_balance_gold"
-            android:textSize="13sp"
-            app:backgroundTint="@android:color/transparent"
-            app:cornerRadius="8dp" />
-    </LinearLayout>
-
-    <!-- Seller action row -->
-    <LinearLayout
-        android:id="@+id/sellerActionRow"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
-        android:gravity="end|center_vertical"
-        android:orientation="horizontal"
-        android:visibility="gone">
-
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnUpdateStatus"
-            style="@style/Widget.Material3.Button.TonalButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Mark as Packed"
-            android:textSize="13sp" />
-    </LinearLayout>
-
-</LinearLayout>
+</com.google.android.material.card.MaterialCardView>

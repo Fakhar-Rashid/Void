@@ -134,6 +134,7 @@ public class CheckoutActivity extends AppCompatActivity {
         }
 
         // Build line items + total from current product snapshots.
+        long now = System.currentTimeMillis();
         List<OrderLineItem> lineItems = new ArrayList<>();
         List<String> storeIds = new ArrayList<>();
         double total = 0;
@@ -147,8 +148,11 @@ public class CheckoutActivity extends AppCompatActivity {
                 return;
             }
             String img = p.getMainImageUrl();
-            lineItems.add(new OrderLineItem(p.getId(), p.getName(), p.getPrice(), img,
-                    item.getColor(), item.getQuantity(), p.getStoreId()));
+            OrderLineItem line = new OrderLineItem(p.getId(), p.getName(), p.getPrice(), img,
+                    item.getColor(), item.getQuantity(), p.getStoreId());
+            line.setStatus(Order.Status.CONFIRMED);
+            line.setConfirmedAt(now);
+            lineItems.add(line);
             if (p.getStoreId() != null && !storeIds.contains(p.getStoreId())) {
                 storeIds.add(p.getStoreId());
             }
@@ -174,10 +178,9 @@ public class CheckoutActivity extends AppCompatActivity {
                 null,
                 user.getId(),
                 finalLineItems,
-                Order.Status.CONFIRMED,
                 finalTotal,
                 DateFormat.getDateInstance(DateFormat.MEDIUM).format(new Date()),
-                System.currentTimeMillis(),
+                now,
                 storeIds
         );
 

@@ -15,6 +15,7 @@ import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentManager;
 
 import com.example.avoid.model.Order;
+import com.example.avoid.model.OrderLineItem;
 import com.example.avoid.model.Review;
 import com.example.avoid.model.User;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
@@ -29,21 +30,26 @@ import java.util.Date;
 import java.util.List;
 
 /**
- * Bottom-sheet review experience that opens from the orders list when an order is delivered.
- * <p>
- * Saves a single {@link Review} per order — rating + delivery issues + optional comment —
- * and marks the order as reviewed atomically via {@link ReviewRepository#saveOrderReview}.
+ * Per-product review bottom sheet. Opened from {@link OrderDetailsFragment} for a specific
+ * {@link OrderLineItem}; saves a {@link Review} pinned to that {@code productId} and flips
+ * the matching line item's {@code reviewed} flag via {@link ReviewRepository#saveProductReview}.
  */
 public class ReviewOrderBottomSheet extends BottomSheetDialogFragment {
 
     private static final String TAG = "ReviewOrderBottomSheet";
-    private static final String ARG_ORDER     = "order";
-    private static final String ARG_READ_ONLY = "readOnly";
-
-    private Order order;
-    private boolean readOnly;
+    private static final String ARG_ORDER         = "order";
+    private static final String ARG_PRODUCT_ID    = "productId";
+    private static final String ARG_PRODUCT_NAME  = "productName";
+    private static final String ARG_STORE_ID      = "storeId";
+    private static final String ARG_READ_ONLY     = "readOnly";
 
     private static final int LOW_RATING_THRESHOLD = 3;
+
+    private Order order;
+    private String productId;
+    private String productName;
+    private String storeId;
+    private boolean readOnly;
 
     private TextView title, subtitle, rateLabel, commentReadOnly;
     private ImageView[] stars;
@@ -55,22 +61,36 @@ public class ReviewOrderBottomSheet extends BottomSheetDialogFragment {
     private TextInputEditText commentInput;
     private MaterialButton submitButton;
 
-    public static ReviewOrderBottomSheet newInstance(@NonNull Order order, boolean readOnly) {
+    @Nullable private Runnable onSubmitted;
+
+    public static ReviewOrderBottomSheet newInstanceForItem(@NonNull Order order,
+                                                            @NonNull OrderLineItem item,
+                                                            boolean readOnly) {
         ReviewOrderBottomSheet sheet = new ReviewOrderBottomSheet();
         Bundle args = new Bundle();
         args.putSerializable(ARG_ORDER, order);
+        args.putString(ARG_PRODUCT_ID, item.getProductId());
+        args.putString(ARG_PRODUCT_NAME, item.getProductName());
+        args.putString(ARG_STORE_ID, item.getStoreId());
         args.putBoolean(ARG_READ_ONLY, readOnly);
         sheet.setArguments(args);
         return sheet;
     }
 
-    public static void show(@NonNull FragmentManager fm, @NonNull Order order, boolean readOnly) {
-        newInstance(order, readOnly).show(fm, TAG);
+    public static void showForItem(@NonNull FragmentManager fm,
+                                   @NonNull Order order,
+                                   @NonNull OrderLineItem item,
+                                   boolean readOnly,
+                                   @Nullable Runnable onSubmitted) {
+        ReviewOrderBottomSheet sheet = newInstanceForItem(order, item, readOnly);
+        sheet.onSubmitted = onSubmitted;
+        sheet.show(fm, TAG);
     }
 
     @Nullable
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
+                             @Nullable Bundle savedInstanceState) {
         return inflater.inflate(R.layout.fragment_review_order_sheet, container, false);
     }
 
@@ -81,8 +101,11 @@ public class ReviewOrderBottomSheet extends BottomSheetDialogFragment {
         Bundle args = getArguments();
         if (args == null) { dismiss(); return; }
         order = (Order) args.getSerializable(ARG_ORDER);
-        readOnly = args.getBoolean(ARG_READ_ONLY, false);
-        if (order == null) { dismiss(); return; }
+        productId   = args.getString(ARG_PRODUCT_ID);
+        productName = args.getString(ARG_PRODUCT_NAME);
+        storeId     = args.getString(ARG_STORE_ID);
+        readOnly    = args.getBoolean(ARG_READ_ONLY, false);
+        if (order == null || productId == null) { dismiss(); return; }
 
         title           = view.findViewById(R.id.reviewSheetTitle);
         subtitle        = view.findViewById(R.id.reviewSheetSubtitle);
@@ -110,7 +133,7 @@ public class ReviewOrderBottomSheet extends BottomSheetDialogFragment {
         commentReadOnly = view.findViewById(R.id.reviewSheetCommentReadOnly);
         submitButton    = view.findViewById(R.id.reviewSheetSubmit);
 
-        title.setText(readOnly ? "Your review" : "Order Delivered!");
+        title.setText(readOnly ? "Your review" : "How was this product?");
         bindSubtitle();
 
         if (readOnly) {
@@ -125,8 +148,6 @@ public class ReviewOrderBottomSheet extends BottomSheetDialogFragment {
     @Override
     public void onStart() {
         super.onStart();
-        // Make the dialog's frame transparent so the sheet's rounded corners + the
-        // floating top-icon overlap render correctly against the dimmed scrim.
         Dialog dialog = getDialog();
         if (dialog instanceof BottomSheetDialog) {
             View bottomSheetFrame = dialog.findViewById(com.google.android.material.R.id.design_bottom_sheet);
@@ -141,25 +162,20 @@ public class ReviewOrderBottomSheet extends BottomSheetDialogFragment {
     }
 
     private void bindSubtitle() {
-        String store = order.getStoreIds() != null && !order.getStoreIds().isEmpty()
-                ? "your store" : "your store";
-        String date = order.getOrderDate() != null ? order.getOrderDate()
-                : DateFormat.getDateInstance(DateFormat.MEDIUM).format(new Date());
-        String fallback = "Your order from " + store + " arrived on " + date + ".";
+        // Always start with a usable fallback so the sheet has something while the store name loads.
+        String fallback = productName != null ? productName : "this product";
         subtitle.setText(fallback);
 
-        // Resolve actual store name asynchronously and patch the subtitle in.
-        if (order.getStoreIds() != null && !order.getStoreIds().isEmpty()) {
-            UserRepository.getInstance().loadStore(order.getStoreIds().get(0),
-                    new UserRepository.Callback<com.example.avoid.model.Store>() {
-                        @Override
-                        public void onSuccess(com.example.avoid.model.Store result) {
-                            if (!isAdded() || result == null || result.getName() == null) return;
-                            subtitle.setText("Your order from " + result.getName() + " arrived on " + date + ".");
-                        }
-                        @Override public void onFailure(@NonNull Exception e) { /* keep fallback */ }
-                    });
-        }
+        if (storeId == null) return;
+        UserRepository.getInstance().loadStore(storeId,
+                new UserRepository.Callback<com.example.avoid.model.Store>() {
+                    @Override
+                    public void onSuccess(com.example.avoid.model.Store result) {
+                        if (!isAdded() || result == null || result.getName() == null) return;
+                        subtitle.setText(fallback + " · From " + result.getName());
+                    }
+                    @Override public void onFailure(@NonNull Exception e) {}
+                });
     }
 
     private void applyReadOnlyMode() {
@@ -173,7 +189,7 @@ public class ReviewOrderBottomSheet extends BottomSheetDialogFragment {
     }
 
     private void applyEditableMode() {
-        rateLabel.setText("Rate your order");
+        rateLabel.setText("Rate this product");
         ratingEnabled = true;
         setRating(0);
         commentLayout.setVisibility(View.VISIBLE);
@@ -188,8 +204,6 @@ public class ReviewOrderBottomSheet extends BottomSheetDialogFragment {
         for (int i = 0; i < stars.length; i++) {
             stars[i].setColorFilter(i < currentRating ? filled : empty);
         }
-
-        // In editable mode, the issues block only matters for low ratings.
         if (ratingEnabled && issuesContainer != null) {
             boolean show = currentRating > 0 && currentRating < LOW_RATING_THRESHOLD;
             issuesContainer.setVisibility(show ? View.VISIBLE : View.GONE);
@@ -208,11 +222,15 @@ public class ReviewOrderBottomSheet extends BottomSheetDialogFragment {
                 new ReviewRepository.Callback<List<Review>>() {
                     @Override
                     public void onSuccess(List<Review> result) {
-                        if (!isAdded() || result.isEmpty()) return;
-                        Review r = result.get(0);
-                        setRating(Math.round(r.getRating()));
+                        if (!isAdded()) return;
+                        Review match = null;
+                        for (Review r : result) {
+                            if (productId.equals(r.getProductId())) { match = r; break; }
+                        }
+                        if (match == null) return;
+                        setRating(Math.round(match.getRating()));
 
-                        List<String> issues = r.getIssues();
+                        List<String> issues = match.getIssues();
                         if (issues != null && !issues.isEmpty()) {
                             issuesContainer.setVisibility(View.VISIBLE);
                             for (MaterialCheckBox cb : new MaterialCheckBox[]{issue1, issue2, issue3, issue4}) {
@@ -222,9 +240,9 @@ public class ReviewOrderBottomSheet extends BottomSheetDialogFragment {
                             issuesContainer.setVisibility(View.GONE);
                         }
 
-                        if (r.getComment() != null && !r.getComment().isEmpty()) {
+                        if (match.getComment() != null && !match.getComment().isEmpty()) {
                             commentReadOnly.setVisibility(View.VISIBLE);
-                            commentReadOnly.setText("“" + r.getComment() + "”");
+                            commentReadOnly.setText("“" + match.getComment() + "”");
                         }
                     }
                     @Override public void onFailure(@NonNull Exception e) {}
@@ -238,15 +256,12 @@ public class ReviewOrderBottomSheet extends BottomSheetDialogFragment {
         }
 
         String comment = commentInput.getText() != null ? commentInput.getText().toString().trim() : "";
-
         User currentUser = UserSession.getInstance().getCurrentUser();
         String reviewerName = currentUser != null && currentUser.getName() != null
                 ? currentUser.getName() : "Anonymous";
         String dateStr = DateFormat.getDateInstance(DateFormat.MEDIUM).format(new Date());
 
-        Review review = new Review(reviewerName, currentRating, dateStr, comment, null, order.getOrderId());
-
-        // Only collect issue tags for low ratings — matches how the UI exposes them.
+        Review review = new Review(reviewerName, currentRating, dateStr, comment, productId, order.getOrderId());
         if (currentRating < LOW_RATING_THRESHOLD) {
             java.util.List<String> issues = new java.util.ArrayList<>();
             for (MaterialCheckBox cb : new MaterialCheckBox[]{issue1, issue2, issue3, issue4}) {
@@ -258,11 +273,12 @@ public class ReviewOrderBottomSheet extends BottomSheetDialogFragment {
         submitButton.setEnabled(false);
         submitButton.setText("Submitting…");
 
-        ReviewRepository.getInstance().saveOrderReview(review, order, new ReviewRepository.Callback<Void>() {
+        ReviewRepository.getInstance().saveProductReview(review, order, new ReviewRepository.Callback<Void>() {
             @Override
             public void onSuccess(Void result) {
                 if (!isAdded()) return;
                 Toast.makeText(requireContext(), "Thanks for your review!", Toast.LENGTH_SHORT).show();
+                if (onSubmitted != null) onSubmitted.run();
                 dismiss();
             }
             @Override

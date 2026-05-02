@@ -24,15 +24,24 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.CartViewHolder
         void onCartChanged();
     }
 
+    public interface OnItemClickListener {
+        void onItemClick(CartItem item, Product product);
+    }
+
     private final List<CartItem> items;
     private final Map<String, Product> productsById;
     private final OnCartChangedListener listener;
+    private OnItemClickListener itemClickListener;
 
     public CartAdapter(List<CartItem> items, Map<String, Product> productsById,
                        OnCartChangedListener listener) {
         this.items = items;
         this.productsById = productsById;
         this.listener = listener;
+    }
+
+    public void setOnItemClickListener(OnItemClickListener listener) {
+        this.itemClickListener = listener;
     }
 
     @NonNull
@@ -48,6 +57,9 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.CartViewHolder
         CartItem item = items.get(position);
         Product product = productsById.get(item.getProductId());
         holder.bind(item, product);
+        holder.itemView.setOnClickListener(v -> {
+            if (itemClickListener != null && product != null) itemClickListener.onItemClick(item, product);
+        });
     }
 
     @Override

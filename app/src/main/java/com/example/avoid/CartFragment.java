@@ -103,7 +103,7 @@ public class CartFragment extends Fragment {
 
         if (ids.isEmpty()) {
             productsById.clear();
-            cartItemsRecyclerView.setAdapter(new CartAdapter(cartItems, productsById, this::onCartChanged));
+            cartItemsRecyclerView.setAdapter(buildCartAdapter());
             updateTotalAndEmpty();
             return;
         }
@@ -115,14 +115,12 @@ public class CartFragment extends Fragment {
                     @Override public void onSuccess(List<Product> products) {
                         productsById.clear();
                         for (Product p : products) productsById.put(p.getId(), p);
-                        cartItemsRecyclerView.setAdapter(new CartAdapter(cartItems, productsById,
-                                CartFragment.this::onCartChanged));
+                        cartItemsRecyclerView.setAdapter(buildCartAdapter());
                         updateTotalAndEmpty();
                     }
                     @Override public void onFailure(@NonNull Exception e) {
                         Log.e(TAG, "Failed to load cart products", e);
-                        cartItemsRecyclerView.setAdapter(new CartAdapter(cartItems, productsById,
-                                CartFragment.this::onCartChanged));
+                        cartItemsRecyclerView.setAdapter(buildCartAdapter());
                         updateTotalAndEmpty();
                     }
                 });
@@ -154,6 +152,12 @@ public class CartFragment extends Fragment {
         cartScrollView.setVisibility(empty ? View.GONE : View.VISIBLE);
         cartBottomBar.setVisibility(empty ? View.GONE : View.VISIBLE);
         cartEmptyContainer.setVisibility(empty ? View.VISIBLE : View.GONE);
+    }
+
+    private CartAdapter buildCartAdapter() {
+        CartAdapter adapter = new CartAdapter(cartItems, productsById, this::onCartChanged);
+        adapter.setOnItemClickListener((cartItem, product) -> openProductDetails(product));
+        return adapter;
     }
 
     private void openExplore() {
