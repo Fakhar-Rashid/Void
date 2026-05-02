@@ -19,9 +19,12 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.avoid.AddProductActivity;
 import com.example.avoid.ProductRepository;
 import com.example.avoid.R;
+import com.example.avoid.UserRepository;
 import com.example.avoid.UserSession;
 import com.example.avoid.adapter.ProductAdapter;
 import com.example.avoid.adapter.SkeletonAdapter;
+import com.example.avoid.model.Order;
+import com.example.avoid.model.OrderLineItem;
 import com.example.avoid.model.Product;
 import com.example.avoid.model.User;
 
@@ -35,6 +38,7 @@ public class SellerHomeFragment extends Fragment {
     private RecyclerView recyclerView;
     private View emptyContainer;
     private TextView subtitleText;
+    private TextView statEarnings, statSold, statOpen;
 
     @Nullable
     @Override
@@ -49,17 +53,57 @@ public class SellerHomeFragment extends Fragment {
         recyclerView   = view.findViewById(R.id.sellerProductsRecyclerView);
         emptyContainer = view.findViewById(R.id.sellerHomeEmptyContainer);
         subtitleText   = view.findViewById(R.id.sellerHomeSubtitle);
+        statEarnings   = view.findViewById(R.id.sellerStatEarnings);
+        statSold       = view.findViewById(R.id.sellerStatSold);
+        statOpen       = view.findViewById(R.id.sellerStatOpen);
 
         recyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
         recyclerView.setAdapter(new SkeletonAdapter(R.layout.item_product_list_skeleton, 4));
 
         loadMyProducts();
+        loadStats();
     }
 
     @Override
     public void onResume() {
         super.onResume();
         loadMyProducts();
+        loadStats();
+    }
+
+    /**
+     * Stats are derived from this seller's orders, not the user wallet:
+     *   Earnings = sum of price × qty for line items delivered to the buyer.
+     *   Sold     = count of items delivered.
+     *   Open     = count of orders that still have a non-delivered item from this store.
+     */
+    private void loadStats() {
+        User user = UserSession.getInstance().getCurrentUser();
+        if (user == null || user.getId() == null) return;
+        final String storeId = user.getId();
+
+        UserRepository.getInstance().loadStoreOrders(storeId, orders -> {
+            if (!isAdded()) return;
+            double earnings = 0;
+            int sold = 0;
+            int open = 0;
+            for (Order order : orders) {
+                boolean hasOpen = false;
+                for (OrderLineItem item : order.getItems()) {
+                    if (!storeId.equals(item.getStoreId())) continue;
+                    if (item.getStatus() == Order.Status.DELIVERED) {
+                        sold += item.getQuantity();
+                        earnings += item.getProductPrice() * item.getQuantity();
+                    } else {
+                        hasOpen = true;
+                    }
+                }
+                if (hasOpen) open++;
+            }
+            statEarnings.setText(String.format(Locale.US, "$%,.0f", earnings));
+            statSold.setText(String.valueOf(sold));
+            statOpen.setText(String.valueOf(open));
+        });
     }
 
     private void loadMyProducts() {

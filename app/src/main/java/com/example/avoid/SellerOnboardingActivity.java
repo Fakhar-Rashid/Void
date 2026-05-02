@@ -50,6 +50,18 @@ public class SellerOnboardingActivity extends AppCompatActivity {
             emailInput.setText(user.getEmail());
         }
 
+        // Pre-fill the form when an existing store is present so this activity
+        // doubles as the seller's "Edit Store" screen.
+        if (user != null && user.getStore() != null) {
+            Store existing = user.getStore();
+            if (existing.getName()         != null) nameInput.setText(existing.getName());
+            if (existing.getDescription()  != null) descriptionInput.setText(existing.getDescription());
+            if (existing.getLocation()     != null) locationInput.setText(existing.getLocation());
+            if (existing.getContactEmail() != null) emailInput.setText(existing.getContactEmail());
+            if (existing.getPhone()        != null) phoneInput.setText(existing.getPhone());
+            submitButton.setText(R.string.seller_onboarding_save_changes);
+        }
+
         submitButton.setOnClickListener(v -> submit());
     }
 
@@ -77,6 +89,10 @@ public class SellerOnboardingActivity extends AppCompatActivity {
         clearError();
         setLoading(true);
 
+        boolean isEdit = user.getStore() != null;
+        long createdAt = isEdit ? user.getStore().getCreatedAt() : System.currentTimeMillis();
+        String existingLogo = isEdit ? user.getStore().getLogoUrl() : null;
+
         Store store = new Store(
                 user.getId(),
                 name,
@@ -84,8 +100,8 @@ public class SellerOnboardingActivity extends AppCompatActivity {
                 location,
                 email,
                 TextUtils.isEmpty(phone) ? null : phone,
-                null,
-                System.currentTimeMillis()
+                existingLogo,
+                createdAt
         );
 
         UserRepository.getInstance().saveStore(store, new UserRepository.Callback<Store>() {
@@ -96,8 +112,12 @@ public class SellerOnboardingActivity extends AppCompatActivity {
                     UserRepository.getInstance().saveSellerStatus(user);
                 }
                 setLoading(false);
-                startActivity(new Intent(SellerOnboardingActivity.this, SellerActivity.class));
-                finish();
+                if (isEdit) {
+                    finish();
+                } else {
+                    startActivity(new Intent(SellerOnboardingActivity.this, SellerActivity.class));
+                    finish();
+                }
             }
             @Override public void onFailure(@NonNull Exception e) {
                 setLoading(false);

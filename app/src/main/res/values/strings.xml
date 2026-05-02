@@ -100,6 +100,7 @@
     <string name="onboarding_hint_email">Contact email</string>
     <string name="onboarding_hint_phone">Phone (optional)</string>
     <string name="onboarding_submit">Open my store</string>
+    <string name="seller_onboarding_save_changes">Save changes</string>
     <string name="onboarding_error_name">Please enter a store name.</string>
     <string name="onboarding_error_location">Please enter a location.</string>
     <string name="onboarding_error_email">Please enter a valid contact email.</string>
