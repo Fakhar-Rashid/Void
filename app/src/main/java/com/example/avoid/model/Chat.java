@@ -13,6 +13,7 @@ public class Chat {
     private String storeName;
     private String lastMessage;
     private long lastMessageTimestamp;
+    private String lastMessageSenderId;
     private int unreadCountBuyer;
     private int unreadCountStore;
 
@@ -58,6 +59,9 @@ public class Chat {
 
     public long getLastMessageTimestamp() { return lastMessageTimestamp; }
     public void setLastMessageTimestamp(long lastMessageTimestamp) { this.lastMessageTimestamp = lastMessageTimestamp; }
+
+    public String getLastMessageSenderId() { return lastMessageSenderId; }
+    public void setLastMessageSenderId(String lastMessageSenderId) { this.lastMessageSenderId = lastMessageSenderId; }
 
     public int getUnreadCountBuyer() { return unreadCountBuyer; }
     public void setUnreadCountBuyer(int unreadCountBuyer) { this.unreadCountBuyer = unreadCountBuyer; }

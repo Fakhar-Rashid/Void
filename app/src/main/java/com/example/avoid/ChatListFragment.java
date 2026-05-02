@@ -140,7 +140,16 @@ public class ChatListFragment extends Fragment {
             holder.chatName.setText(displayName != null ? displayName : "Unknown");
             
             holder.chatProductName.setText(chat.getProductName() != null ? "Product: " + chat.getProductName() : "");
-            holder.chatLastMessage.setText(chat.getLastMessage() != null ? chat.getLastMessage() : "No messages yet");
+
+            String lastMsg = chat.getLastMessage();
+            if (lastMsg == null || lastMsg.isEmpty()) {
+                holder.chatLastMessage.setText("No messages yet");
+            } else if (chat.getLastMessageSenderId() != null
+                    && chat.getLastMessageSenderId().equals(currentUser.getId())) {
+                holder.chatLastMessage.setText("You: " + lastMsg);
+            } else {
+                holder.chatLastMessage.setText(lastMsg);
+            }
 
             if (chat.getLastMessageTimestamp() > 0) {
                 CharSequence timeAgo = DateUtils.getRelativeTimeSpanString(chat.getLastMessageTimestamp(), System.currentTimeMillis(), DateUtils.MINUTE_IN_MILLIS);
