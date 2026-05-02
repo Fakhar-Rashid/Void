@@ -1,0 +1,231 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/bg_review_sheet"
+    android:orientation="vertical"
+    android:paddingStart="24dp"
+    android:paddingTop="22dp"
+    android:paddingEnd="24dp"
+    android:paddingBottom="20dp">
+
+        <FrameLayout
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:layout_gravity="center_horizontal"
+            android:background="@drawable/bg_review_icon">
+
+            <ImageView
+                android:layout_width="28dp"
+                android:layout_height="28dp"
+                android:layout_gravity="center"
+                android:contentDescription="@null"
+                android:tint="@color/home_white"
+                app:srcCompat="@drawable/ic_check" />
+        </FrameLayout>
+
+        <TextView
+            android:id="@+id/reviewSheetTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="14dp"
+            android:fontFamily="sans-serif-medium"
+            android:gravity="center"
+            android:textColor="@color/home_text_primary"
+            android:textSize="22sp"
+            android:textStyle="bold"
+            tools:text="Order Delivered!" />
+
+        <TextView
+            android:id="@+id/reviewSheetSubtitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:gravity="center"
+            android:lineSpacingMultiplier="1.3"
+            android:textColor="@color/home_text_hint"
+            android:textSize="13sp"
+            tools:text="Your order from AlfinasStore arrived on May 2, 2026." />
+
+        <View
+            android:layout_width="32dp"
+            android:layout_height="3dp"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="14dp"
+            android:background="@drawable/bg_review_divider" />
+
+        <TextView
+            android:id="@+id/reviewSheetRateLabel"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="22dp"
+            android:fontFamily="sans-serif-medium"
+            android:textColor="@color/home_text_primary"
+            android:textSize="15sp"
+            android:textStyle="bold"
+            tools:text="Rate your order" />
+
+        <LinearLayout
+            android:id="@+id/reviewSheetStars"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="14dp"
+            android:gravity="center"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:id="@+id/reviewStar1"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:layout_marginEnd="4dp"
+                android:contentDescription="@null"
+                android:padding="2dp"
+                android:tint="@color/review_star_empty"
+                app:srcCompat="@drawable/ic_star_rounded" />
+
+            <ImageView
+                android:id="@+id/reviewStar2"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:layout_marginEnd="4dp"
+                android:contentDescription="@null"
+                android:padding="2dp"
+                android:tint="@color/review_star_empty"
+                app:srcCompat="@drawable/ic_star_rounded" />
+
+            <ImageView
+                android:id="@+id/reviewStar3"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:layout_marginEnd="4dp"
+                android:contentDescription="@null"
+                android:padding="2dp"
+                android:tint="@color/review_star_empty"
+                app:srcCompat="@drawable/ic_star_rounded" />
+
+            <ImageView
+                android:id="@+id/reviewStar4"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:layout_marginEnd="4dp"
+                android:contentDescription="@null"
+                android:padding="2dp"
+                android:tint="@color/review_star_empty"
+                app:srcCompat="@drawable/ic_star_rounded" />
+
+            <ImageView
+                android:id="@+id/reviewStar5"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:contentDescription="@null"
+                android:padding="2dp"
+                android:tint="@color/review_star_empty"
+                app:srcCompat="@drawable/ic_star_rounded" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/reviewSheetIssuesContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:orientation="vertical"
+            android:visibility="gone">
+
+            <com.google.android.material.checkbox.MaterialCheckBox
+                android:id="@+id/reviewSheetIssue1"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:buttonTint="@color/home_balance_background"
+                android:paddingStart="6dp"
+                android:text="Packaging was damaged"
+                android:textColor="@color/home_text_primary"
+                android:textSize="14sp" />
+
+            <com.google.android.material.checkbox.MaterialCheckBox
+                android:id="@+id/reviewSheetIssue2"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:buttonTint="@color/home_balance_background"
+                android:paddingStart="6dp"
+                android:text="Item didn't match description"
+                android:textColor="@color/home_text_primary"
+                android:textSize="14sp" />
+
+            <com.google.android.material.checkbox.MaterialCheckBox
+                android:id="@+id/reviewSheetIssue3"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:buttonTint="@color/home_balance_background"
+                android:paddingStart="6dp"
+                android:text="Item(s) were missing"
+                android:textColor="@color/home_text_primary"
+                android:textSize="14sp" />
+
+            <com.google.android.material.checkbox.MaterialCheckBox
+                android:id="@+id/reviewSheetIssue4"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:buttonTint="@color/home_balance_background"
+                android:paddingStart="6dp"
+                android:text="Other…"
+                android:textColor="@color/home_text_primary"
+                android:textSize="14sp" />
+        </LinearLayout>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:text="Comments, if any"
+            android:textColor="@color/home_text_hint"
+            android:textSize="12sp"
+            android:textStyle="italic" />
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/reviewSheetCommentLayout"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:hint=""
+            app:boxStrokeColor="@color/home_chip_border">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/reviewSheetCommentInput"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="top|start"
+                android:inputType="textMultiLine|textCapSentences"
+                android:maxLines="5"
+                android:minLines="4"
+                android:textColor="@color/home_text_primary"
+                android:textSize="14sp" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <TextView
+            android:id="@+id/reviewSheetCommentReadOnly"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:lineSpacingMultiplier="1.3"
+            android:textColor="@color/home_text_primary"
+            android:textSize="14sp"
+            android:textStyle="italic"
+            android:visibility="gone"
+            tools:text="“Quick delivery, well packaged.”" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/reviewSheetSubmit"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_marginTop="20dp"
+            android:fontFamily="sans-serif-medium"
+            android:text="Submit"
+            android:textColor="@color/home_white"
+            android:textSize="15sp"
+            app:backgroundTint="@color/home_balance_background"
+            app:cornerRadius="14dp" />
+</LinearLayout>

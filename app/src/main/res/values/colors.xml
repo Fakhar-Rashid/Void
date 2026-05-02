@@ -24,6 +24,9 @@
     <color name="auth_divider">#2A2A2D</color>
     <color name="auth_button_dark">#1B1B1D</color>
     <color name="auth_error">#FF6B6B</color>
+
+    <color name="review_star_filled">#F4B400</color>
+    <color name="review_star_empty">#E1DCD2</color>
     <color name="home_balance_background">#1E1E1F</color>
     <color name="home_balance_label">#E5D7B6</color>
     <color name="home_balance_gold">#9A6B13</color>

@@ -123,10 +123,11 @@ public class OrderAdapter extends RecyclerView.Adapter<OrderAdapter.OrderViewHol
                 }
 
                 btnReview.setOnClickListener(v -> {
-                    android.content.Intent intent = new android.content.Intent(ctx, com.example.avoid.ReviewOrderActivity.class);
-                    intent.putExtra("order", order);
-                    intent.putExtra("isReadOnly", isSeller || order.isReviewed());
-                    ctx.startActivity(intent);
+                    if (!(ctx instanceof androidx.fragment.app.FragmentActivity)) return;
+                    androidx.fragment.app.FragmentActivity activity = (androidx.fragment.app.FragmentActivity) ctx;
+                    boolean readOnly = isSeller || order.isReviewed();
+                    com.example.avoid.ReviewOrderBottomSheet.show(
+                            activity.getSupportFragmentManager(), order, readOnly);
                 });
 
             } else {

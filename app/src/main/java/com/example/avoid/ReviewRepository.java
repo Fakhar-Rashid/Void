@@ -73,6 +73,31 @@ public class ReviewRepository {
                 });
     }
 
+    /**
+     * Saves a single order-level review and atomically marks the order as reviewed.
+     * Used by the bottom-sheet review flow where the user rates the entire order at once
+     * (rating + delivery issues + comment) rather than rating each product individually.
+     */
+    public void saveOrderReview(@NonNull Review review, @NonNull com.example.avoid.model.Order order,
+                                @NonNull Callback<Void> callback) {
+        com.google.firebase.firestore.DocumentReference reviewRef =
+                db.collection(COLLECTION).document();
+        review.setId(reviewRef.getId());
+
+        com.google.firebase.firestore.WriteBatch batch = db.batch();
+        batch.set(reviewRef, review);
+
+        order.setReviewed(true);
+        batch.set(db.collection("orders").document(order.getOrderId()), order);
+
+        batch.commit()
+                .addOnSuccessListener(v -> callback.onSuccess(null))
+                .addOnFailureListener(e -> {
+                    Log.e(TAG, "save order review failed", e);
+                    callback.onFailure(e);
+                });
+    }
+
     public void saveReviews(List<Review> reviews, com.example.avoid.model.Order order, Callback<Void> callback) {
         db.runTransaction(transaction -> {
             

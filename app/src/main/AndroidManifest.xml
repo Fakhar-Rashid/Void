@@ -24,10 +24,6 @@
             android:name=".CheckoutActivity"
             android:exported="false" />
         <activity
-            android:name=".ReviewOrderActivity"
-            android:exported="false"
-            android:windowSoftInputMode="adjustResize" />
-        <activity
             android:name=".SellerActivity"
             android:exported="false" />
         <activity

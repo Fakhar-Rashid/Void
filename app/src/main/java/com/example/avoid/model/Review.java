@@ -3,6 +3,8 @@ package com.example.avoid.model;
 import com.google.firebase.firestore.DocumentId;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Review implements Serializable {
 
@@ -15,7 +17,17 @@ public class Review implements Serializable {
     private String comment;
     private String productId;
     private String orderId;
+    /** Issue tags ticked by the buyer when rating < 3. Empty otherwise. */
+    private List<String> issues = new ArrayList<>();
     private long createdAt;
+
+    public List<String> getIssues() {
+        if (issues == null) issues = new ArrayList<>();
+        return issues;
+    }
+    public void setIssues(List<String> issues) {
+        this.issues = issues != null ? issues : new ArrayList<>();
+    }
 
     public Review() {}
 
