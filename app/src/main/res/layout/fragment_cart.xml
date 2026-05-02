@@ -26,14 +26,9 @@
             android:textColor="@color/home_text_primary"
             android:textSize="24sp" />
 
-        <ImageButton
+        <com.example.avoid.ChatIconButton
             android:layout_width="@dimen/home_header_icon_size"
-            android:layout_height="@dimen/home_header_icon_size"
-            android:background="@android:color/transparent"
-            android:contentDescription="@string/home_cd_messages"
-            android:padding="@dimen/home_header_icon_padding"
-            android:tint="@color/home_text_primary"
-            app:srcCompat="@drawable/ic_chat" />
+            android:layout_height="@dimen/home_header_icon_size" />
 
         <ImageButton
             android:layout_width="@dimen/home_header_icon_size"

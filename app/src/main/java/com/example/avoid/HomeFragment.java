@@ -34,7 +34,6 @@ public class HomeFragment extends Fragment {
     private RecyclerView bestSellersRecyclerView;
     private RecyclerView recommendationsRecyclerView;
     private final FirebaseFirestore db = FirebaseFirestore.getInstance();
-    private com.google.firebase.database.ValueEventListener unreadCountListener;
 
     @Nullable
     @Override
@@ -57,52 +56,10 @@ public class HomeFragment extends Fragment {
         recommendationsRecyclerView.setAdapter(new SkeletonAdapter(R.layout.item_product_list_skeleton, 4));
 
         view.findViewById(R.id.searchBar).setOnClickListener(v -> openExplore(null));
-        view.findViewById(R.id.messagesButton).setOnClickListener(v -> {
-            if (UserSession.getInstance().isLoggedIn()) {
-                Intent intent = new Intent(requireContext(), ChatListActivity.class);
-                intent.putExtra("isSellerMode", false);
-                startActivity(intent);
-            } else {
-                startActivity(new Intent(requireContext(), LoginActivity.class));
-            }
-        });
         wireCategoryChips(view);
         bindBalance(view);
 
         loadTopProducts();
-        listenForUnreadCount(view);
-    }
-
-    private void listenForUnreadCount(View view) {
-        if (!UserSession.getInstance().isLoggedIn()) return;
-        String userId = UserSession.getInstance().getCurrentUser().getId();
-        unreadCountListener = ChatRepository.getInstance().listenForTotalUnreadCount(userId, false, new ChatRepository.UnreadCountCallback() {
-            @Override
-            public void onUnreadCountUpdated(int totalUnread) {
-                TextView badge = view.findViewById(R.id.messagesBadge);
-                if (badge != null) {
-                    if (totalUnread > 0) {
-                        badge.setVisibility(View.VISIBLE);
-                        badge.setText(totalUnread > 99 ? "99+" : String.valueOf(totalUnread));
-                    } else {
-                        badge.setVisibility(View.GONE);
-                    }
-                }
-            }
-
-            @Override
-            public void onError(Exception e) {
-            }
-        });
-    }
-
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        if (unreadCountListener != null && UserSession.getInstance().isLoggedIn()) {
-            String userId = UserSession.getInstance().getCurrentUser().getId();
-            ChatRepository.getInstance().removeTotalUnreadCountListener(userId, false, unreadCountListener);
-        }
     }
 
     private void loadTopProducts() {

@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:contentDescription="@string/home_cd_messages"
+        android:padding="@dimen/home_header_icon_padding"
+        android:tint="@color/home_text_primary"
+        app:srcCompat="@drawable/ic_chat" />
+
+    <TextView
+        android:id="@+id/chatIconBadge"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="top|end"
+        android:layout_margin="2dp"
+        android:background="@drawable/bg_badge"
+        android:gravity="center"
+        android:minWidth="14dp"
+        android:paddingStart="3dp"
+        android:paddingEnd="3dp"
+        android:textColor="@android:color/white"
+        android:textSize="9sp"
+        android:textStyle="bold"
+        android:visibility="gone"
+        tools:text="3"
+        tools:visibility="visible" />
+</merge>
