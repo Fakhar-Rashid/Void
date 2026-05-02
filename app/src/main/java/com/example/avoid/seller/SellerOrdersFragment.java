@@ -123,6 +123,8 @@ public class SellerOrdersFragment extends Fragment {
             holder.itemsRecycler.setLayoutManager(new LinearLayoutManager(holder.itemView.getContext()));
             holder.itemsRecycler.setAdapter(new OrderLineAdapter(myItems, OrderLineAdapter.Mode.SELLER,
                     (item, itemPosition) -> advanceStatus(order, item, holder.itemsRecycler)));
+
+            holder.header.setOnClickListener(v -> openDetails(order));
         }
 
         @Override
@@ -130,14 +132,24 @@ public class SellerOrdersFragment extends Fragment {
 
         class GroupVH extends RecyclerView.ViewHolder {
             final TextView id, date;
+            final View header;
             final RecyclerView itemsRecycler;
             GroupVH(@NonNull View itemView) {
                 super(itemView);
                 id            = itemView.findViewById(R.id.sellerOrderGroupId);
                 date          = itemView.findViewById(R.id.sellerOrderGroupDate);
+                header        = itemView.findViewById(R.id.sellerOrderGroupHeader);
                 itemsRecycler = itemView.findViewById(R.id.sellerOrderGroupItems);
             }
         }
+    }
+
+    private void openDetails(Order order) {
+        if (!isAdded()) return;
+        requireActivity().getSupportFragmentManager().beginTransaction()
+                .add(R.id.sellerFragmentContainer, SellerOrderDetailsFragment.newInstance(order))
+                .addToBackStack(null)
+                .commit();
     }
 
     private void advanceStatus(Order order, OrderLineItem item, RecyclerView itemsRecycler) {

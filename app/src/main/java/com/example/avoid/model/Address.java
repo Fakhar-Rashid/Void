@@ -8,6 +8,17 @@ public class Address implements Serializable {
 
     public static final String DEFAULT_COUNTRY = "Pakistan";
 
+    /** Selectable provinces / federal territories — shown as a dropdown wherever an address is edited. */
+    public static final String[] PAKISTAN_PROVINCES = new String[]{
+            "Punjab",
+            "Sindh",
+            "Khyber Pakhtunkhwa",
+            "Balochistan",
+            "Gilgit-Baltistan",
+            "Azad Jammu & Kashmir",
+            "Islamabad Capital Territory"
+    };
+
     private String houseNumber;
     private String streetNumber;
     private String area;
@@ -46,6 +57,13 @@ public class Address implements Serializable {
     public boolean isComplete() {
         return notBlank(houseNumber) && notBlank(streetNumber) && notBlank(area)
                 && notBlank(province) && notBlank(getCountry());
+    }
+
+    /** True when every user-editable field is empty. Country isn't checked because it's auto-filled. */
+    @Exclude
+    public boolean isBlank() {
+        return !notBlank(houseNumber) && !notBlank(streetNumber)
+                && !notBlank(area) && !notBlank(province);
     }
 
     /** Single-line "House 12, Street 5, DHA Phase 4, Punjab, Pakistan". */

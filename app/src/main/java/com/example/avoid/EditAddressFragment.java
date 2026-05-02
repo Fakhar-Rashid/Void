@@ -4,6 +4,9 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
+import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -21,9 +24,14 @@ import com.google.android.material.textfield.TextInputEditText;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * No bottom Save button — each card commits itself when the user taps the tick icon.
+ * Delete also commits immediately. The fragment leaves the user's saved address list
+ * in sync with what they see on screen.
+ */
 public class EditAddressFragment extends Fragment {
 
-    /** Live edit buffer — the user's saved addresses are only persisted on Save. */
+    /** Live edit buffer — copy of the user's saved addresses, mutated as the user edits. */
     private final List<Address> draft = new ArrayList<>();
     /** Per-card edit mode: true means input fields are visible. */
     private final List<Boolean> editing = new ArrayList<>();
@@ -47,7 +55,6 @@ public class EditAddressFragment extends Fragment {
 
         container = view.findViewById(R.id.editAddressContainer);
         addBtn = view.findViewById(R.id.editAddressAdd);
-        MaterialButton save = view.findViewById(R.id.editAddressSave);
 
         User user = UserSession.getInstance().getCurrentUser();
         draft.clear();
@@ -72,36 +79,6 @@ public class EditAddressFragment extends Fragment {
             renderForms();
         });
 
-        save.setOnClickListener(v -> {
-            syncDraftFromUI();
-            List<Address> toSave = new ArrayList<>();
-            for (Address a : draft) {
-                if (!a.isComplete()) {
-                    Toast.makeText(requireContext(),
-                            "Please fill in all fields for every address (or delete it).",
-                            Toast.LENGTH_LONG).show();
-                    return;
-                }
-                toSave.add(a);
-            }
-            user.setAddresses(toSave);
-            save.setEnabled(false);
-            UserRepository.getInstance().saveAddresses(user, new UserRepository.Callback<User>() {
-                @Override public void onSuccess(User result) {
-                    if (!isAdded()) return;
-                    Toast.makeText(requireContext(), "Addresses saved", Toast.LENGTH_SHORT).show();
-                    close();
-                }
-                @Override public void onFailure(@NonNull Exception e) {
-                    if (!isAdded()) return;
-                    save.setEnabled(true);
-                    Toast.makeText(requireContext(),
-                            e.getLocalizedMessage() != null ? e.getLocalizedMessage() : "Save failed",
-                            Toast.LENGTH_SHORT).show();
-                }
-            });
-        });
-
         renderForms();
     }
 
@@ -122,20 +99,20 @@ public class EditAddressFragment extends Fragment {
             TextInputEditText house    = row.findViewById(R.id.addressFormHouse);
             TextInputEditText street   = row.findViewById(R.id.addressFormStreet);
             TextInputEditText area     = row.findViewById(R.id.addressFormArea);
-            TextInputEditText province = row.findViewById(R.id.addressFormProvince);
+            AutoCompleteTextView province = row.findViewById(R.id.addressFormProvince);
             TextInputEditText country  = row.findViewById(R.id.addressFormCountry);
 
             label.setText("Address " + (i + 1));
 
-            // Hydrate inputs from the draft (always — so toggling shows the right values).
+            province.setAdapter(new ArrayAdapter<>(requireContext(),
+                    android.R.layout.simple_list_item_1, Address.PAKISTAN_PROVINCES));
+
             house.setText(addr.getHouseNumber());
             street.setText(addr.getStreetNumber());
             area.setText(addr.getArea());
-            province.setText(addr.getProvince());
-            country.setText(addr.getCountry() == null || addr.getCountry().isEmpty()
-                    ? Address.DEFAULT_COUNTRY : addr.getCountry());
+            province.setText(addr.getProvince(), false);
+            country.setText(Address.DEFAULT_COUNTRY);
 
-            // View body shows formatted address, or a placeholder for brand-new empty cards.
             if (addr.isComplete()) {
                 viewBody.setText(addr.getMultiLine());
             } else {
@@ -154,11 +131,7 @@ public class EditAddressFragment extends Fragment {
 
             final int index = i;
 
-            editBtn.setOnClickListener(v -> {
-                syncDraftFromUI();
-                editing.set(index, !editing.get(index));
-                renderForms();
-            });
+            editBtn.setOnClickListener(v -> onEditButtonTap(index));
 
             delete.setOnClickListener(v -> {
                 syncDraftFromUI();
@@ -171,11 +144,73 @@ public class EditAddressFragment extends Fragment {
                     editing.add(true);
                 }
                 renderForms();
+                persist();
             });
 
             container.addView(row);
         }
         addBtn.setVisibility(draft.size() < User.MAX_ADDRESSES ? View.VISIBLE : View.GONE);
+    }
+
+    /**
+     * Pencil → enter edit mode (no save).
+     * Tick (currently editing): if the card is blank, discard it; if incomplete, toast and stay in
+     * edit mode; otherwise exit edit mode and persist the full list to Firestore.
+     */
+    private void onEditButtonTap(int index) {
+        if (index >= draft.size()) return;
+
+        boolean wasEditing = editing.get(index);
+        if (!wasEditing) {
+            editing.set(index, true);
+            renderForms();
+            return;
+        }
+
+        syncDraftFromUI();
+        Address current = draft.get(index);
+        if (current.isBlank()) {
+            draft.remove(index);
+            editing.remove(index);
+            if (draft.isEmpty()) {
+                draft.add(new Address());
+                editing.add(true);
+            }
+            renderForms();
+            persist();
+            return;
+        }
+        if (!current.isComplete()) {
+            Toast.makeText(requireContext(),
+                    "Please fill in all fields, or delete this address.",
+                    Toast.LENGTH_LONG).show();
+            return;
+        }
+        editing.set(index, false);
+        renderForms();
+        persist();
+    }
+
+    /** Push the current draft (excluding any blank placeholder cards) to Firestore. */
+    private void persist() {
+        User user = UserSession.getInstance().getCurrentUser();
+        List<Address> toSave = new ArrayList<>();
+        for (Address a : draft) {
+            if (a.isComplete()) toSave.add(a);
+        }
+        user.setAddresses(toSave);
+        UserRepository.getInstance().saveAddresses(user, new UserRepository.Callback<User>() {
+            @Override public void onSuccess(User result) {
+                if (!isAdded()) return;
+                Toast.makeText(requireContext(), "Address saved", Toast.LENGTH_SHORT).show();
+            }
+            @Override public void onFailure(@NonNull Exception e) {
+                if (!isAdded()) return;
+                Toast.makeText(requireContext(),
+                        e.getLocalizedMessage() != null ? e.getLocalizedMessage() : "Save failed",
+                        Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     /** Pull current input-field values back into the draft list. Only edit-mode cards have inputs. */
@@ -188,12 +223,12 @@ public class EditAddressFragment extends Fragment {
             a.setStreetNumber(text(row, R.id.addressFormStreet));
             a.setArea(text(row, R.id.addressFormArea));
             a.setProvince(text(row, R.id.addressFormProvince));
-            a.setCountry(text(row, R.id.addressFormCountry));
+            a.setCountry(Address.DEFAULT_COUNTRY);
         }
     }
 
     private static String text(View row, int id) {
-        TextInputEditText input = row.findViewById(id);
+        EditText input = row.findViewById(id);
         return input != null && input.getText() != null ? input.getText().toString().trim() : "";
     }
 

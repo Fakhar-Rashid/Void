@@ -88,10 +88,38 @@ public class Order implements Serializable {
     public String getPaymentMethod() { return paymentMethod; }
     public void setPaymentMethod(String paymentMethod) { this.paymentMethod = paymentMethod; }
 
+    public String getBuyerName() { return buyerName; }
+    public void setBuyerName(String buyerName) { this.buyerName = buyerName; }
+
+    public String getBuyerEmail() { return buyerEmail; }
+    public void setBuyerEmail(String buyerEmail) { this.buyerEmail = buyerEmail; }
+
+    public String getBuyerPhone() { return buyerPhone; }
+    public void setBuyerPhone(String buyerPhone) { this.buyerPhone = buyerPhone; }
+
     @Exclude
     public String getPaymentMethodLabel() {
         if (PAYMENT_COD.equals(paymentMethod)) return "Cash on Delivery";
         return "Ezpay";
+    }
+
+    /** True when the buyer has already paid (Ezpay debits the wallet at placement; COD pays on delivery). */
+    @Exclude
+    public boolean isPaid() {
+        return PAYMENT_EZPAY.equals(paymentMethod);
+    }
+
+    /** Sum of the line items belonging to the given store — used in the seller details view. */
+    @Exclude
+    public double getTotalForStore(String storeId) {
+        if (storeId == null) return 0;
+        double total = 0;
+        for (OrderLineItem item : getItems()) {
+            if (storeId.equals(item.getStoreId())) {
+                total += item.getProductPrice() * item.getQuantity();
+            }
+        }
+        return total;
     }
 
     @Exclude

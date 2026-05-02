@@ -7,6 +7,9 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
+import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.RadioButton;
@@ -59,7 +62,8 @@ public class CheckoutActivity extends AppCompatActivity {
     private LinearLayout addressList;
     private View addressForm;
     private TextView addressManageHint;
-    private TextInputEditText inputHouseNumber, inputStreetNumber, inputArea, inputProvince, inputCountry;
+    private TextInputEditText inputHouseNumber, inputStreetNumber, inputArea, inputCountry;
+    private AutoCompleteTextView inputProvince;
 
     private RadioButton radioEzpay;
     private RadioButton radioCOD;
@@ -135,22 +139,23 @@ public class CheckoutActivity extends AppCompatActivity {
             TextView label = row.findViewById(R.id.checkoutAddressLabel);
             TextView body  = row.findViewById(R.id.checkoutAddressBody);
 
-            radio.setId(View.generateViewId());
             CompoundButtonCompat.setButtonTintList(radio, BLACK_TINT);
             radio.setChecked(i == selectedAddressIndex);
+            // The radio is purely a visual indicator — taps bubble up to the row,
+            // which is the single source of truth for which address is selected.
+            radio.setClickable(false);
+            radio.setFocusable(false);
             label.setText("Address " + (i + 1));
             body.setText(addr.getMultiLine());
 
             final int index = i;
-            View.OnClickListener selectThis = v -> {
+            row.setOnClickListener(v -> {
                 selectedAddressIndex = index;
                 for (int j = 0; j < addressList.getChildCount(); j++) {
                     RadioButton rb = addressList.getChildAt(j).findViewById(R.id.checkoutAddressRadio);
                     if (rb != null) rb.setChecked(j == index);
                 }
-            };
-            row.setOnClickListener(selectThis);
-            radio.setOnClickListener(selectThis);
+            });
 
             addressList.addView(row);
         }
@@ -168,11 +173,11 @@ public class CheckoutActivity extends AppCompatActivity {
                 text(inputStreetNumber),
                 text(inputArea),
                 text(inputProvince),
-                text(inputCountry)
+                Address.DEFAULT_COUNTRY
         );
     }
 
-    private static String text(TextInputEditText input) {
+    private static String text(EditText input) {
         return input != null && input.getText() != null ? input.getText().toString().trim() : "";
     }
 
@@ -289,6 +294,9 @@ public class CheckoutActivity extends AppCompatActivity {
                 shipping,
                 finalPayment
         );
+        order.setBuyerName(user.getName());
+        order.setBuyerEmail(user.getEmail());
+        order.setBuyerPhone(user.getPhone());
 
         UserRepository.getInstance().saveOrder(order, new UserRepository.Callback<Order>() {
             @Override public void onSuccess(Order placed) {
@@ -329,6 +337,9 @@ public class CheckoutActivity extends AppCompatActivity {
         inputArea           = findViewById(R.id.inputArea);
         inputProvince       = findViewById(R.id.inputProvince);
         inputCountry        = findViewById(R.id.inputCountry);
+
+        inputProvince.setAdapter(new ArrayAdapter<>(this,
+                android.R.layout.simple_list_item_1, Address.PAKISTAN_PROVINCES));
 
         radioEzpay          = findViewById(R.id.radioEzpay);
         radioCOD            = findViewById(R.id.radioCOD);
