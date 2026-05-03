@@ -90,6 +90,9 @@ public class ExploreProductsFragment extends Fragment {
         wireTrendingSearchChips(view.findViewById(R.id.trendingSearchGroup));
         wireSearchInput();
 
+        view.findViewById(R.id.exploreSeeAll).setOnClickListener(v ->
+                openSearchResults(null, getString(R.string.explore_trending_products)));
+
         loadAllProducts();
 
         if (getArguments() != null) {
@@ -131,10 +134,7 @@ public class ExploreProductsFragment extends Fragment {
             View chip = root.findViewById(chipIds[i]);
             if (chip == null) continue;
             final String label = labels[i];
-            chip.setOnClickListener(v -> {
-                searchInput.setText(label);
-                searchInput.setSelection(label.length());
-            });
+            chip.setOnClickListener(v -> openSearchResults(label, null));
         }
     }
 
@@ -155,10 +155,7 @@ public class ExploreProductsFragment extends Fragment {
             chip.setTextColor(chipText);
             chip.setChipStrokeWidth(0f);
             chip.setChipCornerRadius(pillRadius);
-            chip.setOnClickListener(v -> {
-                searchInput.setText(term);
-                searchInput.setSelection(term.length());
-            });
+            chip.setOnClickListener(v -> openSearchResults(term, null));
             group.addView(chip);
         }
     }
@@ -171,6 +168,21 @@ public class ExploreProductsFragment extends Fragment {
                 applyFilter(s.toString());
             }
         });
+        // Submitting the keyboard search → push to the dedicated results page.
+        searchInput.setOnEditorActionListener((v, actionId, event) -> {
+            String q = searchInput.getText() != null ? searchInput.getText().toString().trim() : "";
+            if (q.isEmpty()) return false;
+            openSearchResults(q, null);
+            return true;
+        });
+    }
+
+    private void openSearchResults(@Nullable String query, @Nullable String title) {
+        if (!isAdded()) return;
+        requireActivity().getSupportFragmentManager().beginTransaction()
+                .add(R.id.fragment_container, SearchResultsFragment.newInstance(query, title))
+                .addToBackStack(null)
+                .commit();
     }
 
     private void loadAllProducts() {

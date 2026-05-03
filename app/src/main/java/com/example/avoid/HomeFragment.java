@@ -14,6 +14,9 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import androidx.recyclerview.widget.GridLayoutManager;
+
+import com.example.avoid.adapter.MasonryGapDecoration;
 import com.example.avoid.adapter.ProductAdapter;
 import com.example.avoid.adapter.SkeletonAdapter;
 import com.example.avoid.model.Product;
@@ -33,6 +36,7 @@ public class HomeFragment extends Fragment {
 
     private RecyclerView bestSellersRecyclerView;
     private RecyclerView recommendationsRecyclerView;
+    private RecyclerView allProductsRecyclerView;
     private final FirebaseFirestore db = FirebaseFirestore.getInstance();
 
     @Nullable
@@ -47,19 +51,60 @@ public class HomeFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         bestSellersRecyclerView    = view.findViewById(R.id.bestSellersRecyclerView);
         recommendationsRecyclerView = view.findViewById(R.id.recommendationsRecyclerView);
+        allProductsRecyclerView     = view.findViewById(R.id.allProductsRecyclerView);
 
         bestSellersRecyclerView.setLayoutManager(
                 new LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false));
         recommendationsRecyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
 
+        // GridLayoutManager (not StaggeredGridLayoutManager) because we're nested inside a
+        // NestedScrollView with wrap_content height — Staggered can't compute its own height
+        // when the parent passes an UNSPECIFIED measure spec, so the section would render empty.
+        // All cards are roughly equal height anyway, so the masonry effect is moot here.
+        allProductsRecyclerView.setLayoutManager(new GridLayoutManager(requireContext(), 2));
+        allProductsRecyclerView.addItemDecoration(new MasonryGapDecoration(
+                (int) (8 * getResources().getDisplayMetrics().density)));
+
         bestSellersRecyclerView.setAdapter(new SkeletonAdapter(R.layout.item_product_card_skeleton, 4));
         recommendationsRecyclerView.setAdapter(new SkeletonAdapter(R.layout.item_product_list_skeleton, 4));
+        allProductsRecyclerView.setAdapter(new SkeletonAdapter(R.layout.item_product_card_skeleton, 6));
 
         view.findViewById(R.id.searchBar).setOnClickListener(v -> openExplore(null));
         wireCategoryChips(view);
         bindBalance(view);
 
+        view.findViewById(R.id.bestSellersSeeAll).setOnClickListener(v ->
+                openSearchResults(null, getString(R.string.home_best_sellers)));
+        view.findViewById(R.id.recommendationsSeeAll).setOnClickListener(v ->
+                openSearchResults(null, getString(R.string.home_recommendation)));
+
         loadTopProducts();
+        loadAllProducts();
+    }
+
+    private void loadAllProducts() {
+        db.collection(COLLECTION)
+                .orderBy("createdAt", Query.Direction.DESCENDING)
+                .get()
+                .addOnSuccessListener(snapshot -> {
+                    if (getView() == null) return;
+                    List<Product> products = new ArrayList<>();
+                    for (QueryDocumentSnapshot doc : snapshot) {
+                        Product p = doc.toObject(Product.class);
+                        p.setId(doc.getId());
+                        products.add(p);
+                    }
+                    allProductsRecyclerView.setAdapter(new ProductAdapter(
+                            products, ProductAdapter.LayoutMode.GRID, this::openProductDetails));
+                })
+                .addOnFailureListener(e -> Log.e(TAG, "Failed to load all products", e));
+    }
+
+    private void openSearchResults(@Nullable String query, @Nullable String title) {
+        requireActivity().getSupportFragmentManager().beginTransaction()
+                .add(R.id.fragment_container, SearchResultsFragment.newInstance(query, title))
+                .addToBackStack(null)
+                .commit();
     }
 
     private void loadTopProducts() {

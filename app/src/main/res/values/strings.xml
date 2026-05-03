@@ -45,6 +45,8 @@
     <string name="explore_trending_products">Trending Products</string>
     <string name="explore_search_results">Search Results</string>
     <string name="explore_no_results">No products match your search.</string>
+    <string name="search_results_title_query">Search results for \"%1$s\"</string>
+    <string name="search_results_title_all">All products</string>
     <string name="explore_cd_back">Back</string>
 
     <string name="auth_brand">Void</string>

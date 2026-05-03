@@ -33,6 +33,7 @@
             android:textSize="18sp" />
 
         <com.example.avoid.NotificationBellButton
+            android:id="@+id/chatListBell"
             android:layout_width="40dp"
             android:layout_height="40dp" />
     </LinearLayout>

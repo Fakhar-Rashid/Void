@@ -24,7 +24,9 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductV
     public enum LayoutMode {
         CARD(R.layout.item_product_card),
         LIST(R.layout.item_product_list),
-        LIST_HORIZONTAL(R.layout.item_product_list);
+        LIST_HORIZONTAL(R.layout.item_product_list),
+        /** Column-filling card for 2-column staggered grids (e.g. search results). */
+        GRID(R.layout.item_product_grid);
 
         private final int layoutResId;
 

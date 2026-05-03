@@ -66,6 +66,9 @@ public class ChatListFragment extends Fragment {
         } else {
             btnBack.setOnClickListener(v -> requireActivity().finish());
         }
+
+        View bell = view.findViewById(R.id.chatListBell);
+        if (bell != null) bell.setVisibility(isSellerMode ? View.GONE : View.VISIBLE);
         
         recyclerView = view.findViewById(R.id.chatListRecyclerView);
         tvEmptyChats = view.findViewById(R.id.tvEmptyChats);

@@ -144,8 +144,13 @@
                     android:textSize="@dimen/home_section_title_size" />
 
                 <TextView
+                    android:id="@+id/bestSellersSeeAll"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:background="?attr/selectableItemBackground"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:padding="4dp"
                     android:text="@string/home_see_all"
                     android:textColor="@color/home_section_link"
                     android:textSize="@dimen/home_section_link_size" />
@@ -180,8 +185,13 @@
                     android:textSize="@dimen/home_section_title_size" />
 
                 <TextView
+                    android:id="@+id/recommendationsSeeAll"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:background="?attr/selectableItemBackground"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:padding="4dp"
                     android:text="@string/home_see_all"
                     android:textColor="@color/home_section_link"
                     android:textSize="@dimen/home_section_link_size" />
@@ -196,6 +206,25 @@
                 android:overScrollMode="never"
                 tools:itemCount="2"
                 tools:listitem="@layout/item_product_list" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/home_section_spacing_large"
+                android:fontFamily="sans-serif-black"
+                android:text="All Products"
+                android:textColor="@color/home_text_primary"
+                android:textSize="@dimen/home_section_title_size" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/allProductsRecyclerView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/home_product_cards_top_margin"
+                android:nestedScrollingEnabled="false"
+                android:overScrollMode="never"
+                tools:itemCount="6"
+                tools:listitem="@layout/item_product_grid" />
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
 
