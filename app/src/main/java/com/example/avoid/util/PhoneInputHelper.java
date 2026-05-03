@@ -1,9 +1,7 @@
 package com.example.avoid.util;
 
 import android.text.Editable;
-import android.text.InputFilter;
 import android.text.InputType;
-import android.text.Spanned;
 import android.text.TextWatcher;
 import android.widget.EditText;
 
@@ -14,18 +12,13 @@ import androidx.annotation.Nullable;
  * Locks every phone EditText in the app to the {@code +92 } prefix and validates that the
  * remainder is a 10-digit Pakistani mobile number.
  *
- * <p>Usage: {@code PhoneInputHelper.attach(myEditText)} during view setup. After that:
- * <ul>
- *   <li>The field shows {@code +92 } the moment it's attached.</li>
- *   <li>The user can type / delete digits after the prefix but cannot delete or modify
- *       the {@code +92 } itself — any attempt is rolled back.</li>
- *   <li>Selection / cursor movement before the prefix is auto-snapped to right after it.</li>
- *   <li>Only digits and spaces are accepted as input — paste cleanly handles the +92 case.</li>
- * </ul>
- *
- * <p>{@link #isValid(String)} returns true when the value matches {@code +92} followed by
- * exactly 10 digits (whitespace ignored). {@link #isValidOrEmpty(String)} additionally
- * accepts the bare {@code +92} prefix as "user didn't fill it in", for optional fields.
+ * <p>Implementation: a single {@link TextWatcher} watches every change. If after the change
+ * the text doesn't start with {@code +92 }, it pulls every digit out of the field, strips a
+ * leading {@code 92} if present (to avoid duplicating the country code), and rewrites the
+ * field as {@code +92 <digits>}. The cursor is parked at the end. No {@link android.text.InputFilter}
+ * is used — filters can silently swallow {@code setText} calls (their {@code dstart=0} edit
+ * looks identical to a user trying to delete the prefix), which is what was crashing the
+ * Edit Profile screen when seeding an existing phone value.
  */
 public final class PhoneInputHelper {
 
@@ -39,15 +32,10 @@ public final class PhoneInputHelper {
     public static void attach(@NonNull EditText input) {
         input.setInputType(InputType.TYPE_CLASS_PHONE);
 
-        // Seed the prefix on first attach so it always reads "+92 …" — even the first time.
         if (input.getText() == null || !input.getText().toString().startsWith(PREFIX)) {
             input.setText(PREFIX);
             input.setSelection(input.length());
         }
-
-        // Reject anything that would erase or corrupt the prefix. The filter is the
-        // inexpensive guard; the TextWatcher below catches edge cases the filter misses.
-        input.setFilters(new InputFilter[]{new PrefixGuardFilter()});
 
         input.addTextChangedListener(new TextWatcher() {
             boolean self = false;
@@ -56,29 +44,21 @@ public final class PhoneInputHelper {
             @Override public void afterTextChanged(Editable s) {
                 if (self) return;
                 String txt = s.toString();
-                if (!txt.startsWith(PREFIX)) {
-                    self = true;
-                    // Strip whatever's where the prefix should be and re-prepend it.
-                    String tail = txt.replaceFirst("^[^0-9]*", "");
-                    s.replace(0, s.length(), PREFIX + tail);
-                    input.setSelection(s.length());
-                    self = false;
-                }
+                if (txt.startsWith(PREFIX)) return;
+                self = true;
+                String digits = txt.replaceAll("[^0-9]", "");
+                if (digits.startsWith("92")) digits = digits.substring(2);
+                s.replace(0, s.length(), PREFIX + digits);
+                input.setSelection(s.length());
+                self = false;
             }
         });
 
-        // If the user ends up before the prefix (long-press, gesture nav), snap forward.
-        input.setOnClickListener(v -> snapCursor(input));
-        input.setOnFocusChangeListener((v, hasFocus) -> { if (hasFocus) snapCursor(input); });
-    }
-
-    private static void snapCursor(@NonNull EditText input) {
-        int start = input.getSelectionStart();
-        int end   = input.getSelectionEnd();
-        int min   = PREFIX.length();
-        if (start < min || end < min) {
-            input.setSelection(Math.max(min, end));
-        }
+        input.setOnFocusChangeListener((v, hasFocus) -> {
+            if (hasFocus && input.getSelectionStart() < PREFIX.length()) {
+                input.setSelection(input.length());
+            }
+        });
     }
 
     /** Strict — must be {@code +92} + 10 digits (whitespace ignored). */
@@ -96,7 +76,7 @@ public final class PhoneInputHelper {
         return PK_PHONE.matcher(compact).matches();
     }
 
-    /** Returns the raw value typed (with prefix) or null if the field is empty / prefix-only. */
+    /** Returns the compact value typed (with prefix, no spaces) or null when empty / prefix-only. */
     @Nullable
     public static String trimmedValueOrNull(@Nullable String text) {
         if (text == null) return null;
@@ -121,16 +101,5 @@ public final class PhoneInputHelper {
         else if (digits.startsWith("0")) digits = digits.substring(1);
         input.setText(PREFIX + digits);
         input.setSelection(input.length());
-    }
-
-    /** Blocks writes that would erase or shrink the {@code +92 } prefix. */
-    private static class PrefixGuardFilter implements InputFilter {
-        @Override
-        public CharSequence filter(CharSequence source, int start, int end,
-                                   Spanned dest, int dstart, int dend) {
-            // Replacement spans across the prefix? Reject the whole edit.
-            if (dstart < PREFIX.length()) return "";
-            return null; // accept as-is
-        }
     }
 }
