@@ -52,6 +52,40 @@
                     android:tint="@color/home_text_primary"
                     android:padding="8dp"
                     android:elevation="4dp" />
+
+                <!-- Owner-only actions: edit + delete sit on the right of the hero image. -->
+                <LinearLayout
+                    android:id="@+id/productOwnerActions"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="top|end"
+                    android:layout_marginTop="32dp"
+                    android:layout_marginEnd="16dp"
+                    android:elevation="4dp"
+                    android:orientation="horizontal"
+                    android:visibility="gone">
+
+                    <ImageButton
+                        android:id="@+id/productEditButton"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:background="@drawable/bg_avatar_circle"
+                        android:contentDescription="Edit product"
+                        android:padding="9dp"
+                        android:src="@drawable/ic_edit"
+                        android:tint="@color/home_text_primary" />
+
+                    <ImageButton
+                        android:id="@+id/productDeleteButton"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:layout_marginStart="8dp"
+                        android:background="@drawable/bg_avatar_circle"
+                        android:contentDescription="Delete product"
+                        android:padding="9dp"
+                        android:src="@drawable/ic_delete"
+                        android:tint="@color/profile_logout" />
+                </LinearLayout>
             </FrameLayout>
 
             <LinearLayout
@@ -194,6 +228,7 @@
 
                 <!-- Choose Color -->
                 <TextView
+                    android:id="@+id/chooseColorLabel"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="32dp"
@@ -258,6 +293,7 @@
                     android:visibility="gone" />
 
                 <TextView
+                    android:id="@+id/storeInfoLabel"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="32dp"
@@ -282,6 +318,7 @@
 
     <!-- Bottom Footer Layout -->
     <LinearLayout
+        android:id="@+id/productDetailsFooter"
         android:layout_width="match_parent"
         android:layout_height="76dp"
         android:layout_gravity="bottom"

@@ -76,9 +76,87 @@ public class ProductDetailsFragment extends Fragment {
         setupAddToCartSection(view);
         setupStockLabel(view);
         loadStoreInfo(view);
+        setupOwnerActions(view);
 
         ImageButton chatButton = view.findViewById(R.id.footerChatButton);
         chatButton.setOnClickListener(v -> openChat());
+    }
+
+    /**
+     * Owner-only chrome:
+     * <ul>
+     *   <li>Show the edit + delete buttons (top-right of the hero).</li>
+     *   <li>Hide buyer-only sections that don't apply to your own product — the bottom
+     *       footer (chat + add to cart), the Store Information card, and the Choose Color
+     *       picker (you set the colours during listing, no need to pick one).</li>
+     * </ul>
+     */
+    private void setupOwnerActions(View root) {
+        View ownerActions     = root.findViewById(R.id.productOwnerActions);
+        ImageButton editBtn   = root.findViewById(R.id.productEditButton);
+        ImageButton deleteBtn = root.findViewById(R.id.productDeleteButton);
+
+        boolean owner = isCurrentUserOwner();
+
+        // Buyer-only sections: hide for the owner.
+        toggleVisibility(root, R.id.productDetailsFooter, !owner);
+        toggleVisibility(root, R.id.storeInfoLabel,       !owner);
+        toggleVisibility(root, R.id.productStoreCard,     !owner);
+        toggleVisibility(root, R.id.chooseColorLabel,     !owner);
+        toggleVisibility(root, R.id.colorSwatchesLayout,  !owner);
+
+        if (ownerActions == null) return;
+        if (!owner) {
+            ownerActions.setVisibility(View.GONE);
+            return;
+        }
+        ownerActions.setVisibility(View.VISIBLE);
+
+        editBtn.setOnClickListener(v -> {
+            if (!isCurrentUserOwner() || product == null || product.getId() == null) return;
+            startActivity(AddProductActivity.createIntent(requireContext(), product.getId()));
+        });
+
+        deleteBtn.setOnClickListener(v -> {
+            if (!isCurrentUserOwner() || product == null || product.getId() == null) return;
+            new androidx.appcompat.app.AlertDialog.Builder(requireContext())
+                    .setTitle(product.getName() != null ? product.getName() : "Delete product")
+                    .setMessage(R.string.seller_product_delete_confirm)
+                    .setPositiveButton(R.string.seller_product_action_delete, (d, w) -> deleteProduct())
+                    .setNegativeButton(android.R.string.cancel, null)
+                    .show();
+        });
+    }
+
+    private static void toggleVisibility(View root, int id, boolean visible) {
+        View v = root.findViewById(id);
+        if (v != null) v.setVisibility(visible ? View.VISIBLE : View.GONE);
+    }
+
+    private boolean isCurrentUserOwner() {
+        UserSession session = UserSession.getInstance();
+        if (!session.isLoggedIn() || session.getCurrentUser() == null) return false;
+        if (product == null || product.getStoreId() == null) return false;
+        return product.getStoreId().equals(session.getCurrentUser().getId());
+    }
+
+    private void deleteProduct() {
+        if (product == null || product.getId() == null) return;
+        ProductRepository.getInstance().deleteProduct(product.getId(),
+                new ProductRepository.Callback<Void>() {
+                    @Override public void onSuccess(Void unused) {
+                        if (!isAdded()) return;
+                        android.widget.Toast.makeText(requireContext(), "Deleted",
+                                android.widget.Toast.LENGTH_SHORT).show();
+                        requireActivity().getSupportFragmentManager().popBackStack();
+                    }
+                    @Override public void onFailure(@NonNull Exception e) {
+                        if (!isAdded()) return;
+                        android.widget.Toast.makeText(requireContext(),
+                                e.getLocalizedMessage() != null ? e.getLocalizedMessage() : "Delete failed",
+                                android.widget.Toast.LENGTH_SHORT).show();
+                    }
+                });
     }
 
     private void openChat() {

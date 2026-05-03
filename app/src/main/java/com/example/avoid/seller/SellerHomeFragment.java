@@ -1,22 +1,19 @@
 package com.example.avoid.seller;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.avoid.AddProductActivity;
+import com.example.avoid.ProductDetailsFragment;
 import com.example.avoid.ProductRepository;
 import com.example.avoid.R;
 import com.example.avoid.UserRepository;
@@ -138,51 +135,17 @@ public class SellerHomeFragment extends Fragment {
                 "%d listing%s", products.size(), products.size() == 1 ? "" : "s"));
 
         ProductAdapter adapter = new ProductAdapter(products, ProductAdapter.LayoutMode.LIST,
-                this::openEdit);
+                this::openProductDetails);
         recyclerView.setAdapter(adapter);
-
-        // Long-press to delete.
-        recyclerView.post(() -> wireLongPressForDelete(products));
     }
 
-    private void wireLongPressForDelete(List<Product> products) {
-        for (int i = 0; i < recyclerView.getChildCount(); i++) {
-            int finalI = i;
-            View child = recyclerView.getChildAt(i);
-            child.setOnLongClickListener(v -> {
-                if (finalI < products.size()) confirmDelete(products.get(finalI));
-                return true;
-            });
-        }
+    /** Tap → product details (with owner edit + delete buttons). */
+    private void openProductDetails(Product product) {
+        if (product == null || !isAdded()) return;
+        requireActivity().getSupportFragmentManager().beginTransaction()
+                .add(R.id.sellerFragmentContainer, ProductDetailsFragment.newInstance(product))
+                .addToBackStack(null)
+                .commit();
     }
 
-    private void openEdit(Product product) {
-        if (product.getId() == null) return;
-        startActivity(AddProductActivity.createIntent(requireContext(), product.getId()));
-    }
-
-    private void confirmDelete(Product product) {
-        new AlertDialog.Builder(requireContext())
-                .setTitle(product.getName())
-                .setMessage(R.string.seller_product_delete_confirm)
-                .setPositiveButton(R.string.seller_product_action_delete, (d, w) -> doDelete(product))
-                .setNegativeButton(android.R.string.cancel, null)
-                .show();
-    }
-
-    private void doDelete(Product product) {
-        if (product.getId() == null) return;
-        ProductRepository.getInstance().deleteProduct(product.getId(),
-                new ProductRepository.Callback<Void>() {
-                    @Override public void onSuccess(Void unused) {
-                        Toast.makeText(requireContext(), "Deleted", Toast.LENGTH_SHORT).show();
-                        loadMyProducts();
-                    }
-                    @Override public void onFailure(@NonNull Exception e) {
-                        Toast.makeText(requireContext(),
-                                e.getLocalizedMessage() != null ? e.getLocalizedMessage() : "Delete failed",
-                                Toast.LENGTH_SHORT).show();
-                    }
-                });
-    }
 }

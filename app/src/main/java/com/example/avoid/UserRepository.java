@@ -372,6 +372,9 @@ public class UserRepository {
         }
     }
 
+    /** Welcome bonus credited the very first time a Firebase user shows up in Firestore. */
+    private static final double NEW_USER_STARTING_BALANCE = 5000.0;
+
     private static User newUserFromAuth(FirebaseUser fbUser) {
         return new User(
                 fbUser.getUid(),
@@ -380,7 +383,7 @@ public class UserRepository {
                 fbUser.getEmail() != null ? fbUser.getEmail() : "",
                 null,
                 fbUser.getPhotoUrl() != null ? fbUser.getPhotoUrl().toString() : null,
-                0.0,
+                NEW_USER_STARTING_BALANCE,
                 new Settings()
         );
     }
