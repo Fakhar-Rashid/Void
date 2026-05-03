@@ -26,6 +26,7 @@ public class MainActivity extends AppCompatActivity implements CartBadgeUpdater 
             R.drawable.ic_home,
             R.drawable.ic_orders,
             R.drawable.ic_bag,
+            R.drawable.ic_tab_stores,     // ic_shopping_bag wrapped with inset to match other tabs
             R.drawable.ic_profile
     };
 

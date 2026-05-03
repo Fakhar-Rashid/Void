@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Bottom-nav wrapper around ic_shopping_bag. The base icon fills its 24×24 viewport
+  edge-to-edge, which made it look noticeably bigger than the other tab icons. The 4dp
+  inset on every side scales the bag down to ~75% within the tab's icon slot, matching
+  ic_bag / ic_orders / ic_profile visually without redrawing the source vector.
+-->
+<inset xmlns:android="http://schemas.android.com/apk/res/android"
+    android:drawable="@drawable/ic_shopping_bag"
+    android:inset="4dp" />

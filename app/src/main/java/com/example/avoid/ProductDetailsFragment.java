@@ -138,10 +138,44 @@ public class ProductDetailsFragment extends Fragment {
         storefrontText.setText(product.getStoreName() != null ? product.getStoreName()
                 : (product.getLocation() != null ? product.getLocation() : ""));
 
-        ((TextView) view.findViewById(R.id.storeNameText))
-                .setText(product.getStoreName() != null ? product.getStoreName() : "");
-        ((TextView) view.findViewById(R.id.storeLocationText))
-                .setText(product.getLocation() != null ? " · " + product.getLocation() : "");
+        bindStoreCard(view);
+    }
+
+    /**
+     * Loads the full {@link com.example.avoid.model.Store} doc for this product so the shared
+     * card view (logo, name, location, follow button) can be wired identically to how it
+     * appears in the followed-stores tab.
+     */
+    private void bindStoreCard(View root) {
+        View card = root.findViewById(R.id.productStoreCard);
+        if (card == null || product == null || product.getStoreId() == null) return;
+
+        // Optimistic seed from product fields so the card shows something immediately.
+        com.example.avoid.model.Store seed = new com.example.avoid.model.Store(
+                product.getStoreId(),
+                product.getStoreName(),
+                null, product.getLocation(), null, null, null, null, 0L);
+        StoreCardBinder.bind(card, seed, this::openStoreDetails);
+
+        UserRepository.getInstance().loadStore(product.getStoreId(),
+                new UserRepository.Callback<com.example.avoid.model.Store>() {
+                    @Override public void onSuccess(com.example.avoid.model.Store store) {
+                        if (!isAdded() || store == null) return;
+                        if (store.getId() == null) store.setId(product.getStoreId());
+                        // Owner id is what the rest of the app uses to identify the store.
+                        if (store.getOwnerId() == null) store.setOwnerId(product.getStoreId());
+                        StoreCardBinder.bind(card, store, ProductDetailsFragment.this::openStoreDetails);
+                    }
+                    @Override public void onFailure(@NonNull Exception e) { /* keep seed */ }
+                });
+    }
+
+    private void openStoreDetails(@NonNull com.example.avoid.model.Store store) {
+        if (!isAdded()) return;
+        requireActivity().getSupportFragmentManager().beginTransaction()
+                .add(R.id.fragment_container, StoreDetailsFragment.newInstance(store))
+                .addToBackStack(null)
+                .commit();
     }
 
     private void setupImageCarousel(View view) {
@@ -299,8 +333,6 @@ public class ProductDetailsFragment extends Fragment {
     private void loadStoreInfo(View view) {
         if (product == null || product.getStoreId() == null) return;
         TextView storefrontText = view.findViewById(R.id.detailProductStorefront);
-        TextView storeNameText  = view.findViewById(R.id.storeNameText);
-        TextView storeLocText   = view.findViewById(R.id.storeLocationText);
 
         UserRepository.getInstance().loadStore(product.getStoreId(),
                 new UserRepository.Callback<com.example.avoid.model.Store>() {
@@ -309,8 +341,6 @@ public class ProductDetailsFragment extends Fragment {
                         String name = store.getName() != null ? store.getName() : "";
                         String loc  = store.getLocation() != null ? store.getLocation() : "";
                         storefrontText.setText(loc.isEmpty() ? name : name + " · " + loc);
-                        storeNameText.setText(name);
-                        storeLocText.setText(loc.isEmpty() ? "" : " · " + loc);
                     }
                     @Override public void onFailure(@androidx.annotation.NonNull Exception e) {}
                 });

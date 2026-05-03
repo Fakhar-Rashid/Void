@@ -16,12 +16,13 @@ public class Store implements Serializable {
     private String contactEmail;
     private String phone;
     private String logoUrl;
+    private String bannerUrl;
     private long createdAt;
 
     public Store() {}
 
     public Store(String ownerId, String name, String description, String location,
-                 String contactEmail, String phone, String logoUrl, long createdAt) {
+                 String contactEmail, String phone, String logoUrl, String bannerUrl, long createdAt) {
         this.ownerId = ownerId;
         this.name = name;
         this.description = description;
@@ -29,6 +30,7 @@ public class Store implements Serializable {
         this.contactEmail = contactEmail;
         this.phone = phone;
         this.logoUrl = logoUrl;
+        this.bannerUrl = bannerUrl;
         this.createdAt = createdAt;
     }
 
@@ -55,6 +57,9 @@ public class Store implements Serializable {
 
     public String getLogoUrl() { return logoUrl; }
     public void setLogoUrl(String logoUrl) { this.logoUrl = logoUrl; }
+
+    public String getBannerUrl() { return bannerUrl; }
+    public void setBannerUrl(String bannerUrl) { this.bannerUrl = bannerUrl; }
 
     public long getCreatedAt() { return createdAt; }
     public void setCreatedAt(long createdAt) { this.createdAt = createdAt; }

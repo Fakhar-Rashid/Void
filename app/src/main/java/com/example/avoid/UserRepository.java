@@ -250,6 +250,62 @@ public class UserRepository {
                 });
     }
 
+    /**
+     * Toggle a store in the user's followed-stores list and persist the change. The local
+     * list is mutated in-place so the next render sees the new state immediately even if the
+     * Firestore write is in flight.
+     */
+    public void setFollowing(User user, @NonNull String storeId, boolean follow,
+                             @Nullable Callback<User> callback) {
+        if (user == null || user.getId() == null) {
+            if (callback != null) callback.onFailure(new IllegalArgumentException("user/id required"));
+            return;
+        }
+        List<String> followed = user.getFollowedStoreIds();
+        if (follow) {
+            if (!followed.contains(storeId)) followed.add(storeId);
+        } else {
+            followed.remove(storeId);
+        }
+        Map<String, Object> patch = new HashMap<>();
+        patch.put("followedStoreIds", followed);
+        db.collection(USERS).document(user.getId()).update(patch)
+                .addOnSuccessListener(v -> { if (callback != null) callback.onSuccess(user); })
+                .addOnFailureListener(e -> {
+                    Log.e(TAG, "set following failed", e);
+                    if (callback != null) callback.onFailure(e);
+                });
+    }
+
+    /** Load every store in the given id list. Order of the returned list mirrors {@code storeIds}. */
+    public void loadStores(@NonNull List<String> storeIds, @NonNull Callback<List<Store>> callback) {
+        if (storeIds.isEmpty()) {
+            callback.onSuccess(new ArrayList<>());
+            return;
+        }
+        // Firestore "in" supports up to 10 ids per query; for typical follow lists this is plenty.
+        // For larger lists we'd need to chunk — left as TODO when that becomes a real problem.
+        List<String> trimmed = storeIds.size() > 10 ? storeIds.subList(0, 10) : storeIds;
+        db.collection(STORES)
+                .whereIn(com.google.firebase.firestore.FieldPath.documentId(), trimmed)
+                .get()
+                .addOnSuccessListener(snap -> {
+                    java.util.Map<String, Store> byId = new HashMap<>();
+                    for (QueryDocumentSnapshot doc : snap) {
+                        Store s = doc.toObject(Store.class);
+                        if (s.getId() == null) s.setId(doc.getId());
+                        byId.put(doc.getId(), s);
+                    }
+                    List<Store> ordered = new ArrayList<>();
+                    for (String id : trimmed) {
+                        Store s = byId.get(id);
+                        if (s != null) ordered.add(s);
+                    }
+                    callback.onSuccess(ordered);
+                })
+                .addOnFailureListener(callback::onFailure);
+    }
+
     public void saveAddresses(User user, @Nullable Callback<User> callback) {
         if (user == null || user.getId() == null) {
             if (callback != null) callback.onFailure(new IllegalArgumentException("user/id required"));
@@ -263,6 +319,14 @@ public class UserRepository {
                     Log.e(TAG, "save addresses failed", e);
                     if (callback != null) callback.onFailure(e);
                 });
+    }
+
+    public void saveProfileImage(User user) {
+        if (user == null || user.getId() == null) return;
+        Map<String, Object> patch = new HashMap<>();
+        patch.put("profileImageUrl", user.getProfileImageUrl());
+        db.collection(USERS).document(user.getId()).update(patch)
+                .addOnFailureListener(e -> Log.e(TAG, "save profile image failed", e));
     }
 
     public void saveSellerStatus(User user) {

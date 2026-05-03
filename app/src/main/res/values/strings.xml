@@ -106,6 +106,16 @@
     <string name="onboarding_error_name">Please enter a store name.</string>
     <string name="onboarding_error_location">Please enter a location.</string>
     <string name="onboarding_error_email">Please enter a valid contact email.</string>
+    <string name="onboarding_section_branding">Branding</string>
+    <string name="onboarding_label_profile_picture">Your profile photo</string>
+    <string name="onboarding_label_store_logo">Store logo</string>
+    <string name="onboarding_label_store_banner">Store banner</string>
+    <string name="onboarding_pick_image">Pick image</string>
+    <string name="onboarding_replace_image">Replace</string>
+    <string name="onboarding_error_profile_picture">Please add a profile photo.</string>
+    <string name="onboarding_error_store_logo">Please add a store logo.</string>
+    <string name="onboarding_error_store_banner">Please add a store banner.</string>
+    <string name="onboarding_uploading">Uploading images…</string>
 
     <string name="add_product_title_new">Add a product</string>
     <string name="add_product_title_edit">Edit product</string>

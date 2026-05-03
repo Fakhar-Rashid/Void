@@ -18,6 +18,7 @@ public class User implements Serializable {
     private String email;
     private String phone;
     private List<Address> addresses = new ArrayList<>();
+    private List<String> followedStoreIds = new ArrayList<>();
     private String profileImageUrl;
     private double balance;
     private boolean seller;
@@ -67,6 +68,19 @@ public class User implements Serializable {
     }
     public void setAddresses(List<Address> addresses) {
         this.addresses = addresses != null ? addresses : new ArrayList<>();
+    }
+
+    public List<String> getFollowedStoreIds() {
+        if (followedStoreIds == null) followedStoreIds = new ArrayList<>();
+        return followedStoreIds;
+    }
+    public void setFollowedStoreIds(List<String> followedStoreIds) {
+        this.followedStoreIds = followedStoreIds != null ? followedStoreIds : new ArrayList<>();
+    }
+
+    @Exclude
+    public boolean isFollowing(String storeId) {
+        return storeId != null && getFollowedStoreIds().contains(storeId);
     }
 
     public String getProfileImageUrl() { return profileImageUrl; }

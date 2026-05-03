@@ -268,115 +268,11 @@
                     android:textStyle="bold"
                     android:text="Store Information" />
 
-                <!-- Store Information -->
-                <LinearLayout
+                <include
+                    android:id="@+id/productStoreCard"
+                    layout="@layout/view_store_card"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:padding="12dp">
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:gravity="center_vertical">
-
-                        <!-- Avatar -->
-                        <ImageView
-                            android:layout_width="48dp"
-                            android:layout_height="48dp"
-                            android:src="@drawable/ic_profile"
-                            android:background="@drawable/bg_avatar_circle"
-                            android:scaleType="centerCrop" />
-
-                        <!-- Store Info -->
-                        <LinearLayout
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:layout_marginStart="12dp"
-                            android:orientation="vertical">
-
-                            <!-- Store Name -->
-                            <TextView
-                                android:id="@+id/storeNameText"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:textColor="@color/home_text_primary"
-                                android:textSize="15sp"
-                                tools:text="AlfinasStore" />
-
-                            <!-- Status + Location -->
-                            <LinearLayout
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:orientation="horizontal"
-                                android:layout_marginTop="2dp">
-
-                                <TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:text="Online"
-                                    android:textStyle="bold"
-                                    android:textColor="@color/home_text_primary"
-                                    android:textSize="12sp" />
-
-                                <TextView
-                                    android:id="@+id/storeLocationText"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:textColor="@color/home_text_hint"
-                                    android:textSize="12sp"
-                                    tools:text=" · North Jakarta" />
-                            </LinearLayout>
-
-                        </LinearLayout>
-
-                        <!-- Follow Button -->
-                        <com.google.android.material.button.MaterialButton
-                            android:id="@+id/followStoreButton"
-                            android:layout_width="wrap_content"
-                            android:layout_height="36dp"
-                            android:text="Follow"
-                            android:textStyle="bold"
-                            android:textAllCaps="false"
-                            android:textSize="13sp"
-                            android:textColor="@color/home_text_primary"
-                            app:backgroundTint="@android:color/transparent"
-                            app:strokeColor="@color/home_chip_border"
-                            app:strokeWidth="1dp"
-                            app:cornerRadius="8dp"
-                            android:insetTop="0dp"
-                            android:insetBottom="0dp"
-                            style="@style/Widget.Material3.Button.OutlinedButton" />
-
-                    </LinearLayout>
-
-                    <!-- Rating Row -->
-                    <LinearLayout
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:gravity="center_vertical"
-                        android:layout_marginTop="8dp"
-                        android:layout_marginStart="2dp">
-
-                        <ImageView
-                            android:layout_width="14dp"
-                            android:layout_height="14dp"
-                            android:src="@drawable/ic_star"
-                            android:tint="@color/home_text_hint" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="4.8 Rating Store"
-                            android:textColor="@color/home_text_hint"
-                            android:textSize="12sp"
-                            android:layout_marginStart="4dp" />
-                    </LinearLayout>
-
-                </LinearLayout>
+                    android:layout_height="wrap_content" />
 
 
 

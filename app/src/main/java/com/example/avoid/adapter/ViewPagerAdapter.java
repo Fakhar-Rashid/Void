@@ -6,6 +6,7 @@ import androidx.fragment.app.FragmentActivity;
 import androidx.viewpager2.adapter.FragmentStateAdapter;
 
 import com.example.avoid.CartFragment;
+import com.example.avoid.FollowedStoresFragment;
 import com.example.avoid.HomeFragment;
 import com.example.avoid.OrdersFragment;
 import com.example.avoid.ProfileFragment;
@@ -22,13 +23,14 @@ public class ViewPagerAdapter extends FragmentStateAdapter {
         switch (position) {
             case 1:  return new OrdersFragment();
             case 2:  return new CartFragment();
-            case 3:  return new ProfileFragment();
+            case 3:  return new FollowedStoresFragment();
+            case 4:  return new ProfileFragment();
             default: return new HomeFragment();
         }
     }
 
     @Override
     public int getItemCount() {
-        return 4;
+        return 5;
     }
 }

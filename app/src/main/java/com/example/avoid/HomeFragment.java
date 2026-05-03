@@ -73,6 +73,20 @@ public class HomeFragment extends Fragment {
         wireCategoryChips(view);
         bindBalance(view);
 
+        // DEV: long-press the home title to refresh the three demo stores' logo + banner with
+        // tech-themed images. Swap the call inside runSeeder() to seedAll / seedExtras when
+        // you need products instead. Remove this whole block when you're done seeding.
+        view.findViewById(R.id.homeTitle).setOnLongClickListener(v -> {
+            new androidx.appcompat.app.AlertDialog.Builder(requireContext())
+                    .setTitle("Refresh store banners?")
+                    .setMessage("Updates the logo + banner on Raid, Saifullah Store, and Organo " +
+                            "with tech-themed images. Doesn't touch any products.")
+                    .setPositiveButton("Update", (d, w) -> runSeeder())
+                    .setNegativeButton(android.R.string.cancel, null)
+                    .show();
+            return true;
+        });
+
         view.findViewById(R.id.bestSellersSeeAll).setOnClickListener(v ->
                 openSearchResults(null, getString(R.string.home_best_sellers)));
         view.findViewById(R.id.recommendationsSeeAll).setOnClickListener(v ->
@@ -98,6 +112,27 @@ public class HomeFragment extends Fragment {
                             products, ProductAdapter.LayoutMode.GRID, this::openProductDetails));
                 })
                 .addOnFailureListener(e -> Log.e(TAG, "Failed to load all products", e));
+    }
+
+    private void runSeeder() {
+        android.widget.Toast.makeText(requireContext(), "Updating…", android.widget.Toast.LENGTH_SHORT).show();
+        // Swap to ProductSeeder.seedAll(...)   → re-seeds the original 18 products
+        // Swap to ProductSeeder.seedExtras(...) → adds the 12 extra products
+        // Current call: seedStoreBranding(...) → just refreshes logo + banner on the 3 stores
+        com.example.avoid.dev.ProductSeeder.seedStoreBranding(new com.example.avoid.dev.ProductSeeder.Callback() {
+            @Override public void onDone(int productsAdded, int storesPatched) {
+                if (!isAdded()) return;
+                android.widget.Toast.makeText(requireContext(),
+                        "Refreshed " + storesPatched + " store" + (storesPatched == 1 ? "" : "s"),
+                        android.widget.Toast.LENGTH_LONG).show();
+            }
+            @Override public void onError(@androidx.annotation.NonNull Exception e) {
+                if (!isAdded()) return;
+                android.widget.Toast.makeText(requireContext(),
+                        "Seeder failed: " + (e.getLocalizedMessage() != null ? e.getLocalizedMessage() : "unknown"),
+                        android.widget.Toast.LENGTH_LONG).show();
+            }
+        });
     }
 
     private void openSearchResults(@Nullable String query, @Nullable String title) {
