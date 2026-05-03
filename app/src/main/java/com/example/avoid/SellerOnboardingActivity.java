@@ -19,6 +19,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.bumptech.glide.Glide;
 import com.example.avoid.model.Store;
 import com.example.avoid.model.User;
+import com.example.avoid.util.PhoneInputHelper;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.imageview.ShapeableImageView;
 import com.google.android.material.textfield.TextInputEditText;
@@ -87,6 +88,8 @@ public class SellerOnboardingActivity extends AppCompatActivity {
         ImageButton back = findViewById(R.id.onboardingBackButton);
         back.setOnClickListener(v -> finish());
 
+        PhoneInputHelper.attach(phoneInput);
+
         bannerButton.setOnClickListener(v -> bannerPicker.launch("image/*"));
         profileButton.setOnClickListener(v -> profilePicker.launch("image/*"));
         logoButton.setOnClickListener(v -> logoPicker.launch("image/*"));
@@ -109,7 +112,7 @@ public class SellerOnboardingActivity extends AppCompatActivity {
             if (existing.getDescription()  != null) descriptionInput.setText(existing.getDescription());
             if (existing.getLocation()     != null) locationInput.setText(existing.getLocation());
             if (existing.getContactEmail() != null) emailInput.setText(existing.getContactEmail());
-            if (existing.getPhone()        != null) phoneInput.setText(existing.getPhone());
+            if (existing.getPhone()        != null) PhoneInputHelper.setValue(phoneInput, existing.getPhone());
             if (existing.getLogoUrl() != null && !existing.getLogoUrl().isEmpty()) {
                 existingLogoUrl = existing.getLogoUrl();
                 loadInto(logoImage, existingLogoUrl);
@@ -163,6 +166,13 @@ public class SellerOnboardingActivity extends AppCompatActivity {
             showError(getString(R.string.onboarding_error_email));
             return;
         }
+        if (!PhoneInputHelper.isValidOrEmpty(phone)) {
+            showError("Phone must be +92 followed by 10 digits.");
+            return;
+        }
+        // Use a fresh final var so it's effectively final for the upload lambdas below.
+        String trimmedPhone = PhoneInputHelper.trimmedValueOrNull(phone);
+        final String phoneToPersist = trimmedPhone != null ? trimmedPhone : "";
         if (pendingProfileUri == null && (existingProfileUrl == null || existingProfileUrl.isEmpty())) {
             showError(getString(R.string.onboarding_error_profile_picture)); return;
         }
@@ -188,7 +198,7 @@ public class SellerOnboardingActivity extends AppCompatActivity {
         uploadIfPicked(pendingProfileUri, existingProfileUrl, FOLDER_AVATARS, profileUrl ->
                 uploadIfPicked(pendingLogoUri, existingLogoUrl, FOLDER_LOGOS, logoUrl ->
                         uploadIfPicked(pendingBannerUri, existingBannerUrl, FOLDER_BANNERS, bannerUrl ->
-                                persist(user, name, description, location, email, phone,
+                                persist(user, name, description, location, email, phoneToPersist,
                                         profileUrl, logoUrl, bannerUrl))));
     }
 

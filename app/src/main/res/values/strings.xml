@@ -72,6 +72,7 @@
     <string name="auth_error_email_required">Please enter your email.</string>
     <string name="auth_error_password_required">Please enter your password.</string>
     <string name="auth_error_password_short">Password must be at least 6 characters.</string>
+    <string name="auth_password_helper">11–20 chars, with 8 digits, an uppercase, a lowercase, and a special character.</string>
     <string name="auth_error_name_required">Please enter your name.</string>
     <string name="auth_error_email_invalid">Please enter a valid email.</string>
     <string name="auth_error_email_not_verified">Please verify your email first. Check your inbox.</string>

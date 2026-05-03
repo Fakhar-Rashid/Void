@@ -78,7 +78,8 @@ public class SignUpActivity extends AppCompatActivity {
         if (TextUtils.isEmpty(email)) { showFormError(getString(R.string.auth_error_email_required)); return; }
         if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) { showFormError(getString(R.string.auth_error_email_invalid)); return; }
         if (TextUtils.isEmpty(password)) { showFormError(getString(R.string.auth_error_password_required)); return; }
-        if (password.length() < 6) { showFormError(getString(R.string.auth_error_password_short)); return; }
+        String passwordError = com.example.avoid.util.PasswordValidator.validate(password);
+        if (passwordError != null) { showFormError(passwordError); return; }
 
         setLoading(true);
         clearFormError();

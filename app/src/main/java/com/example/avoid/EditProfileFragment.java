@@ -12,6 +12,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import com.example.avoid.model.User;
+import com.example.avoid.util.PhoneInputHelper;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textfield.TextInputEditText;
 
@@ -36,7 +37,8 @@ public class EditProfileFragment extends Fragment {
 
         User user = UserSession.getInstance().getCurrentUser();
         nameInput.setText(user.getName());
-        phoneInput.setText(user.getPhone());
+        PhoneInputHelper.attach(phoneInput);
+        PhoneInputHelper.setValue(phoneInput, user.getPhone());
 
         MaterialButton save = view.findViewById(R.id.editProfileSave);
         save.setOnClickListener(v -> {
@@ -45,8 +47,14 @@ public class EditProfileFragment extends Fragment {
                 Toast.makeText(requireContext(), "Name cannot be empty", Toast.LENGTH_SHORT).show();
                 return;
             }
+            String phoneRaw = text(phoneInput);
+            if (!PhoneInputHelper.isValidOrEmpty(phoneRaw)) {
+                Toast.makeText(requireContext(),
+                        "Phone must be +92 followed by 10 digits.", Toast.LENGTH_LONG).show();
+                return;
+            }
             user.setName(name);
-            user.setPhone(text(phoneInput));
+            user.setPhone(PhoneInputHelper.trimmedValueOrNull(phoneRaw));
             save.setEnabled(false);
             UserRepository.getInstance().saveProfile(user, new UserRepository.Callback<User>() {
                 @Override public void onSuccess(User result) {
