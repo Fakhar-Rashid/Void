@@ -175,6 +175,17 @@ public class UserRepository {
                 });
     }
 
+    /** Light user lookup that returns just the profile image URL (or null). Used by the chat
+     *  list / chat header to render the other party's avatar without pulling the full doc. */
+    public void loadUserProfileImage(@NonNull String userId, @NonNull Callback<String> callback) {
+        db.collection(USERS).document(userId).get()
+                .addOnSuccessListener(doc -> {
+                    String url = doc.exists() ? doc.getString("profileImageUrl") : null;
+                    callback.onSuccess(url);
+                })
+                .addOnFailureListener(callback::onFailure);
+    }
+
     public void loadStore(@NonNull String storeId, @NonNull Callback<Store> callback) {
         db.collection(STORES).document(storeId).get()
                 .addOnSuccessListener(doc -> {

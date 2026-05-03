@@ -80,6 +80,8 @@ public class ChatActivity extends AppCompatActivity {
         tvChatTitle.setText(isStoreOwner ? buyerName : storeName);
         tvChatSubtitle.setText(productName);
 
+        bindHeaderAvatar(isStoreOwner);
+
         messagesRecyclerView = findViewById(R.id.messagesRecyclerView);
         layoutManager = new LinearLayoutManager(this);
         layoutManager.setStackFromEnd(true);
@@ -98,6 +100,42 @@ public class ChatActivity extends AppCompatActivity {
         // gets canceled (you'd see "Failed to load messages").
         Chat seed = new Chat(chatId, productId, productName, buyerId, buyerName, storeId, storeName);
         ChatRepository.getInstance().ensureChatExists(chatId, seed, this::attachMessagesListener);
+    }
+
+    /**
+     * Loads the other party's avatar into the toolbar — store logo when the buyer is here,
+     * buyer's profile photo when the store owner is here.
+     */
+    private void bindHeaderAvatar(boolean isStoreOwner) {
+        com.google.android.material.imageview.ShapeableImageView avatar = findViewById(R.id.chatHeaderAvatar);
+        if (avatar == null) return;
+        avatar.setImageResource(R.drawable.ic_profile);
+
+        if (isStoreOwner) {
+            if (buyerId == null) return;
+            UserRepository.getInstance().loadUserProfileImage(buyerId, new UserRepository.Callback<String>() {
+                @Override public void onSuccess(String url) {
+                    if (url != null && !url.isEmpty()) {
+                        com.bumptech.glide.Glide.with(avatar).load(url)
+                                .placeholder(R.drawable.ic_profile).error(R.drawable.ic_profile)
+                                .centerCrop().into(avatar);
+                    }
+                }
+                @Override public void onFailure(@NonNull Exception e) {}
+            });
+        } else {
+            if (storeId == null) return;
+            UserRepository.getInstance().loadStore(storeId, new UserRepository.Callback<com.example.avoid.model.Store>() {
+                @Override public void onSuccess(com.example.avoid.model.Store store) {
+                    if (store != null && store.getLogoUrl() != null && !store.getLogoUrl().isEmpty()) {
+                        com.bumptech.glide.Glide.with(avatar).load(store.getLogoUrl())
+                                .placeholder(R.drawable.ic_profile).error(R.drawable.ic_profile)
+                                .centerCrop().into(avatar);
+                    }
+                }
+                @Override public void onFailure(@NonNull Exception e) {}
+            });
+        }
     }
 
     private void attachMessagesListener() {

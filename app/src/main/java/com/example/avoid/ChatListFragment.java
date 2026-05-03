@@ -67,8 +67,6 @@ public class ChatListFragment extends Fragment {
             btnBack.setOnClickListener(v -> requireActivity().finish());
         }
 
-        View bell = view.findViewById(R.id.chatListBell);
-        if (bell != null) bell.setVisibility(isSellerMode ? View.GONE : View.VISIBLE);
         
         recyclerView = view.findViewById(R.id.chatListRecyclerView);
         tvEmptyChats = view.findViewById(R.id.tvEmptyChats);
@@ -135,12 +133,53 @@ public class ChatListFragment extends Fragment {
         @Override
         public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
             Chat chat = chats.get(position);
-            
+
             // Determine if the current user is the buyer or the store owner for this thread
             boolean isStoreOwner = currentUser.getId().equals(chat.getStoreId());
-            
+
             String displayName = isStoreOwner ? chat.getBuyerName() : chat.getStoreName();
             holder.chatName.setText(displayName != null ? displayName : "Unknown");
+
+            // Reset avatar (recycler reuses ViewHolders).
+            holder.chatAvatar.setImageResource(R.drawable.ic_profile);
+            if (isStoreOwner) {
+                // Seller's chat list shows the buyer's profile photo.
+                if (chat.getBuyerId() != null) {
+                    UserRepository.getInstance().loadUserProfileImage(chat.getBuyerId(),
+                            new UserRepository.Callback<String>() {
+                                @Override public void onSuccess(String url) {
+                                    if (url != null && !url.isEmpty()) {
+                                        com.bumptech.glide.Glide.with(holder.chatAvatar)
+                                                .load(url)
+                                                .placeholder(R.drawable.ic_profile)
+                                                .error(R.drawable.ic_profile)
+                                                .centerCrop()
+                                                .into(holder.chatAvatar);
+                                    }
+                                }
+                                @Override public void onFailure(@NonNull Exception e) {}
+                            });
+                }
+            } else {
+                // Buyer's chat list shows the store's logo.
+                if (chat.getStoreId() != null) {
+                    UserRepository.getInstance().loadStore(chat.getStoreId(),
+                            new UserRepository.Callback<com.example.avoid.model.Store>() {
+                                @Override public void onSuccess(com.example.avoid.model.Store store) {
+                                    if (store != null && store.getLogoUrl() != null
+                                            && !store.getLogoUrl().isEmpty()) {
+                                        com.bumptech.glide.Glide.with(holder.chatAvatar)
+                                                .load(store.getLogoUrl())
+                                                .placeholder(R.drawable.ic_profile)
+                                                .error(R.drawable.ic_profile)
+                                                .centerCrop()
+                                                .into(holder.chatAvatar);
+                                    }
+                                }
+                                @Override public void onFailure(@NonNull Exception e) {}
+                            });
+                }
+            }
             
             holder.chatProductName.setText(chat.getProductName() != null ? "Product: " + chat.getProductName() : "");
 
@@ -188,10 +227,12 @@ public class ChatListFragment extends Fragment {
         }
 
         class ViewHolder extends RecyclerView.ViewHolder {
+            android.widget.ImageView chatAvatar;
             TextView chatName, chatTime, chatProductName, chatLastMessage, chatUnreadCount;
 
             ViewHolder(@NonNull View itemView) {
                 super(itemView);
+                chatAvatar = itemView.findViewById(R.id.chatAvatar);
                 chatName = itemView.findViewById(R.id.chatName);
                 chatTime = itemView.findViewById(R.id.chatTime);
                 chatProductName = itemView.findViewById(R.id.chatProductName);
