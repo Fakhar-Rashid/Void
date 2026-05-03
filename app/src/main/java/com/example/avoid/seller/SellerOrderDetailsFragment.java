@@ -1,6 +1,9 @@
 package com.example.avoid.seller;
 
+import android.content.Context;
+import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
+import android.text.format.DateUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,26 +13,29 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.avoid.NotificationRepository;
 import com.example.avoid.R;
 import com.example.avoid.UserRepository;
 import com.example.avoid.UserSession;
 import com.example.avoid.adapter.OrderLineAdapter;
 import com.example.avoid.model.Address;
+import com.example.avoid.model.NotificationItem;
 import com.example.avoid.model.Order;
 import com.example.avoid.model.OrderLineItem;
+import com.google.android.material.button.MaterialButton;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
 /**
- * Seller-side detail page for a single order. Shows the buyer (name/email/phone),
- * shipping address, payment method + paid/unpaid badge, the seller's earnings on this
- * order, and the seller's line items with status-update controls.
+ * Seller-side detail page for a single order. Status is per-shipment now (not per-item) — one
+ * "Mark as …" button advances every line item belonging to this seller in lockstep.
  */
 public class SellerOrderDetailsFragment extends Fragment {
 
@@ -38,6 +44,10 @@ public class SellerOrderDetailsFragment extends Fragment {
     private Order order;
     private RecyclerView itemsRecycler;
     private TextView sellerTotal;
+    private TextView statusText;
+    private MaterialButton advanceButton;
+    private View seg1, seg2, seg3, seg4;
+    private final List<OrderLineItem> myItems = new ArrayList<>();
 
     public static SellerOrderDetailsFragment newInstance(@NonNull Order order) {
         SellerOrderDetailsFragment fragment = new SellerOrderDetailsFragment();
@@ -70,6 +80,7 @@ public class SellerOrderDetailsFragment extends Fragment {
         bindBuyer(view);
         bindAddress(view);
         bindPayment(view);
+        bindShipment(view);
 
         itemsRecycler = view.findViewById(R.id.sodItemsRecycler);
         itemsRecycler.setLayoutManager(new LinearLayoutManager(requireContext()));
@@ -118,45 +129,156 @@ public class SellerOrderDetailsFragment extends Fragment {
         sellerTotal.setText(String.format(Locale.US, "$%,.2f", order.getTotalForStore(storeId)));
     }
 
+    private void bindShipment(View root) {
+        statusText    = root.findViewById(R.id.sodStatusText);
+        advanceButton = root.findViewById(R.id.sodAdvanceButton);
+        seg1 = root.findViewById(R.id.sodSeg1);
+        seg2 = root.findViewById(R.id.sodSeg2);
+        seg3 = root.findViewById(R.id.sodSeg3);
+        seg4 = root.findViewById(R.id.sodSeg4);
+    }
+
     private void bindItems() {
         String storeId = UserSession.getInstance().getCurrentUser().getId();
-        List<OrderLineItem> myItems = new ArrayList<>();
+        myItems.clear();
         for (OrderLineItem item : order.getItems()) {
             if (storeId != null && storeId.equals(item.getStoreId())) myItems.add(item);
         }
-        OrderLineAdapter adapter = new OrderLineAdapter(myItems, OrderLineAdapter.Mode.SELLER,
-                this::advanceStatus);
+        OrderLineAdapter adapter = new OrderLineAdapter(myItems, OrderLineAdapter.Mode.SELLER, null);
         itemsRecycler.setAdapter(adapter);
+        renderShipmentChrome();
     }
 
-    private void advanceStatus(OrderLineItem item, int position) {
-        Order.Status next = nextStatus(item.getStatus());
-        if (next == null) return;
+    /** Refresh progress + status text + button label from the current shipment status. */
+    private void renderShipmentChrome() {
+        Order.Status current = currentShipmentStatus();
+        paintProgress(requireContext(), current, seg1, seg2, seg3, seg4);
+        statusText.setText(buildStatusText(current));
 
-        long now = System.currentTimeMillis();
-        item.setStatus(next);
-        switch (next) {
-            case PACKED:     item.setPackedAt(now); break;
-            case ON_THE_WAY: item.setOnTheWayAt(now); break;
-            case DELIVERED:  item.setDeliveredAt(now); break;
-            default: break;
+        Order.Status next = nextStatus(current);
+        if (next == null) {
+            advanceButton.setVisibility(View.GONE);
+            return;
         }
+        advanceButton.setVisibility(View.VISIBLE);
+        advanceButton.setText(buttonLabelFor(next));
+        advanceButton.setOnClickListener(v -> advanceShipment());
+    }
 
+    private Order.Status currentShipmentStatus() {
+        Order.Status lowest = Order.Status.DELIVERED;
+        for (OrderLineItem item : myItems) {
+            Order.Status s = item.getStatus() != null ? item.getStatus() : Order.Status.CONFIRMED;
+            if (s.ordinal() < lowest.ordinal()) lowest = s;
+        }
+        return myItems.isEmpty() ? Order.Status.CONFIRMED : lowest;
+    }
+
+    private void advanceShipment() {
+        Order.Status next = nextStatus(currentShipmentStatus());
+        if (next == null) return;
+        long now = System.currentTimeMillis();
+        for (OrderLineItem item : myItems) {
+            item.setStatus(next);
+            switch (next) {
+                case PACKED:     item.setPackedAt(now); break;
+                case ON_THE_WAY: item.setOnTheWayAt(now); break;
+                case DELIVERED:  item.setDeliveredAt(now); break;
+                default: break;
+            }
+        }
+        advanceButton.setEnabled(false);
         UserRepository.getInstance().saveOrder(order, new UserRepository.Callback<Order>() {
             @Override public void onSuccess(Order result) {
                 if (!isAdded()) return;
+                advanceButton.setEnabled(true);
+                renderShipmentChrome();
                 if (itemsRecycler.getAdapter() != null) {
                     itemsRecycler.getAdapter().notifyDataSetChanged();
                 }
-                SellerOrdersFragment.notifyBuyerOfStatus(order, item, next);
+                notifyBuyerOfShipmentStatus(order, myItems, next);
             }
             @Override public void onFailure(@NonNull Exception e) {
                 if (!isAdded()) return;
+                advanceButton.setEnabled(true);
                 Toast.makeText(requireContext(),
                         e.getLocalizedMessage() != null ? e.getLocalizedMessage() : "Failed to update status",
                         Toast.LENGTH_SHORT).show();
             }
         });
+    }
+
+    /** One notification per shipment per status bump (replaces per-item pings). */
+    static void notifyBuyerOfShipmentStatus(Order order, List<OrderLineItem> shipmentItems, Order.Status next) {
+        if (order == null || order.getUserId() == null || next == null) return;
+        String storeName = null;
+        for (OrderLineItem item : shipmentItems) {
+            if (item.getStoreId() != null) {
+                storeName = item.getStoreId(); // fallback: use id when name unknown
+                break;
+            }
+        }
+
+        NotificationItem n = new NotificationItem();
+        n.setType(NotificationItem.TYPE_ORDER_STATUS);
+        n.setTitle(statusTitle(next));
+        int count = shipmentItems.size();
+        String itemsLabel = count == 1
+                ? (shipmentItems.get(0).getProductName() != null
+                        ? shipmentItems.get(0).getProductName() : "Your item")
+                : count + " items in your order";
+        n.setBody(itemsLabel + " · " + statusBody(next));
+        n.setOrderId(order.getOrderId());
+        NotificationRepository.getInstance().send(order.getUserId(), n);
+    }
+
+    private static String buttonLabelFor(Order.Status next) {
+        switch (next) {
+            case PACKED:     return "Mark as Packed";
+            case ON_THE_WAY: return "Mark as On the way";
+            case DELIVERED:  return "Mark as Delivered";
+            default:         return "";
+        }
+    }
+
+    private static String statusTitle(Order.Status s) {
+        switch (s) {
+            case PACKED:     return "Packed";
+            case ON_THE_WAY: return "On the way";
+            case DELIVERED:  return "Delivered";
+            default:         return "Order updated";
+        }
+    }
+
+    private static String statusBody(Order.Status s) {
+        switch (s) {
+            case PACKED:     return "the seller packed it.";
+            case ON_THE_WAY: return "is on the way to you.";
+            case DELIVERED:  return "has been delivered.";
+            default:         return "status updated.";
+        }
+    }
+
+    private static String buildStatusText(Order.Status s) {
+        switch (s) {
+            case CONFIRMED:  return "Confirmed — ready to pack.";
+            case PACKED:     return "Packed — ready to ship.";
+            case ON_THE_WAY: return "On the way to the buyer.";
+            case DELIVERED:  return "Delivered.";
+            default:         return "";
+        }
+    }
+
+    private static void paintProgress(Context ctx, Order.Status status,
+                                      View seg1, View seg2, View seg3, View seg4) {
+        int active = (status == null ? Order.Status.CONFIRMED : status).ordinal() + 1;
+        int activeColor   = ContextCompat.getColor(ctx, R.color.home_balance_background);
+        int inactiveColor = ContextCompat.getColor(ctx, R.color.home_placeholder);
+        View[] segs = {seg1, seg2, seg3, seg4};
+        for (int i = 0; i < segs.length; i++) {
+            ((GradientDrawable) segs[i].getBackground().mutate())
+                    .setColor(i < active ? activeColor : inactiveColor);
+        }
     }
 
     private static Order.Status nextStatus(Order.Status current) {

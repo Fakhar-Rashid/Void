@@ -412,6 +412,18 @@
                         android:checked="false"
                         app:useMaterialThemeColors="false" />
                 </LinearLayout>
+
+                <TextView
+                    android:id="@+id/checkoutShipmentsHint"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="14dp"
+                    android:fontFamily="sans-serif-medium"
+                    android:textColor="@color/home_text_primary"
+                    android:textSize="13sp"
+                    android:visibility="gone"
+                    tools:text="Your order will arrive in 2 shipments — one per store."
+                    tools:visibility="visible" />
             </LinearLayout>
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>

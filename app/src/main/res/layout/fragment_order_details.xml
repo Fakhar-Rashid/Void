@@ -140,8 +140,20 @@
                             android:layout_height="wrap_content"
                             android:textColor="@color/home_text_primary"
                             android:textSize="13sp"
-                            tools:text="3 items · 2 stores" />
+                            tools:text="3 items" />
                     </LinearLayout>
+
+                    <TextView
+                        android:id="@+id/odSummaryShipments"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:fontFamily="sans-serif-medium"
+                        android:textColor="@color/home_text_primary"
+                        android:textSize="13sp"
+                        android:visibility="gone"
+                        tools:text="Arriving in 2 shipments"
+                        tools:visibility="visible" />
 
                     <View
                         android:layout_width="match_parent"
@@ -176,22 +188,12 @@
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="20dp"
-                android:layout_marginBottom="10dp"
-                android:letterSpacing="0.08"
-                android:text="ITEMS IN THIS ORDER"
-                android:textColor="@color/home_text_hint"
-                android:textSize="11sp" />
-
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/odItemsRecyclerView"
+            <LinearLayout
+                android:id="@+id/odShipmentsContainer"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:nestedScrollingEnabled="false"
-                android:overScrollMode="never" />
+                android:layout_marginTop="20dp"
+                android:orientation="vertical" />
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
 </LinearLayout>

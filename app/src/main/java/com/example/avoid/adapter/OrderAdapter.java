@@ -84,7 +84,7 @@ public class OrderAdapter extends RecyclerView.Adapter<OrderAdapter.OrderViewHol
             int itemCount = order.getTotalItemCount();
             int storeCount = order.getStoreIds().size();
             String summaryText = itemCount + " item" + (itemCount == 1 ? "" : "s");
-            if (storeCount > 1) summaryText += " · " + storeCount + " stores";
+            if (storeCount > 1) summaryText += " · " + storeCount + " shipments";
             summary.setText(summaryText);
 
             total.setText(String.format(Locale.US, "$%,.2f", order.getTotalAmount()));

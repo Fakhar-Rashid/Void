@@ -1,8 +1,6 @@
 package com.example.avoid.adapter;
 
 import android.content.Context;
-import android.graphics.drawable.GradientDrawable;
-import android.text.format.DateUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -27,12 +25,13 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Renders {@link OrderLineItem}s with their own progress strip + per-item action button.
- * Used in both:
+ * Renders {@link OrderLineItem}s as product cards. Status now lives at the shipment level
+ * (one strip + one action button per store), so this adapter only handles per-product UI:
  * <ul>
- *   <li>Buyer's Order Details — action button is "Leave a review"; once reviewed the
- *       button is replaced by an inline preview of the review (rating + comment).</li>
- *   <li>Seller's Orders — action button advances the line item's status.</li>
+ *   <li>Buyer mode — once delivered, exposes a "Leave a review" button or shows the inline
+ *       review preview.</li>
+ *   <li>Seller mode — pure read-only product info; the per-shipment status button is owned
+ *       by the page that hosts this list.</li>
  * </ul>
  */
 public class OrderLineAdapter extends RecyclerView.Adapter<OrderLineAdapter.LineViewHolder> {
@@ -88,8 +87,7 @@ public class OrderLineAdapter extends RecyclerView.Adapter<OrderLineAdapter.Line
 
     static class LineViewHolder extends RecyclerView.ViewHolder {
         private final ShapeableImageView image;
-        private final TextView name, meta, store, price, statusText;
-        private final View seg1, seg2, seg3, seg4;
+        private final TextView name, meta, store, price;
         private final MaterialButton actionButton;
         private final View reviewDisplay;
         private final ImageView star1, star2, star3, star4, star5;
@@ -102,11 +100,6 @@ public class OrderLineAdapter extends RecyclerView.Adapter<OrderLineAdapter.Line
             meta           = itemView.findViewById(R.id.orderLineMeta);
             store          = itemView.findViewById(R.id.orderLineStore);
             price          = itemView.findViewById(R.id.orderLinePrice);
-            seg1           = itemView.findViewById(R.id.orderLineSeg1);
-            seg2           = itemView.findViewById(R.id.orderLineSeg2);
-            seg3           = itemView.findViewById(R.id.orderLineSeg3);
-            seg4           = itemView.findViewById(R.id.orderLineSeg4);
-            statusText     = itemView.findViewById(R.id.orderLineStatusText);
             actionButton   = itemView.findViewById(R.id.orderLineActionButton);
             reviewDisplay  = itemView.findViewById(R.id.orderLineReviewDisplay);
             star1          = itemView.findViewById(R.id.orderLineStar1);
@@ -136,19 +129,15 @@ public class OrderLineAdapter extends RecyclerView.Adapter<OrderLineAdapter.Line
                 image.setImageDrawable(null);
             }
 
-            store.setVisibility(View.GONE); // populated async by caller via setStoreName.
-
-            bindProgress(ctx, item.getStatus());
-            statusText.setText(buildStatusText(item));
+            store.setVisibility(View.GONE); // grouped views surface the store name in the header.
 
             if (mode == Mode.BUYER) {
                 bindBuyerView(item, actionListener, existingReview, position);
             } else {
-                bindSellerAction(item, actionListener, position);
+                actionButton.setVisibility(View.GONE);
+                reviewDisplay.setVisibility(View.GONE);
             }
 
-            // Forward taps anywhere on the card to the item-click listener (skip when over
-            // the action button, which has its own click handler).
             itemView.setOnClickListener(v -> {
                 if (itemClickListener != null) itemClickListener.onItemClick(item, position);
             });
@@ -189,59 +178,12 @@ public class OrderLineAdapter extends RecyclerView.Adapter<OrderLineAdapter.Line
             });
         }
 
-        private void bindSellerAction(OrderLineItem item, ActionListener actionListener, int position) {
-            reviewDisplay.setVisibility(View.GONE);
-            if (item.getStatus() == Order.Status.DELIVERED) {
-                actionButton.setVisibility(View.GONE);
-                return;
-            }
-            actionButton.setVisibility(View.VISIBLE);
-            switch (item.getStatus()) {
-                case CONFIRMED:  actionButton.setText("Mark as Packed");      break;
-                case PACKED:     actionButton.setText("Mark as On the Way"); break;
-                case ON_THE_WAY: actionButton.setText("Mark as Delivered");  break;
-                default:         actionButton.setVisibility(View.GONE);      return;
-            }
-            actionButton.setBackgroundTintList(ContextCompat.getColorStateList(
-                    itemView.getContext(), R.color.home_balance_background));
-            actionButton.setTextColor(ContextCompat.getColor(
-                    itemView.getContext(), R.color.home_white));
-            actionButton.setOnClickListener(v -> {
-                if (actionListener != null) actionListener.onAction(item, position);
-            });
-        }
-
         private void renderStars(int rating) {
             int filled = ContextCompat.getColor(itemView.getContext(), R.color.review_star_filled);
             int empty  = ContextCompat.getColor(itemView.getContext(), R.color.review_star_empty);
             ImageView[] stars = {star1, star2, star3, star4, star5};
             for (int i = 0; i < stars.length; i++) {
                 stars[i].setColorFilter(i < rating ? filled : empty);
-            }
-        }
-
-        private void bindProgress(Context ctx, Order.Status status) {
-            int active = (status == null ? Order.Status.CONFIRMED : status).ordinal() + 1;
-            int activeColor   = ContextCompat.getColor(ctx, R.color.home_balance_background);
-            int inactiveColor = ContextCompat.getColor(ctx, R.color.home_placeholder);
-            View[] segs = {seg1, seg2, seg3, seg4};
-            for (int i = 0; i < segs.length; i++) {
-                ((GradientDrawable) segs[i].getBackground().mutate())
-                        .setColor(i < active ? activeColor : inactiveColor);
-            }
-        }
-
-        private String buildStatusText(OrderLineItem item) {
-            long ts = item.getStatusTimestamp();
-            String when = ts > 0
-                    ? DateUtils.getRelativeTimeSpanString(ts, System.currentTimeMillis(), DateUtils.MINUTE_IN_MILLIS).toString()
-                    : "—";
-            switch (item.getStatus() != null ? item.getStatus() : Order.Status.CONFIRMED) {
-                case CONFIRMED:  return "Order confirmed " + when;
-                case PACKED:     return "Packed " + when;
-                case ON_THE_WAY: return "On the way " + when;
-                case DELIVERED:  return "Delivered " + when;
-                default:         return "";
             }
         }
     }

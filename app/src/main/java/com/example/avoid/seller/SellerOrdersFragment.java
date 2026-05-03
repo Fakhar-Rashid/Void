@@ -5,7 +5,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -13,12 +12,10 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.avoid.NotificationRepository;
 import com.example.avoid.R;
 import com.example.avoid.UserRepository;
 import com.example.avoid.UserSession;
 import com.example.avoid.adapter.OrderLineAdapter;
-import com.example.avoid.model.NotificationItem;
 import com.example.avoid.model.Order;
 import com.example.avoid.model.OrderLineItem;
 import com.example.avoid.model.User;
@@ -28,9 +25,9 @@ import java.util.List;
 import java.util.Locale;
 
 /**
- * Seller's incoming orders. Each row groups one order and shows ONLY the line items whose
- * {@code storeId} matches the seller's user id. Each item carries its own per-item status
- * + status-update button so a seller can ship products at different times.
+ * Seller's incoming orders. Each row groups one order and renders this seller's items as a
+ * read-only preview — the per-shipment status update lives on the details page so a single
+ * tap can advance every item in the parcel together.
  */
 public class SellerOrdersFragment extends Fragment {
 
@@ -123,8 +120,8 @@ public class SellerOrdersFragment extends Fragment {
             }
 
             holder.itemsRecycler.setLayoutManager(new LinearLayoutManager(holder.itemView.getContext()));
-            holder.itemsRecycler.setAdapter(new OrderLineAdapter(myItems, OrderLineAdapter.Mode.SELLER,
-                    (item, itemPosition) -> advanceStatus(order, item, holder.itemsRecycler)));
+            // Read-only items in SELLER mode — no per-item action button. Tap header → details.
+            holder.itemsRecycler.setAdapter(new OrderLineAdapter(myItems, OrderLineAdapter.Mode.SELLER, null));
 
             holder.header.setOnClickListener(v -> openDetails(order));
         }
@@ -152,72 +149,5 @@ public class SellerOrdersFragment extends Fragment {
                 .add(R.id.sellerFragmentContainer, SellerOrderDetailsFragment.newInstance(order))
                 .addToBackStack(null)
                 .commit();
-    }
-
-    private void advanceStatus(Order order, OrderLineItem item, RecyclerView itemsRecycler) {
-        Order.Status next = nextStatus(item.getStatus());
-        if (next == null) return;
-
-        long now = System.currentTimeMillis();
-        item.setStatus(next);
-        switch (next) {
-            case PACKED:     item.setPackedAt(now); break;
-            case ON_THE_WAY: item.setOnTheWayAt(now); break;
-            case DELIVERED:  item.setDeliveredAt(now); break;
-            default: break;
-        }
-
-        UserRepository.getInstance().saveOrder(order, new UserRepository.Callback<Order>() {
-            @Override public void onSuccess(Order result) {
-                if (itemsRecycler.getAdapter() != null) {
-                    itemsRecycler.getAdapter().notifyDataSetChanged();
-                }
-                notifyBuyerOfStatus(order, item, next);
-            }
-            @Override public void onFailure(@NonNull Exception e) {
-                Toast.makeText(requireContext(),
-                        e.getLocalizedMessage() != null ? e.getLocalizedMessage() : "Failed to update status",
-                        Toast.LENGTH_SHORT).show();
-            }
-        });
-    }
-
-    /** Drop a notification into the buyer's inbox describing the new status. */
-    static void notifyBuyerOfStatus(Order order, OrderLineItem item, Order.Status next) {
-        if (order == null || order.getUserId() == null || item == null || next == null) return;
-        NotificationItem n = new NotificationItem();
-        n.setType(NotificationItem.TYPE_ORDER_STATUS);
-        n.setTitle(statusTitle(next));
-        n.setBody((item.getProductName() != null ? item.getProductName() : "Your item") + " · " + statusBody(next));
-        n.setOrderId(order.getOrderId());
-        NotificationRepository.getInstance().send(order.getUserId(), n);
-    }
-
-    private static String statusTitle(Order.Status s) {
-        switch (s) {
-            case PACKED:     return "Packed";
-            case ON_THE_WAY: return "On the way";
-            case DELIVERED:  return "Delivered";
-            default:         return "Order updated";
-        }
-    }
-
-    private static String statusBody(Order.Status s) {
-        switch (s) {
-            case PACKED:     return "the seller packed it.";
-            case ON_THE_WAY: return "is on the way to you.";
-            case DELIVERED:  return "has been delivered.";
-            default:         return "status updated.";
-        }
-    }
-
-    private static Order.Status nextStatus(Order.Status current) {
-        if (current == null) return Order.Status.PACKED;
-        switch (current) {
-            case CONFIRMED:  return Order.Status.PACKED;
-            case PACKED:     return Order.Status.ON_THE_WAY;
-            case ON_THE_WAY: return Order.Status.DELIVERED;
-            default:         return null;
-        }
     }
 }

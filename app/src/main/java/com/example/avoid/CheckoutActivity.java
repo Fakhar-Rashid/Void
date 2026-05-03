@@ -382,10 +382,25 @@ public class CheckoutActivity extends AppCompatActivity {
 
     private void updateTotal() {
         double total = 0;
+        java.util.Set<String> uniqueStores = new java.util.HashSet<>();
         for (CartItem item : cartItems) {
             Product p = productsById.get(item.getProductId());
-            if (p != null) total += p.getPrice() * item.getQuantity();
+            if (p != null) {
+                total += p.getPrice() * item.getQuantity();
+                if (p.getStoreId() != null) uniqueStores.add(p.getStoreId());
+            }
         }
         cartTotalPrice.setText(String.format(Locale.US, "$ %,.2f", total));
+
+        TextView shipmentsHint = findViewById(R.id.checkoutShipmentsHint);
+        if (shipmentsHint != null) {
+            int n = uniqueStores.size();
+            if (n > 1) {
+                shipmentsHint.setVisibility(View.VISIBLE);
+                shipmentsHint.setText("Your order will arrive in " + n + " shipments — one per store.");
+            } else {
+                shipmentsHint.setVisibility(View.GONE);
+            }
+        }
     }
 }
