@@ -27,6 +27,17 @@
         <item name="android:textSize">11sp</item>
     </style>
 
+    <style name="Theme.Void.Splash" parent="Theme.Material3.Dark.NoActionBar">
+        <item name="android:statusBarColor">@android:color/black</item>
+        <item name="android:navigationBarColor">@android:color/black</item>
+        <item name="android:windowLightStatusBar">false</item>
+        <item name="android:windowLightNavigationBar">false</item>
+        <item name="android:windowBackground">@android:color/black</item>
+        <!-- Android 12+ system splash: keep it black instead of showing the launcher icon. -->
+        <item name="android:windowSplashScreenBackground" tools:targetApi="s">@android:color/black</item>
+        <item name="android:windowSplashScreenAnimatedIcon" tools:targetApi="s">@android:color/transparent</item>
+    </style>
+
     <style name="Theme.Void.Auth" parent="Theme.Material3.Dark.NoActionBar">
         <item name="android:statusBarColor">@color/auth_bg</item>
         <item name="android:navigationBarColor">@color/auth_bg</item>

@@ -46,7 +46,11 @@
             android:windowSoftInputMode="adjustResize" />
         <activity
             android:name=".MainActivity"
-            android:exported="true">
+            android:exported="false" />
+        <activity
+            android:name=".SplashActivity"
+            android:exported="true"
+            android:theme="@style/Theme.Void.Splash">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
