@@ -33,6 +33,7 @@ import com.example.avoid.adapter.CartAdapter;
 import com.example.avoid.model.Address;
 import com.example.avoid.model.Cart;
 import com.example.avoid.model.CartItem;
+import com.example.avoid.model.NotificationItem;
 import com.example.avoid.model.Order;
 import com.example.avoid.model.OrderLineItem;
 import com.example.avoid.model.Product;
@@ -312,6 +313,19 @@ public class CheckoutActivity extends AppCompatActivity {
                     user.getAddresses().add(finalAddressToPersist);
                     UserRepository.getInstance().saveAddresses(user, null);
                 }
+
+                // Notify every store that contributed to this order.
+                for (String storeId : placed.getStoreIds()) {
+                    if (storeId == null) continue;
+                    NotificationItem n = new NotificationItem();
+                    n.setType(NotificationItem.TYPE_ORDER_NEW);
+                    n.setTitle("New order");
+                    n.setBody((user.getName() != null ? user.getName() : "A buyer")
+                            + " placed an order with your store.");
+                    n.setOrderId(placed.getOrderId());
+                    NotificationRepository.getInstance().send(storeId, n);
+                }
+
                 cart.clear();
                 UserRepository.getInstance().saveCartForCurrentUser();
                 Toast.makeText(CheckoutActivity.this, "Order placed", Toast.LENGTH_SHORT).show();

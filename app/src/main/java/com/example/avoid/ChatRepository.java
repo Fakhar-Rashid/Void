@@ -5,6 +5,7 @@ import androidx.annotation.Nullable;
 
 import com.example.avoid.model.Chat;
 import com.example.avoid.model.ChatMessage;
+import com.example.avoid.model.NotificationItem;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -180,11 +181,44 @@ public class ChatRepository {
                 // /messages/{chatId} is gated on the parent chat being readable.
                 if (committed) {
                     messagesRef.child(messageId).setValue(messageToPersist);
+                    fireChatNotification(chatId, chatMetadata, messageToPersist);
                 } else {
                     android.util.Log.e("ChatRepository", "Chat doc upsert failed", error != null ? error.toException() : null);
                 }
             }
         });
+    }
+
+    /** Fire-and-forget: ping the OTHER participant about an incoming message. */
+    private void fireChatNotification(String chatId, Chat chat, ChatMessage message) {
+        if (chat == null || message == null) return;
+        String senderId = message.getSenderId();
+        if (senderId == null) return;
+
+        boolean senderIsStore = senderId.equals(chat.getStoreId());
+        String recipientId   = senderIsStore ? chat.getBuyerId() : chat.getStoreId();
+        if (recipientId == null) return;
+
+        String senderName = senderIsStore
+                ? (chat.getStoreName() != null ? chat.getStoreName() : "Store")
+                : (chat.getBuyerName() != null ? chat.getBuyerName() : "Customer");
+
+        NotificationItem n = new NotificationItem();
+        n.setType(NotificationItem.TYPE_CHAT);
+        n.setTitle("New message from " + senderName);
+        String preview = message.getText() != null ? message.getText() : "";
+        if (preview.length() > 120) preview = preview.substring(0, 120) + "…";
+        n.setBody(preview);
+        n.setChatId(chatId);
+        n.setFromUserId(senderId);
+        n.setFromUserName(senderName);
+        n.setProductId(chat.getProductId());
+        n.setProductName(chat.getProductName());
+        n.setBuyerId(chat.getBuyerId());
+        n.setBuyerName(chat.getBuyerName());
+        n.setStoreId(chat.getStoreId());
+        n.setStoreName(chat.getStoreName());
+        NotificationRepository.getInstance().send(recipientId, n);
     }
 
     /**

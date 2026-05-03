@@ -148,6 +148,7 @@ public class SellerOrderDetailsFragment extends Fragment {
                 if (itemsRecycler.getAdapter() != null) {
                     itemsRecycler.getAdapter().notifyDataSetChanged();
                 }
+                SellerOrdersFragment.notifyBuyerOfStatus(order, item, next);
             }
             @Override public void onFailure(@NonNull Exception e) {
                 if (!isAdded()) return;

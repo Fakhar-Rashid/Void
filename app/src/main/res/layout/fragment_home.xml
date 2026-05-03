@@ -48,16 +48,10 @@
                     android:layout_width="@dimen/home_header_icon_size"
                     android:layout_height="@dimen/home_header_icon_size" />
 
-                <ImageButton
-                    android:id="@+id/notificationsButton"
+                <com.example.avoid.NotificationBellButton
                     android:layout_width="@dimen/home_header_icon_size"
                     android:layout_height="@dimen/home_header_icon_size"
-                    android:layout_marginStart="@dimen/home_header_icon_spacing"
-                    android:background="@android:color/transparent"
-                    android:contentDescription="@string/home_cd_notifications"
-                    android:padding="@dimen/home_header_icon_padding"
-                    android:tint="@color/home_text_primary"
-                    app:srcCompat="@drawable/ic_bell" />
+                    android:layout_marginStart="@dimen/home_header_icon_spacing" />
             </LinearLayout>
 
             <LinearLayout

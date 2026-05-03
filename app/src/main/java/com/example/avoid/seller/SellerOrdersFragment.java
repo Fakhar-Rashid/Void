@@ -13,10 +13,12 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.avoid.NotificationRepository;
 import com.example.avoid.R;
 import com.example.avoid.UserRepository;
 import com.example.avoid.UserSession;
 import com.example.avoid.adapter.OrderLineAdapter;
+import com.example.avoid.model.NotificationItem;
 import com.example.avoid.model.Order;
 import com.example.avoid.model.OrderLineItem;
 import com.example.avoid.model.User;
@@ -170,6 +172,7 @@ public class SellerOrdersFragment extends Fragment {
                 if (itemsRecycler.getAdapter() != null) {
                     itemsRecycler.getAdapter().notifyDataSetChanged();
                 }
+                notifyBuyerOfStatus(order, item, next);
             }
             @Override public void onFailure(@NonNull Exception e) {
                 Toast.makeText(requireContext(),
@@ -177,6 +180,35 @@ public class SellerOrdersFragment extends Fragment {
                         Toast.LENGTH_SHORT).show();
             }
         });
+    }
+
+    /** Drop a notification into the buyer's inbox describing the new status. */
+    static void notifyBuyerOfStatus(Order order, OrderLineItem item, Order.Status next) {
+        if (order == null || order.getUserId() == null || item == null || next == null) return;
+        NotificationItem n = new NotificationItem();
+        n.setType(NotificationItem.TYPE_ORDER_STATUS);
+        n.setTitle(statusTitle(next));
+        n.setBody((item.getProductName() != null ? item.getProductName() : "Your item") + " · " + statusBody(next));
+        n.setOrderId(order.getOrderId());
+        NotificationRepository.getInstance().send(order.getUserId(), n);
+    }
+
+    private static String statusTitle(Order.Status s) {
+        switch (s) {
+            case PACKED:     return "Packed";
+            case ON_THE_WAY: return "On the way";
+            case DELIVERED:  return "Delivered";
+            default:         return "Order updated";
+        }
+    }
+
+    private static String statusBody(Order.Status s) {
+        switch (s) {
+            case PACKED:     return "the seller packed it.";
+            case ON_THE_WAY: return "is on the way to you.";
+            case DELIVERED:  return "has been delivered.";
+            default:         return "status updated.";
+        }
     }
 
     private static Order.Status nextStatus(Order.Status current) {

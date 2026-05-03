@@ -1,7 +1,6 @@
 package com.example.avoid;
 
 import android.os.Bundle;
-import android.view.View;
 import android.widget.FrameLayout;
 
 import androidx.annotation.Nullable;
@@ -18,9 +17,11 @@ public class ChatListActivity extends AppCompatActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         
-        // We can just use an empty frame layout
+        // Empty frame layout that doubles as a fragment container — the well-known id
+        // R.id.fragment_container lets NotificationBellButton add the notifications screen
+        // on top of the chat list when the bell is tapped.
         FrameLayout frameLayout = new FrameLayout(this);
-        frameLayout.setId(View.generateViewId());
+        frameLayout.setId(R.id.fragment_container);
         setContentView(frameLayout);
         
         setupSystemBars();
@@ -28,7 +29,7 @@ public class ChatListActivity extends AppCompatActivity {
         if (savedInstanceState == null) {
             boolean isSellerMode = getIntent().getBooleanExtra("isSellerMode", false);
             getSupportFragmentManager().beginTransaction()
-                    .replace(frameLayout.getId(), ChatListFragment.newInstance(isSellerMode))
+                    .replace(R.id.fragment_container, ChatListFragment.newInstance(isSellerMode))
                     .commit();
         }
     }

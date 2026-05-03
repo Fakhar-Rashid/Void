@@ -273,6 +273,20 @@ public class UserRepository {
                 .addOnFailureListener(e -> Log.e(TAG, "save seller status failed", e));
     }
 
+    public void loadOrder(@NonNull String orderId, @NonNull Callback<Order> callback) {
+        db.collection(ORDERS).document(orderId).get()
+                .addOnSuccessListener(doc -> {
+                    if (!doc.exists()) {
+                        callback.onFailure(new IllegalStateException("Order not found"));
+                        return;
+                    }
+                    Order o = doc.toObject(Order.class);
+                    if (o != null && o.getOrderId() == null) o.setOrderId(doc.getId());
+                    callback.onSuccess(o);
+                })
+                .addOnFailureListener(callback::onFailure);
+    }
+
     public void saveOrder(@NonNull Order order, @Nullable Callback<Order> callback) {
         if (order.getOrderId() == null) {
             db.collection(ORDERS).add(order)
